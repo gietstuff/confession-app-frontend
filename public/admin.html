@@ -76,7 +76,8 @@
     }
 
     async function loadApproved() {
-      const res = await fetch('/api/confessions');
+      const API_BASE = 'https://your-render-url.onrender.com';
+      fetch(`${API_BASE}/api/confessions`)
       const arr = await res.json();
       const container = document.getElementById('approvedList');
       container.innerHTML = '';
