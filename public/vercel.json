@@ -1,6 +1,5 @@
 {
-  "routes": [
-    { "src": "/api/(.*)", "dest": "https://your-render-url.onrender.com/api/$1" },
-    { "src": "/(.*)", "dest": "/index.html" }
+  "rewrites": [
+    { "source": "/(.*)", "destination": "/index.html" }
   ]
 }

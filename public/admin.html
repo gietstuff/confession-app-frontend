@@ -22,6 +22,7 @@
     .stat-box{background:#ffe4f0;padding:14px;border-radius:12px;flex:1;min-width:168px;}
     .stat-box h3{margin:0;color:#a01661;}
     #modStatus{margin-top:10px;font-weight:700;}
+    .hidden{display:none;}
   </style>
 </head>
 <body>
@@ -44,82 +45,122 @@
       <div id="modStatus"></div>
     </div>
   </div>
+
   <script>
+    // ✅ FIX: Use the real Render backend URL — update this when you redeploy
     const API_BASE = 'https://giet-confession-backend.onrender.com';
+
+    // ✅ FIX: Store the token in memory and send it as a header on every admin request
+    // This bypasses the cross-site cookie issue between Vercel and Render.
     let authToken = null;
+
+    function adminHeaders() {
+      return {
+        'Content-Type': 'application/json',
+        'x-admin-token': authToken || ''
+      };
+    }
 
     function setStatus(message, color='#2a6d4d') {
       const el = document.getElementById('modStatus');
       el.textContent = message;
       el.style.color = color;
-      setTimeout(()=>el.textContent = '',4000);
+      setTimeout(() => el.textContent = '', 4000);
     }
 
     async function updateAnalytics() {
-      const res = await fetch(`${API_BASE}/api/analytics`);
-      const data = await res.json();
-      document.getElementById('visitCount').textContent = 'Visits: ' + data.visits;
-      document.getElementById('uniqueCount').textContent = 'Unique users: ' + data.uniqueVisitors;
+      try {
+        const res = await fetch(`${API_BASE}/api/analytics`);
+        const data = await res.json();
+        document.getElementById('visitCount').textContent = 'Visits: ' + data.visits;
+        document.getElementById('uniqueCount').textContent = 'Unique users: ' + data.uniqueVisitors;
+      } catch(e) { console.warn('analytics error', e); }
     }
 
     async function loadPending() {
-      const res = await fetch(`${API_BASE}/api/pending`);
-      const arr = await res.json();
-      const container = document.getElementById('pendingList');
-      container.innerHTML = '';
-      if(!arr.length){ container.innerHTML = '<p style="color:#6e3f68">No pending confessions.</p>'; return; }
-      arr.forEach(item => {
-        const div = document.createElement('div');
-        div.className='item';
-        div.innerHTML = `<div class="time">${new Date(item.createdAt).toLocaleString()}</div><p>${item.message}</p><div class="btn-box"><button onclick="moderate('${item.id}','approve')">Approve</button><button onclick="moderate('${item.id}','reject')" style="background:#b73057">Reject</button><button onclick="deleteConfession('${item.id}')" style="background:#c12d50">Delete</button></div>`;
-        container.appendChild(div);
-      });
+      try {
+        const res = await fetch(`${API_BASE}/api/pending`);
+        const arr = await res.json();
+        const container = document.getElementById('pendingList');
+        container.innerHTML = '';
+        if (!arr.length) {
+          container.innerHTML = '<p style="color:#6e3f68">No pending confessions.</p>';
+          return;
+        }
+        arr.forEach(item => {
+          const div = document.createElement('div');
+          div.className = 'item';
+          div.innerHTML = `
+            <div class="time">${new Date(item.createdAt).toLocaleString()}</div>
+            <p>${item.message}</p>
+            <div class="btn-box">
+              <button onclick="moderate('${item.id}','approve')">Approve</button>
+              <button onclick="moderate('${item.id}','reject')" style="background:#b73057">Reject</button>
+              <button onclick="deleteConfession('${item.id}')" style="background:#c12d50">Delete</button>
+            </div>`;
+          container.appendChild(div);
+        });
+      } catch(e) { console.warn('pending load error', e); }
     }
 
     async function loadApproved() {
-      const res = await fetch(`${API_BASE}/api/confessions`);
-      const arr = await res.json();
-      const container = document.getElementById('approvedList');
-      container.innerHTML = '';
-      if(!arr.length){ container.innerHTML = '<p style="color:#6e3f68">No approved confessions yet.</p>'; return; }
-      arr.forEach(item => {
-        const div = document.createElement('div');
-        div.className='item';
-        div.innerHTML = `<div class="time">${new Date(item.createdAt).toLocaleString()} - 👍${item.likes} 👎${item.dislikes}</div><p>${item.message}</p><div class="btn-box"><button onclick="deleteConfession('${item.id}')" style="background:#c12d50">Delete</button></div>`;
-        container.appendChild(div);
-      });
+      try {
+        const res = await fetch(`${API_BASE}/api/confessions`);
+        const arr = await res.json();
+        const container = document.getElementById('approvedList');
+        container.innerHTML = '';
+        if (!arr.length) {
+          container.innerHTML = '<p style="color:#6e3f68">No approved confessions yet.</p>';
+          return;
+        }
+        arr.forEach(item => {
+          const div = document.createElement('div');
+          div.className = 'item';
+          div.innerHTML = `
+            <div class="time">${new Date(item.createdAt).toLocaleString()} — 👍${item.likes} 👎${item.dislikes}</div>
+            <p>${item.message}</p>
+            <div class="btn-box">
+              <button onclick="deleteConfession('${item.id}')" style="background:#c12d50">Delete</button>
+            </div>`;
+          container.appendChild(div);
+        });
+      } catch(e) { console.warn('approved load error', e); }
     }
 
     async function moderate(confessionId, action) {
-      const res = await fetch(`${API_BASE}/api/admin/moderate`, {
-        method: 'POST',
-        headers: {'Content-Type': 'application/json'},
-        body: JSON.stringify({token: authToken, confessionId, action})
-      });
-      const data = await res.json();
-      if (data.error) {
-        setStatus(data.error,'#a1182a');
-      } else {
-        setStatus('Moderation saved.');
-        await loadPending();
-        await loadApproved();
-      }
+      try {
+        const res = await fetch(`${API_BASE}/api/admin/moderate`, {
+          method: 'POST',
+          headers: adminHeaders(),
+          body: JSON.stringify({ confessionId, action })
+        });
+        const data = await res.json();
+        if (data.error) {
+          setStatus(data.error, '#a1182a');
+        } else {
+          setStatus('Moderation saved.');
+          await loadPending();
+          await loadApproved();
+        }
+      } catch(e) { setStatus('Network error', '#a1182a'); }
     }
 
     async function deleteConfession(confessionId) {
-      const res = await fetch(`${API_BASE}/api/admin/delete`, {
-        method: 'POST',
-        headers: {'Content-Type': 'application/json'},
-        body: JSON.stringify({token: authToken, confessionId})
-      });
-      const data = await res.json();
-      if (data.error) {
-        setStatus(data.error,'#a1182a');
-      } else {
-        setStatus('Confession deleted.');
-        await loadPending();
-        await loadApproved();
-      }
+      try {
+        const res = await fetch(`${API_BASE}/api/admin/delete`, {
+          method: 'POST',
+          headers: adminHeaders(),
+          body: JSON.stringify({ confessionId })
+        });
+        const data = await res.json();
+        if (data.error) {
+          setStatus(data.error, '#a1182a');
+        } else {
+          setStatus('Confession deleted.');
+          await loadPending();
+          await loadApproved();
+        }
+      } catch(e) { setStatus('Network error', '#a1182a'); }
     }
 
     function showAdmin() {
@@ -129,21 +170,29 @@
 
     document.getElementById('loginBtn').addEventListener('click', async () => {
       const pass = document.getElementById('adminPass').value.trim();
-      const res = await fetch(`${API_BASE}/api/admin/login`, {
-        method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({password:pass})
-      });
-      const data = await res.json();
-      if (data.token) {
-        authToken = data.token;
-        document.getElementById('loginMsg').textContent='Login successful!';
-        showAdmin();
-        updateAnalytics();
-        loadPending();
-        loadApproved();
-        setInterval(updateAnalytics, 15000);
-        setInterval(loadPending, 12000);
-      } else {
-        document.getElementById('loginMsg').textContent=data.error || 'Login failed';
+      try {
+        const res = await fetch(`${API_BASE}/api/admin/login`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ password: pass })
+        });
+        const data = await res.json();
+
+        // ✅ FIX: Server now returns token in the JSON body — store it here
+        if (data.token) {
+          authToken = data.token;
+          document.getElementById('loginMsg').textContent = 'Login successful!';
+          showAdmin();
+          updateAnalytics();
+          loadPending();
+          loadApproved();
+          setInterval(updateAnalytics, 15000);
+          setInterval(loadPending, 12000);
+        } else {
+          document.getElementById('loginMsg').textContent = data.error || 'Login failed';
+        }
+      } catch(e) {
+        document.getElementById('loginMsg').textContent = 'Network error. Check backend URL.';
       }
     });
   </script>
