@@ -217,11 +217,7 @@
       return id;
     }
     function words(t){ return t.trim().split(/\s+/).filter(Boolean).length; }
-    function clean(t){
-      let o = t.replace(/\d+/g,'');
-      abusive.forEach(w => { o = o.replace(new RegExp(w,'gi'),'***'); });
-      return o;
-    }
+    function clean(t){ return t; }
     function ago(ts) {
       const d = Math.floor((Date.now()-ts)/1000);
       if(d<60) return 'just now';
