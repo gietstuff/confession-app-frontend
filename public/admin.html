@@ -89,11 +89,16 @@ body{min-height:100vh;background:#0d0008;color:var(--text);font-family:'DM Sans'
 .empty-msg{text-align:center;padding:30px;color:var(--muted);font-style:italic;font-family:'Playfair Display',serif;}
 #modStatus{margin-top:12px;font-size:0.85rem;font-weight:600;min-height:18px;}
 
+/* In-page notification banner */
+.notif-banner{position:fixed;top:16px;left:50%;transform:translateX(-50%) translateY(-120px);opacity:0;background:linear-gradient(135deg,#f59e0b,#d97706);color:#fff;padding:12px 28px;border-radius:40px;font-size:0.9rem;font-weight:700;box-shadow:0 8px 30px rgba(245,158,11,0.5);transition:all .5s cubic-bezier(.34,1.56,.64,1);z-index:9999;white-space:nowrap;font-family:'DM Sans',sans-serif;cursor:pointer;}
+.notif-banner.show{transform:translateX(-50%) translateY(0);opacity:1;}
+
 .hidden{display:none;}
 </style>
 </head>
 <body>
 <div class="bg"></div>
+<div class="notif-banner" id="notifBanner" onclick="document.getElementById('notifBanner').classList.remove('show')">💌 New confessions waiting for review!</div>
 
 <!-- Login -->
 <div class="login-wrap" id="loginWrap">
@@ -168,7 +173,7 @@ body{min-height:100vh;background:#0d0008;color:var(--text);font-family:'DM Sans'
 const API = 'https://confession-app-1w0s.onrender.com';
 let authToken = null;
 let notifEnabled = false;
-let lastPendingCount = 0;
+let lastPendingCount = -1; // -1 = not yet polled; avoids false notif on first load
 
 function adminH(){ return {'Content-Type':'application/json','x-admin-token':authToken||''}; }
 
@@ -240,12 +245,27 @@ async function requestNotifPermission(){
   }
 }
 
+let bannerTimer;
+function showBanner(count){
+  const el=document.getElementById('notifBanner');
+  el.textContent=`💌 ${count} new confession${count>1?'s':''} waiting for review!`;
+  el.classList.add('show');
+  clearTimeout(bannerTimer);
+  bannerTimer=setTimeout(()=>el.classList.remove('show'),6000);
+}
+
 function sendNotif(count){
-  if(!notifEnabled||Notification.permission!=='granted')return;
-  new Notification(`💌 ${count} new confession${count>1?'s':''}!`,{
-    body:'New confessions are waiting for your review.',
-    icon:'https://em-content.zobj.net/source/twitter/376/love-letter_1f48c.png'
-  });
+  // Always show in-page banner
+  showBanner(count);
+  // Also try browser notification if permitted
+  if(notifEnabled&&Notification.permission==='granted'){
+    try{
+      new Notification(`💌 ${count} new confession${count>1?'s':''}!`,{
+        body:'New confessions are waiting for your review.',
+        icon:'https://em-content.zobj.net/source/twitter/376/love-letter_1f48c.png'
+      });
+    }catch(e){}
+  }
 }
 
 // ── Moderate ───────────────────────────────────────────
@@ -279,8 +299,8 @@ async function loadPending(){
   badge.textContent=arr.length;
   document.getElementById('sPending').textContent=arr.length;
 
-  // Notification on new arrivals
-  if(arr.length>lastPendingCount&&lastPendingCount>=0){
+  // Notification on new arrivals — skip the very first poll (lastPendingCount === -1)
+  if(lastPendingCount !== -1 && arr.length > lastPendingCount){
     const newCount=arr.length-lastPendingCount;
     if(newCount>0)sendNotif(newCount);
   }

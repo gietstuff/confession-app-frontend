@@ -4,6 +4,13 @@
 <meta charset="UTF-8"/>
 <meta name="viewport" content="width=device-width,initial-scale=1.0"/>
 <title>GIET Confessions 💌</title>
+<!-- PWA -->
+<link rel="manifest" href="/manifest.json"/>
+<meta name="theme-color" content="#ff2d6f"/>
+<meta name="apple-mobile-web-app-capable" content="yes"/>
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent"/>
+<meta name="apple-mobile-web-app-title" content="Confessions 💌"/>
+<meta name="description" content="Anonymous confessions for GIET students 💌"/>
 <link rel="preconnect" href="https://fonts.googleapis.com"/>
 <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,700;1,400&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet"/>
 <style>
@@ -103,6 +110,11 @@ textarea:focus{border-color:var(--rose);box-shadow:0 0 0 3px rgba(255,45,111,0.1
 .reply-send{background:var(--rose);border:none;color:#fff;border-radius:12px;padding:9px 16px;font-size:0.82rem;font-weight:600;cursor:pointer;font-family:'DM Sans',sans-serif;transition:all .2s;white-space:nowrap;}
 .reply-send:hover{background:var(--crimson);}
 .no-replies{font-size:0.82rem;color:var(--muted);font-style:italic;text-align:center;padding:10px 0;}
+/* Show replies toggle row */
+.replies-toggle-row{margin-top:10px;display:flex;align-items:center;gap:8px;}
+.show-replies-btn{display:inline-flex;align-items:center;gap:5px;background:rgba(255,45,111,0.08);border:1px solid rgba(255,45,111,0.2);color:var(--rose2);border-radius:20px;padding:4px 12px;font-size:0.76rem;font-weight:600;cursor:pointer;transition:all .18s;font-family:'DM Sans',sans-serif;}
+.show-replies-btn:hover{background:rgba(255,45,111,0.18);border-color:var(--rose);}
+.reply-count-dot{width:5px;height:5px;border-radius:50%;background:var(--rose);display:inline-block;animation:pulse 2s infinite;}
 
 /* Skeleton */
 .skel-card{background:var(--glass);border:1px solid var(--border);border-radius:20px;padding:22px 24px;}
@@ -345,14 +357,22 @@ function shareCopy(){
 document.getElementById('shareModal').addEventListener('click',e=>{if(e.target===e.currentTarget)closeShare();});
 
 // ── Replies ───────────────────────────────────────────
-const openReplies={};
-async function toggleReplies(confId){
+async function toggleReplies(confId,showBtn){
   const wrap=document.getElementById('rw-'+confId);
   if(!wrap)return;
   const isOpen=wrap.classList.contains('open');
-  if(isOpen){wrap.classList.remove('open');openReplies[confId]=false;return;}
+  if(isOpen){
+    wrap.classList.remove('open');openReplies[confId]=false;
+    // Update the show-replies button text
+    const rc=replyCounts[confId]||0;
+    if(showBtn)showBtn.innerHTML=`<span class="reply-count-dot"></span> Show ${rc} repl${rc===1?'y':'ies'}`;
+    return;
+  }
   wrap.classList.add('open');openReplies[confId]=true;
   await loadReplies(confId);
+  // Update button text
+  const rc=replyCounts[confId]||0;
+  if(showBtn)showBtn.innerHTML=`<span class="reply-count-dot"></span> Hide ${rc} repl${rc===1?'y':'ies'}`;
 }
 
 async function loadReplies(confId){
@@ -362,8 +382,19 @@ async function loadReplies(confId){
   try{
     const r=await fetch(`${API}/api/replies/${confId}`);
     const replies=await r.json();
+    // Store the count so render() can show the badge
+    replyCounts[confId]=replies.length;
     if(!replies.length){list.innerHTML='<div class="no-replies">No replies yet — be the first 💬</div>';return;}
     list.innerHTML=replies.map(r=>`<div class="reply-item">${r.message}<div class="reply-time">${ago(r.createdAt)}</div></div>`).join('');
+    // Refresh the show-replies toggle button label in-place (no full re-render needed)
+    const card=list.closest('.conf-card');
+    if(card){
+      const btn=card.querySelector('.show-replies-btn');
+      if(btn){
+        const open=openReplies[confId];
+        btn.innerHTML=`<span class="reply-count-dot"></span> ${open?'Hide':'Show'} ${replies.length} repl${replies.length===1?'y':'ies'}`;
+      }
+    }
   }catch(e){list.innerHTML='<div class="no-replies">Could not load replies</div>';}
 }
 
@@ -379,6 +410,17 @@ async function sendReply(confId){
     inp.value='';inp.disabled=false;
     toast('💬 Reply sent!');
     await loadReplies(confId);
+    // After first reply, add the show-replies button if it doesn't exist yet
+    const card=inp.closest('.conf-card');
+    if(card&&!card.querySelector('.show-replies-btn')){
+      const toggleRow=document.createElement('div');
+      toggleRow.className='replies-toggle-row';
+      const rc=replyCounts[confId]||1;
+      toggleRow.innerHTML=`<button class="show-replies-btn" onclick="toggleReplies('${confId}',this)"><span class="reply-count-dot"></span> Hide ${rc} repl${rc===1?'y':'ies'}</button>`;
+      // Insert before the replies-wrap
+      const rw=document.getElementById('rw-'+confId);
+      card.insertBefore(toggleRow,rw);
+    }
   }catch(e){toast('Network error');inp.disabled=false;}
 }
 
@@ -396,6 +438,8 @@ async function flagConfession(id,btn){
 
 // ── State & render ────────────────────────────────────
 let allConf=[],seenIds=new Set(),firstLoad=true;
+const openReplies={};
+const replyCounts={};   // tracks reply counts per confession id
 
 function render(){
   const feed=document.getElementById('feed');
@@ -409,19 +453,24 @@ function render(){
     const d=document.createElement('div');
     d.className='conf-card';d.style.animationDelay=(i*0.06)+'s';
     const replyOpen=openReplies[m.id]?'open':'';
+    const rc=replyCounts[m.id]||0;
+    const showRepliesBtn=rc>0
+      ?`<button class="show-replies-btn" onclick="toggleReplies('${m.id}',this)"><span class="reply-count-dot"></span> ${openReplies[m.id]?'Hide':'Show'} ${rc} repl${rc===1?'y':'ies'}</button>`
+      :'';
     d.innerHTML=`
       <div class="card-cat">${m.category||'💭 Random'}</div>
       <div class="card-msg">${m.message}</div>
       <div class="card-footer">
         <span class="card-time">🕐 ${ago(m.createdAt)}</span>
         <div class="action-row">
-          <button class="act-btn" onclick="vote('${m.id}','like',this)">❤️ ${m.likes}</button>
-          <button class="act-btn" onclick="vote('${m.id}','dislike',this)">💔 ${m.dislikes}</button>
-          <button class="act-btn" onclick="toggleReplies('${m.id}')">💬 Reply</button>
+          <button class="act-btn like-btn" onclick="vote('${m.id}','like',this)">❤️ ${m.likes}</button>
+          <button class="act-btn dislike-btn" onclick="vote('${m.id}','dislike',this)">💔 ${m.dislikes}</button>
+          <button class="act-btn" onclick="toggleReplies('${m.id}',null)">💬 Reply</button>
           <button class="act-btn" onclick="openShare(\`${m.message.replace(/`/g,"'")}\`,'${m.id}')">📤 Share</button>
           <button class="act-btn${(m.flags||0)>0?' flagged':''}" onclick="flagConfession('${m.id}',this)">⚑ ${(m.flags||0)>0?'Flagged':'Flag'}</button>
         </div>
       </div>
+      ${showRepliesBtn?`<div class="replies-toggle-row">${showRepliesBtn}</div>`:''}
       <div class="replies-wrap ${replyOpen}" id="rw-${m.id}">
         <div id="rl-${m.id}"></div>
         <div class="reply-input-wrap">
@@ -435,20 +484,74 @@ function render(){
   });
 }
 
+let pendingRender=false;
+
+async function fetchReplyCountsForAll(confessions){
+  // Batch-fetch reply counts for all confessions so we can show the "Show X replies" button
+  await Promise.all(confessions.map(async m=>{
+    try{
+      const r=await fetch(`${API}/api/replies/${m.id}`);
+      const replies=await r.json();
+      replyCounts[m.id]=replies.length;
+    }catch(e){}
+  }));
+}
+
 function fetchConf(){
   fetch(`${API}/api/confessions`)
-    .then(r=>r.json()).then(data=>{
+    .then(r=>r.json()).then(async data=>{
       const newOnes=data.filter(m=>!seenIds.has(m.id));
-      if(newOnes.length&&!firstLoad)toast(`💌 ${newOnes.length} new confession${newOnes.length>1?'s':''}!`);
-      seenIds=new Set(data.map(m=>m.id));allConf=data;firstLoad=false;render();
+      if(newOnes.length&&!firstLoad){
+        toast(`💌 ${newOnes.length} new confession${newOnes.length>1?'s':''}!`);
+        // Update document title badge (visible on "Add to Home Screen" / browser tab)
+        document.title=`(${newOnes.length}) GIET Confessions 💌`;
+        // Clear badge when user taps/focuses
+        const clearBadge=()=>{document.title='GIET Confessions 💌';window.removeEventListener('focus',clearBadge);document.removeEventListener('visibilitychange',clearBadge);};
+        window.addEventListener('focus',clearBadge);
+        document.addEventListener('visibilitychange',()=>{if(!document.hidden)clearBadge();});
+      }
+      seenIds=new Set(data.map(m=>m.id));allConf=data;
+      // Fetch reply counts on first load, or for new confessions
+      if(firstLoad){
+        await fetchReplyCountsForAll(data);
+      } else if(newOnes.length){
+        await fetchReplyCountsForAll(newOnes);
+      }
+      firstLoad=false;
+      // Only re-render if no reply input is focused (keyboard safety)
+      const focused=document.activeElement;
+      const replyFocused=focused&&focused.classList.contains('reply-input');
+      if(replyFocused){pendingRender=true;}
+      else{render();pendingRender=false;}
     }).catch(()=>{if(firstLoad)document.getElementById('feed').innerHTML=`<div class="empty"><span class="empty-icon">📡</span>Connecting to server… please wait</div>`;});
 }
+
+// When user blurs a reply input, do the deferred render
+document.addEventListener('focusout',e=>{
+  if(e.target.classList.contains('reply-input')&&pendingRender){
+    // Small delay so the send button click still registers
+    setTimeout(()=>{if(pendingRender){render();pendingRender=false;}},300);
+  }
+});
 
 // ── Vote ──────────────────────────────────────────────
 window.vote=function(id,type,btn){
   btn.style.opacity='0.5';
   fetch(`${API}/api/${type}/${id}`,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({clientId:cid()})})
-    .then(r=>r.json()).then(()=>fetchConf()).catch(()=>{btn.style.opacity='1';});
+    .then(r=>r.json()).then(d=>{
+      // Update the confession data in memory
+      const conf=allConf.find(c=>c.id===id);
+      if(conf){conf.likes=d.likes;conf.dislikes=d.dislikes;}
+      // Update buttons in-place without re-rendering the whole feed
+      const card=btn.closest('.conf-card');
+      if(card){
+        const likeBtn=card.querySelector('.like-btn');
+        const dislikeBtn=card.querySelector('.dislike-btn');
+        if(likeBtn)likeBtn.innerHTML=`❤️ ${d.likes}`;
+        if(dislikeBtn)dislikeBtn.innerHTML=`💔 ${d.dislikes}`;
+      }
+      btn.style.opacity='1';
+    }).catch(()=>{btn.style.opacity='1';});
 };
 
 // ── Submit ────────────────────────────────────────────
@@ -481,8 +584,16 @@ async function analytics(){
   }catch(e){}
 }
 
-setInterval(render,30000);
-window.addEventListener('load',()=>{fetchConf();analytics();setInterval(fetchConf,12000);setInterval(analytics,15000);});
+// Periodic render removed — fetchConf handles updates safely
+window.addEventListener('load',()=>{
+  fetchConf();analytics();
+  setInterval(fetchConf,15000);
+  setInterval(analytics,15000);
+  // Register service worker for PWA
+  if('serviceWorker' in navigator){
+    navigator.serviceWorker.register('/sw.js').catch(()=>{});
+  }
+});
 </script>
 </body>
 </html>
