@@ -1,200 +1,356 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>GIET Confession Admin</title>
-  <style>
-    body{margin:0;padding:0;font-family:'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;background:#fdf2f8;color:#4a1f42;}
-    .wrap{max-width:960px;margin:18px auto; padding:24px;}
-    .box{background:#fff; border-radius:16px; box-shadow:0 10px 24px rgba(157,18,89,.18); padding:18px; margin-bottom:16px;}
-    h1{margin-bottom:10px;font-size:1.9rem;color:#a11659;}
-    input[type=password]{width:100%;padding:10px;border:1px solid #f0b8d1;border-radius:10px;font-size:1rem;}
-    button{background:#e12f71;color:#fff;border:0;border-radius:10px;padding:10px 16px;font-size:1rem;cursor:pointer;}
-    button:hover{filter:brightness(1.04);}
-    .panel{margin-top:16px;}
-    .txt-small{color:#7e4d75;}
-    .item{background:linear-gradient(150deg,#ffe9f6,#ffb9dc);border-radius:12px;border:1px solid #f7a6d3;padding:12px;margin-bottom:12px;position:relative;}
-    .item .time{font-size:.82rem;color:#6e325c;}
-    .item .btn-box{margin-top:10px;display:flex;gap:8px;}
-    .item button{flex:1;}
-    .stats{display:flex;gap:12px;flex-wrap:wrap;}
-    .stat-box{background:#ffe4f0;padding:14px;border-radius:12px;flex:1;min-width:168px;}
-    .stat-box h3{margin:0;color:#a01661;}
-    #modStatus{margin-top:10px;font-weight:700;}
-    .hidden{display:none;}
-  </style>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1.0"/>
+<title>GIET Admin Panel 🔐</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet"/>
+<style>
+*{margin:0;padding:0;box-sizing:border-box;}
+:root{--rose:#ff2d6f;--rose2:#ff6b9d;--crimson:#c0144c;--green:#22c55e;--yellow:#f59e0b;--red:#ef4444;--glass:rgba(255,255,255,0.07);--border:rgba(255,100,150,0.25);--text:#fff0f5;--muted:rgba(255,200,220,0.7);}
+body{min-height:100vh;background:#0d0008;color:var(--text);font-family:'DM Sans',sans-serif;}
+.bg{position:fixed;inset:0;z-index:0;background:radial-gradient(ellipse 80% 60% at 20% 10%,rgba(192,20,76,0.3) 0%,transparent 60%),radial-gradient(ellipse 50% 50% at 50% 50%,rgba(40,0,20,1) 0%,#0d0008 100%);}
+.page{position:relative;z-index:1;max-width:900px;margin:0 auto;padding:24px 16px 80px;}
+
+/* Login */
+.login-wrap{min-height:100vh;display:flex;align-items:center;justify-content:center;}
+.login-box{background:var(--glass);border:1px solid var(--border);border-radius:24px;padding:40px;max-width:380px;width:100%;backdrop-filter:blur(16px);text-align:center;}
+.login-icon{font-size:3rem;margin-bottom:16px;display:block;}
+.login-box h1{font-family:'Playfair Display',serif;font-size:1.8rem;margin-bottom:8px;}
+.login-box p{color:var(--muted);font-size:0.88rem;margin-bottom:24px;}
+.pass-input{width:100%;background:rgba(0,0,0,0.4);border:1.5px solid var(--border);border-radius:14px;padding:13px 16px;color:var(--text);font-size:1rem;font-family:'DM Sans',sans-serif;outline:none;margin-bottom:12px;transition:border-color .2s;}
+.pass-input:focus{border-color:var(--rose);}
+.pass-input::placeholder{color:rgba(255,200,220,0.35);}
+.login-btn{width:100%;padding:13px;background:linear-gradient(135deg,var(--rose),var(--crimson));color:#fff;border:none;border-radius:14px;font-size:1rem;font-weight:600;cursor:pointer;font-family:'DM Sans',sans-serif;transition:all .2s;}
+.login-btn:hover{transform:translateY(-2px);box-shadow:0 8px 24px rgba(255,45,111,0.4);}
+#loginMsg{margin-top:10px;font-size:0.85rem;color:var(--rose2);}
+
+/* Header */
+.admin-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:28px;flex-wrap:wrap;gap:12px;}
+.admin-title{font-family:'Playfair Display',serif;font-size:1.8rem;}
+.admin-title span{color:var(--rose);}
+.logout-btn{background:rgba(255,45,111,0.1);border:1px solid rgba(255,45,111,0.3);color:var(--rose2);border-radius:30px;padding:7px 18px;cursor:pointer;font-size:0.82rem;font-weight:600;font-family:'DM Sans',sans-serif;transition:all .2s;}
+.logout-btn:hover{background:rgba(255,45,111,0.2);}
+
+/* Stats row */
+.stats-row{display:flex;gap:12px;margin-bottom:24px;flex-wrap:wrap;}
+.stat-box{flex:1;min-width:120px;background:var(--glass);border:1px solid var(--border);border-radius:16px;padding:16px;backdrop-filter:blur(10px);text-align:center;}
+.stat-num{font-size:1.8rem;font-weight:700;color:var(--rose2);}
+.stat-lbl{font-size:0.75rem;color:var(--muted);margin-top:4px;}
+
+/* Control panel */
+.control-panel{background:var(--glass);border:1px solid var(--border);border-radius:20px;padding:22px;backdrop-filter:blur(12px);margin-bottom:24px;}
+.control-panel h2{font-family:'Playfair Display',serif;font-size:1.1rem;margin-bottom:18px;color:var(--muted);}
+.controls{display:flex;gap:10px;flex-wrap:wrap;align-items:center;}
+
+/* Toggle switch */
+.toggle-wrap{display:flex;align-items:center;gap:10px;background:rgba(0,0,0,0.3);border:1px solid var(--border);border-radius:14px;padding:10px 16px;flex:1;min-width:220px;}
+.toggle-label{font-size:0.88rem;font-weight:600;flex:1;}
+.toggle-sub{font-size:0.72rem;color:var(--muted);display:block;margin-top:2px;}
+.toggle{position:relative;width:46px;height:26px;flex-shrink:0;}
+.toggle input{opacity:0;width:0;height:0;}
+.toggle-slider{position:absolute;inset:0;background:rgba(255,255,255,0.1);border-radius:26px;cursor:pointer;transition:background .3s;}
+.toggle-slider::before{content:'';position:absolute;width:20px;height:20px;left:3px;top:3px;background:#fff;border-radius:50%;transition:transform .3s;}
+.toggle input:checked+.toggle-slider{background:var(--green);}
+.toggle input:checked+.toggle-slider::before{transform:translateX(20px);}
+
+.ctrl-btn{display:flex;align-items:center;gap:7px;padding:11px 18px;border-radius:14px;border:none;cursor:pointer;font-size:0.85rem;font-weight:600;font-family:'DM Sans',sans-serif;transition:all .2s;}
+.approve-all-btn{background:linear-gradient(135deg,var(--green),#16a34a);color:#fff;box-shadow:0 4px 16px rgba(34,197,94,0.3);}
+.approve-all-btn:hover{transform:translateY(-2px);box-shadow:0 6px 22px rgba(34,197,94,0.45);}
+.notif-btn{background:rgba(245,158,11,0.15);border:1px solid rgba(245,158,11,0.35)!important;color:#fbbf24;border-radius:14px;padding:11px 18px;cursor:pointer;font-size:0.85rem;font-weight:600;font-family:'DM Sans',sans-serif;transition:all .2s;}
+.notif-btn:hover{background:rgba(245,158,11,0.25);}
+.notif-btn.enabled{background:rgba(34,197,94,0.15);border-color:rgba(34,197,94,0.35)!important;color:var(--green);}
+
+/* Section */
+.section{background:var(--glass);border:1px solid var(--border);border-radius:20px;padding:22px;backdrop-filter:blur(12px);margin-bottom:20px;}
+.section-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:16px;flex-wrap:wrap;gap:8px;}
+.section-head h2{font-family:'Playfair Display',serif;font-size:1.2rem;}
+.badge{background:var(--rose);color:#fff;border-radius:20px;padding:2px 10px;font-size:0.72rem;font-weight:700;margin-left:8px;}
+.badge.flagged-badge{background:var(--yellow);}
+
+/* Confession item */
+.item{background:rgba(0,0,0,0.25);border:1px solid rgba(255,100,150,0.15);border-radius:14px;padding:16px;margin-bottom:12px;transition:border-color .2s;}
+.item:last-child{margin-bottom:0;}
+.item.flagged-item{border-color:rgba(245,158,11,0.4);background:rgba(245,158,11,0.04);}
+.item-meta{display:flex;align-items:center;gap:8px;margin-bottom:8px;flex-wrap:wrap;}
+.item-cat{background:rgba(255,45,111,0.15);border:1px solid rgba(255,45,111,0.3);color:var(--rose2);border-radius:12px;padding:2px 10px;font-size:0.7rem;font-weight:600;}
+.item-time{font-size:0.72rem;color:var(--muted);}
+.flag-count{background:rgba(245,158,11,0.2);border:1px solid rgba(245,158,11,0.4);color:#fbbf24;border-radius:12px;padding:2px 10px;font-size:0.7rem;font-weight:700;}
+.item-msg{font-size:0.9rem;line-height:1.65;color:rgba(255,240,245,0.88);margin-bottom:12px;white-space:pre-wrap;word-wrap:break-word;}
+.item-actions{display:flex;gap:8px;flex-wrap:wrap;}
+.ia-btn{padding:7px 14px;border-radius:10px;border:none;font-size:0.78rem;font-weight:600;cursor:pointer;font-family:'DM Sans',sans-serif;transition:all .18s;}
+.approve{background:rgba(34,197,94,0.2);color:var(--green);border:1px solid rgba(34,197,94,0.4);}
+.approve:hover{background:rgba(34,197,94,0.35);}
+.reject{background:rgba(239,68,68,0.15);color:#fca5a5;border:1px solid rgba(239,68,68,0.35);}
+.reject:hover{background:rgba(239,68,68,0.3);}
+.delete{background:rgba(80,80,80,0.2);color:#aaa;border:1px solid rgba(150,150,150,0.25);}
+.delete:hover{background:rgba(239,68,68,0.2);color:#fca5a5;}
+
+.empty-msg{text-align:center;padding:30px;color:var(--muted);font-style:italic;font-family:'Playfair Display',serif;}
+#modStatus{margin-top:12px;font-size:0.85rem;font-weight:600;min-height:18px;}
+
+.hidden{display:none;}
+</style>
 </head>
 <body>
-  <div class="wrap">
-    <h1>Admin Moderation (Secret URL)</h1>
-    <div class="box" id="loginBox">
-      <div class="txt-small">Enter admin password to moderate confessions:</div>
-      <input type="password" id="adminPass" placeholder="Admin Password" />
-      <button id="loginBtn" style="margin-top:10px;">Login</button>
-      <div id="loginMsg" class="txt-small" style="margin-top:8px;color:#a21d5f;"></div>
-    </div>
+<div class="bg"></div>
 
-    <div id="contentPanel" class="panel hidden">
-      <div class="stats">
-        <div class="stat-box"><h3 id="visitCount">Visits: 0</h3></div>
-        <div class="stat-box"><h3 id="uniqueCount">Unique Users: 0</h3></div>
+<!-- Login -->
+<div class="login-wrap" id="loginWrap">
+  <div class="login-box">
+    <span class="login-icon">🔐</span>
+    <h1>Admin Panel</h1>
+    <p>GIET Confessions — Moderator Access</p>
+    <input class="pass-input" type="password" id="adminPass" placeholder="Enter admin password" onkeydown="if(event.key==='Enter')doLogin()"/>
+    <button class="login-btn" onclick="doLogin()">Login</button>
+    <div id="loginMsg"></div>
+  </div>
+</div>
+
+<!-- Admin panel -->
+<div class="page hidden" id="adminPanel">
+
+  <div class="admin-header">
+    <div class="admin-title">🔐 <span>Admin</span> Panel</div>
+    <button class="logout-btn" onclick="logout()">Logout</button>
+  </div>
+
+  <!-- Stats -->
+  <div class="stats-row">
+    <div class="stat-box"><div class="stat-num" id="sVisits">—</div><div class="stat-lbl">Total Visits</div></div>
+    <div class="stat-box"><div class="stat-num" id="sUnique">—</div><div class="stat-lbl">Unique Visitors</div></div>
+    <div class="stat-box"><div class="stat-num" id="sLive">—</div><div class="stat-lbl">Online Now</div></div>
+    <div class="stat-box"><div class="stat-num" id="sPending">—</div><div class="stat-lbl">Pending</div></div>
+  </div>
+
+  <!-- Controls -->
+  <div class="control-panel">
+    <h2>⚙️ Controls</h2>
+    <div class="controls">
+      <!-- Auto-approve toggle -->
+      <div class="toggle-wrap">
+        <div>
+          <div class="toggle-label">Auto-Approve</div>
+          <span class="toggle-sub">New confessions go live instantly</span>
+        </div>
+        <label class="toggle">
+          <input type="checkbox" id="autoApproveToggle" onchange="toggleAutoApprove()"/>
+          <span class="toggle-slider"></span>
+        </label>
       </div>
-      <div class="box" id="pendingBox"><h3>Pending confessions for review</h3><div id="pendingList"></div></div>
-      <div class="box" id="approvedBox"><h3>Approved confessions</h3><div id="approvedList"></div></div>
-      <div id="modStatus"></div>
+      <!-- Bulk approve -->
+      <button class="ctrl-btn approve-all-btn" onclick="approveAll()">✅ Approve All Pending</button>
+      <!-- Browser notifications -->
+      <button class="notif-btn" id="notifBtn" onclick="requestNotifPermission()">🔔 Enable Notifications</button>
     </div>
   </div>
 
-  <script>
-    // ✅ FIX: Use the real Render backend URL — update this when you redeploy
-    const API_BASE = 'https://confession-app-1w0s.onrender.com';
+  <!-- Pending -->
+  <div class="section">
+    <div class="section-head">
+      <h2>📥 Pending <span class="badge" id="pendingBadge">0</span> <span class="badge flagged-badge" id="flaggedBadge" style="display:none">⚑ Flagged</span></h2>
+    </div>
+    <div id="pendingList"><div class="empty-msg">No pending confessions 🎉</div></div>
+  </div>
 
-    // ✅ FIX: Store the token in memory and send it as a header on every admin request
-    // This bypasses the cross-site cookie issue between Vercel and Render.
-    let authToken = null;
+  <!-- Approved -->
+  <div class="section">
+    <div class="section-head">
+      <h2>✅ Approved <span class="badge" id="approvedBadge">0</span></h2>
+    </div>
+    <div id="approvedList"><div class="empty-msg">No approved confessions yet</div></div>
+  </div>
 
-    function adminHeaders() {
-      return {
-        'Content-Type': 'application/json',
-        'x-admin-token': authToken || ''
-      };
+  <div id="modStatus"></div>
+</div>
+
+<script>
+const API = 'https://confession-app-1w0s.onrender.com';
+let authToken = null;
+let notifEnabled = false;
+let lastPendingCount = 0;
+
+function adminH(){ return {'Content-Type':'application/json','x-admin-token':authToken||''}; }
+
+function setStatus(msg,color='var(--green)'){const el=document.getElementById('modStatus');el.textContent=msg;el.style.color=color;setTimeout(()=>el.textContent='',4000);}
+
+function ago(ts){const d=Math.floor((Date.now()-ts)/1000);if(d<60)return 'just now';if(d<3600)return Math.floor(d/60)+'m ago';if(d<86400)return Math.floor(d/3600)+'h ago';return Math.floor(d/86400)+'d ago';}
+
+// ── Login ──────────────────────────────────────────────
+async function doLogin(){
+  const pass=document.getElementById('adminPass').value.trim();
+  document.getElementById('loginMsg').textContent='Logging in…';
+  try{
+    const r=await fetch(`${API}/api/admin/login`,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({password:pass})});
+    const d=await r.json();
+    if(d.token){
+      authToken=d.token;
+      document.getElementById('loginWrap').classList.add('hidden');
+      document.getElementById('adminPanel').classList.remove('hidden');
+      loadAll();
+      setInterval(loadAll,12000);
+      setInterval(loadAnalytics,15000);
+      loadAutoApproveState();
+    }else{
+      document.getElementById('loginMsg').textContent=d.error||'Login failed';
     }
+  }catch(e){document.getElementById('loginMsg').textContent='Network error';}
+}
 
-    function setStatus(message, color='#2a6d4d') {
-      const el = document.getElementById('modStatus');
-      el.textContent = message;
-      el.style.color = color;
-      setTimeout(() => el.textContent = '', 4000);
-    }
+function logout(){authToken=null;location.reload();}
 
-    async function updateAnalytics() {
-      try {
-        const res = await fetch(`${API_BASE}/api/analytics`);
-        const data = await res.json();
-        document.getElementById('visitCount').textContent = 'Visits: ' + data.visits;
-        document.getElementById('uniqueCount').textContent = 'Unique users: ' + data.uniqueVisitors;
-      } catch(e) { console.warn('analytics error', e); }
-    }
+// ── Auto-approve ───────────────────────────────────────
+async function loadAutoApproveState(){
+  try{
+    const r=await fetch(`${API}/api/settings`);
+    const d=await r.json();
+    document.getElementById('autoApproveToggle').checked=!!d.autoApprove;
+  }catch(e){}
+}
 
-    async function loadPending() {
-      try {
-        const res = await fetch(`${API_BASE}/api/pending`);
-        const arr = await res.json();
-        const container = document.getElementById('pendingList');
-        container.innerHTML = '';
-        if (!arr.length) {
-          container.innerHTML = '<p style="color:#6e3f68">No pending confessions.</p>';
-          return;
-        }
-        arr.forEach(item => {
-          const div = document.createElement('div');
-          div.className = 'item';
-          div.innerHTML = `
-            <div class="time">${new Date(item.createdAt).toLocaleString()}</div>
-            <p>${item.message}</p>
-            <div class="btn-box">
-              <button onclick="moderate('${item.id}','approve')">Approve</button>
-              <button onclick="moderate('${item.id}','reject')" style="background:#b73057">Reject</button>
-              <button onclick="deleteConfession('${item.id}')" style="background:#c12d50">Delete</button>
-            </div>`;
-          container.appendChild(div);
-        });
-      } catch(e) { console.warn('pending load error', e); }
-    }
+async function toggleAutoApprove(){
+  const enabled=document.getElementById('autoApproveToggle').checked;
+  try{
+    await fetch(`${API}/api/admin/auto-approve`,{method:'POST',headers:adminH(),body:JSON.stringify({enabled})});
+    setStatus(enabled?'✅ Auto-approve ON — confessions go live instantly':'⏸ Auto-approve OFF — manual review required', enabled?'var(--green)':'var(--rose2)');
+  }catch(e){setStatus('Failed to update setting','var(--rose)');document.getElementById('autoApproveToggle').checked=!enabled;}
+}
 
-    async function loadApproved() {
-      try {
-        const res = await fetch(`${API_BASE}/api/confessions`);
-        const arr = await res.json();
-        const container = document.getElementById('approvedList');
-        container.innerHTML = '';
-        if (!arr.length) {
-          container.innerHTML = '<p style="color:#6e3f68">No approved confessions yet.</p>';
-          return;
-        }
-        arr.forEach(item => {
-          const div = document.createElement('div');
-          div.className = 'item';
-          div.innerHTML = `
-            <div class="time">${new Date(item.createdAt).toLocaleString()} — 👍${item.likes} 👎${item.dislikes}</div>
-            <p>${item.message}</p>
-            <div class="btn-box">
-              <button onclick="deleteConfession('${item.id}')" style="background:#c12d50">Delete</button>
-            </div>`;
-          container.appendChild(div);
-        });
-      } catch(e) { console.warn('approved load error', e); }
-    }
+// ── Approve all ────────────────────────────────────────
+async function approveAll(){
+  if(!confirm('Approve ALL pending confessions at once?'))return;
+  try{
+    const r=await fetch(`${API}/api/admin/approve-all`,{method:'POST',headers:adminH()});
+    const d=await r.json();
+    if(d.error){setStatus(d.error,'var(--rose)');return;}
+    setStatus(`✅ ${d.approved} confession${d.approved!==1?'s':''} approved!`);
+    loadAll();
+  }catch(e){setStatus('Network error','var(--rose)');}
+}
 
-    async function moderate(confessionId, action) {
-      try {
-        const res = await fetch(`${API_BASE}/api/admin/moderate`, {
-          method: 'POST',
-          headers: adminHeaders(),
-          body: JSON.stringify({ confessionId, action })
-        });
-        const data = await res.json();
-        if (data.error) {
-          setStatus(data.error, '#a1182a');
-        } else {
-          setStatus('Moderation saved.');
-          await loadPending();
-          await loadApproved();
-        }
-      } catch(e) { setStatus('Network error', '#a1182a'); }
-    }
+// ── Notifications ──────────────────────────────────────
+async function requestNotifPermission(){
+  if(!('Notification' in window)){alert('Your browser does not support notifications.');return;}
+  const perm=await Notification.requestPermission();
+  if(perm==='granted'){
+    notifEnabled=true;
+    document.getElementById('notifBtn').textContent='🔔 Notifications ON';
+    document.getElementById('notifBtn').classList.add('enabled');
+    new Notification('GIET Admin 🔐',{body:'Notifications enabled! You\'ll be alerted when new confessions arrive.',icon:'https://em-content.zobj.net/source/twitter/376/love-letter_1f48c.png'});
+  }
+}
 
-    async function deleteConfession(confessionId) {
-      try {
-        const res = await fetch(`${API_BASE}/api/admin/delete`, {
-          method: 'POST',
-          headers: adminHeaders(),
-          body: JSON.stringify({ confessionId })
-        });
-        const data = await res.json();
-        if (data.error) {
-          setStatus(data.error, '#a1182a');
-        } else {
-          setStatus('Confession deleted.');
-          await loadPending();
-          await loadApproved();
-        }
-      } catch(e) { setStatus('Network error', '#a1182a'); }
-    }
+function sendNotif(count){
+  if(!notifEnabled||Notification.permission!=='granted')return;
+  new Notification(`💌 ${count} new confession${count>1?'s':''}!`,{
+    body:'New confessions are waiting for your review.',
+    icon:'https://em-content.zobj.net/source/twitter/376/love-letter_1f48c.png'
+  });
+}
 
-    function showAdmin() {
-      document.getElementById('loginBox').classList.add('hidden');
-      document.getElementById('contentPanel').classList.remove('hidden');
-    }
+// ── Moderate ───────────────────────────────────────────
+async function moderate(id,action){
+  try{
+    const r=await fetch(`${API}/api/admin/moderate`,{method:'POST',headers:adminH(),body:JSON.stringify({confessionId:id,action})});
+    const d=await r.json();
+    if(d.error){setStatus(d.error,'var(--rose)');return;}
+    setStatus(action==='approve'?'✅ Approved!':'❌ Rejected');
+    loadAll();
+  }catch(e){setStatus('Network error','var(--rose)');}
+}
 
-    document.getElementById('loginBtn').addEventListener('click', async () => {
-      const pass = document.getElementById('adminPass').value.trim();
-      try {
-        const res = await fetch(`${API_BASE}/api/admin/login`, {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ password: pass })
-        });
-        const data = await res.json();
+async function deleteConf(id){
+  if(!confirm('Delete this confession?'))return;
+  try{
+    const r=await fetch(`${API}/api/admin/delete`,{method:'POST',headers:adminH(),body:JSON.stringify({confessionId:id})});
+    const d=await r.json();
+    if(d.error){setStatus(d.error,'var(--rose)');return;}
+    setStatus('🗑 Deleted');loadAll();
+  }catch(e){setStatus('Network error','var(--rose)');}
+}
 
-        // ✅ FIX: Server now returns token in the JSON body — store it here
-        if (data.token) {
-          authToken = data.token;
-          document.getElementById('loginMsg').textContent = 'Login successful!';
-          showAdmin();
-          updateAnalytics();
-          loadPending();
-          loadApproved();
-          setInterval(updateAnalytics, 15000);
-          setInterval(loadPending, 12000);
-        } else {
-          document.getElementById('loginMsg').textContent = data.error || 'Login failed';
-        }
-      } catch(e) {
-        document.getElementById('loginMsg').textContent = 'Network error. Check backend URL.';
-      }
-    });
-  </script>
+// ── Load data ──────────────────────────────────────────
+async function loadPending(){
+  const r=await fetch(`${API}/api/pending`);
+  const arr=await r.json();
+  const container=document.getElementById('pendingList');
+  const badge=document.getElementById('pendingBadge');
+  const flagBadge=document.getElementById('flaggedBadge');
+  badge.textContent=arr.length;
+  document.getElementById('sPending').textContent=arr.length;
+
+  // Notification on new arrivals
+  if(arr.length>lastPendingCount&&lastPendingCount>=0){
+    const newCount=arr.length-lastPendingCount;
+    if(newCount>0)sendNotif(newCount);
+  }
+  lastPendingCount=arr.length;
+
+  const flagged=arr.filter(i=>(i.flags||0)>0);
+  flagBadge.style.display=flagged.length?'inline':'none';
+  flagBadge.textContent=`⚑ ${flagged.length} Flagged`;
+
+  if(!arr.length){container.innerHTML='<div class="empty-msg">No pending confessions 🎉</div>';return;}
+  container.innerHTML='';
+  arr.forEach(item=>{
+    const div=document.createElement('div');
+    div.className='item'+(((item.flags||0)>0)?' flagged-item':'');
+    div.innerHTML=`
+      <div class="item-meta">
+        <span class="item-cat">${item.category||'💭 Random'}</span>
+        <span class="item-time">🕐 ${ago(item.createdAt)}</span>
+        ${(item.flags||0)>0?`<span class="flag-count">⚑ ${item.flags} flag${item.flags>1?'s':''}</span>`:''}
+      </div>
+      <div class="item-msg">${item.message}</div>
+      <div class="item-actions">
+        <button class="ia-btn approve" onclick="moderate('${item.id}','approve')">✅ Approve</button>
+        <button class="ia-btn reject" onclick="moderate('${item.id}','reject')">❌ Reject</button>
+        <button class="ia-btn delete" onclick="deleteConf('${item.id}')">🗑 Delete</button>
+      </div>`;
+    container.appendChild(div);
+  });
+}
+
+async function loadApproved(){
+  const cutoff=Date.now()-24*3600*1000;
+  const r=await fetch(`${API}/api/confessions`);
+  const arr=await r.json();
+  const container=document.getElementById('approvedList');
+  document.getElementById('approvedBadge').textContent=arr.length;
+  if(!arr.length){container.innerHTML='<div class="empty-msg">No approved confessions yet</div>';return;}
+  container.innerHTML='';
+  arr.forEach(item=>{
+    const div=document.createElement('div');
+    div.className='item';
+    div.innerHTML=`
+      <div class="item-meta">
+        <span class="item-cat">${item.category||'💭 Random'}</span>
+        <span class="item-time">🕐 ${ago(item.createdAt)} · ❤️ ${item.likes} 💔 ${item.dislikes}</span>
+        ${(item.flags||0)>0?`<span class="flag-count">⚑ ${item.flags} flag${item.flags>1?'s':''}</span>`:''}
+      </div>
+      <div class="item-msg">${item.message}</div>
+      <div class="item-actions">
+        <button class="ia-btn delete" onclick="deleteConf('${item.id}')">🗑 Delete</button>
+      </div>`;
+    container.appendChild(div);
+  });
+}
+
+async function loadAnalytics(){
+  try{
+    const r=await fetch(`${API}/api/analytics`);
+    const d=await r.json();
+    document.getElementById('sVisits').textContent=d.visits||0;
+    document.getElementById('sUnique').textContent=d.uniqueVisitors||0;
+    document.getElementById('sLive').textContent=d.activeVisitors||0;
+  }catch(e){}
+}
+
+async function loadAll(){
+  try{await loadPending();}catch(e){}
+  try{await loadApproved();}catch(e){}
+  try{await loadAnalytics();}catch(e){}
+}
+</script>
 </body>
 </html>
