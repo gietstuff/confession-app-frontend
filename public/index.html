@@ -1,338 +1,705 @@
 <!DOCTYPE html>
-<html lang="en" data-theme="light">
+<html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>GIET Confession Page</title>
-  <style>
-    :root {
-      --bg-grad: radial-gradient(circle at top,#ffe9f0,#ffd8e7 35%,#fce3f1 100%);
-      --card-bg:#ffedf5; --card-border:rgba(255,89,153,.45);
-      --msg-bg:linear-gradient(145deg,#fff,#ffd6ec); --msg-border:rgba(255,104,146,.45);
-      --text:#530a3c; --text-sub:#4b1f42; --text-meta:#773962;
-      --accent:#f3276e; --btn-bg:linear-gradient(145deg,#ff5089,#ff1479);
-      --vote-bg:#fff0f8; --vote-border:#fc9fc4; --vote-text:#9c2a69;
-      --disc-bg:rgba(255,255,255,.85); --disc-border:#f3c2d6;
-      --upd-text:#6b2f56; --skel:linear-gradient(90deg,#f5c2da 25%,#ffd6eb 50%,#f5c2da 75%);
-      --prog-bg:#ffd1e8; --tag-bg:#ffe0ef; --tag-act:#ff1479; --tag-text:#9c2a69;
-    }
-    [data-theme="dark"] {
-      --bg-grad:radial-gradient(circle at top,#1a0a12,#2d0f1e 35%,#1f0b18 100%);
-      --card-bg:#2a1020; --card-border:rgba(255,89,153,.25);
-      --msg-bg:linear-gradient(145deg,#2e1122,#3d1530); --msg-border:rgba(255,104,146,.25);
-      --text:#f7c5df; --text-sub:#d89ab8; --text-meta:#c47aa0;
-      --accent:#ff4d8f; --btn-bg:linear-gradient(145deg,#c0305a,#a01040);
-      --vote-bg:#3a1428; --vote-border:#8c3d60; --vote-text:#f0a0c8;
-      --disc-bg:rgba(40,10,28,.85); --disc-border:#6b2545;
-      --upd-text:#c080a0; --skel:linear-gradient(90deg,#3a1428 25%,#52203c 50%,#3a1428 75%);
-      --prog-bg:#4a1530; --tag-bg:#3a1428; --tag-act:#c0305a; --tag-text:#e090b8;
-    }
-    *{box-sizing:border-box;margin:0;padding:0;font-family:'Segoe UI',Tahoma,Geneva,Verdana,sans-serif;}
-    body{background:var(--bg-grad);color:var(--text);min-height:100vh;transition:background .3s,color .3s;}
-    .container{max-width:900px;margin:0 auto;padding:20px 15px 80px;}
-    .header{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:20px;gap:12px;}
-    .header-right{display:flex;flex-direction:column;align-items:flex-end;gap:10px;}
-    .title{font-size:2.2rem;font-weight:800;text-transform:uppercase;letter-spacing:.08em;color:var(--accent);text-shadow:2px 2px 12px rgba(157,0,96,.25);}
-    .subtitle{font-size:1rem;color:var(--text-sub);margin-top:5px;}
-    #analyticsInfo{margin-top:5px;font-size:.85rem;color:var(--text-meta);}
-    .theme-btn{background:var(--card-bg);border:2px solid var(--card-border);color:var(--text);border-radius:20px;padding:6px 14px;cursor:pointer;font-size:.82rem;font-weight:700;transition:all .2s;}
-    .theme-btn:hover{transform:scale(1.05);}
-    .ig-link{display:inline-flex;align-items:center;gap:7px;background:linear-gradient(135deg,#f09433,#e6683c,#dc2743,#cc2366,#bc1888);color:#fff;padding:9px 14px;border-radius:12px;text-decoration:none;font-weight:700;font-size:.85rem;box-shadow:0 6px 18px rgba(220,59,121,.3);transition:transform .2s;}
-    .ig-link:hover{transform:scale(1.05);}
-    /* Toast */
-    .notice{position:fixed;top:16px;left:50%;transform:translateX(-50%) translateY(-120%);opacity:0;background:rgba(255,51,123,.95);color:#fff;padding:12px 24px;border-radius:14px;box-shadow:0 10px 25px rgba(189,42,124,.35);transition:all .35s cubic-bezier(.34,1.56,.64,1);z-index:9999;font-size:.95rem;font-weight:800;white-space:nowrap;}
-    .notice.show{transform:translateX(-50%) translateY(0);opacity:1;}
-    /* Cards */
-    .disc{background:var(--disc-bg);backdrop-filter:blur(5px);border-radius:12px;padding:13px;margin-bottom:14px;color:var(--text-sub);border:1px solid var(--disc-border);font-size:.88rem;}
-    .card{background:var(--card-bg);border:2px dashed var(--card-border);border-radius:22px;padding:18px;box-shadow:0 12px 30px rgba(220,59,121,.1);}
-    .card h2{margin-bottom:12px;color:var(--accent);}
-    .tags-row{display:flex;flex-wrap:wrap;gap:7px;margin-bottom:12px;align-items:center;}
-    .tags-row>span{font-size:.8rem;font-weight:700;color:var(--text-meta);}
-    .tag{background:var(--tag-bg);color:var(--tag-text);border:1px solid var(--vote-border);border-radius:20px;padding:4px 12px;font-size:.8rem;font-weight:700;cursor:pointer;transition:all .15s;}
-    .tag.active,.tag:hover{background:var(--tag-act);color:#fff;border-color:var(--tag-act);}
-    textarea{width:100%;min-height:108px;border:2px solid var(--vote-border);border-radius:14px;padding:12px;font-size:1rem;resize:vertical;background:var(--vote-bg);color:var(--text);transition:border-color .2s;}
-    textarea:focus{outline:none;border-color:var(--accent);}
-    /* Word bar */
-    .wbar-wrap{margin:8px 0;}
-    .wbar-bg{background:var(--prog-bg);border-radius:6px;height:6px;overflow:hidden;}
-    .wbar{height:100%;width:0%;background:linear-gradient(90deg,#ff5089,#ff1479);border-radius:6px;transition:width .18s,background .18s;}
-    .wbar.warn{background:linear-gradient(90deg,#ff8800,#ff4400);}
-    .wbar.over{background:#cc0000;}
-    .winfo{font-size:.8rem;color:var(--text-meta);margin-top:4px;}
-    .submit-btn{background:var(--btn-bg);color:#fff;border:0;border-radius:12px;padding:11px 22px;font-size:1rem;font-weight:700;cursor:pointer;box-shadow:0 10px 18px rgba(178,27,83,.3);transition:all .2s;margin-top:10px;}
-    .submit-btn:hover{transform:translateY(-2px);box-shadow:0 14px 23px rgba(178,27,83,.42);}
-    .submit-btn:disabled{opacity:.6;cursor:not-allowed;transform:none;}
-    #fStatus{margin-top:8px;font-weight:700;font-size:.9rem;min-height:18px;}
-    /* Filter bar */
-    .filter-bar{display:flex;align-items:center;gap:7px;margin:18px 0 10px;flex-wrap:wrap;}
-    .filter-bar>span{font-weight:700;color:var(--text-meta);font-size:.88rem;}
-    .ftag{background:var(--tag-bg);color:var(--tag-text);border:1px solid var(--vote-border);border-radius:20px;padding:4px 12px;font-size:.8rem;font-weight:700;cursor:pointer;transition:all .15s;}
-    .ftag.active,.ftag:hover{background:var(--tag-act);color:#fff;border-color:var(--tag-act);}
-    /* Grid */
-    .grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:16px;margin-top:8px;}
-    .message-card{background:var(--msg-bg);border-radius:16px;padding:20px;position:relative;overflow:hidden;box-shadow:0 10px 20px rgba(199,31,96,.14);border:1px solid var(--msg-border);min-height:108px;transition:transform .15s,box-shadow .15s;}
-    .message-card:hover{transform:translateY(-2px);box-shadow:0 16px 28px rgba(199,31,96,.22);}
-    .message-card::before{content:'❤️';position:absolute;font-size:60px;opacity:.1;top:-8px;right:-8px;transform:rotate(13deg);pointer-events:none;}
-    .cat-badge{display:inline-block;background:var(--tag-act);color:#fff;border-radius:9px;padding:2px 8px;font-size:.7rem;font-weight:700;margin-bottom:7px;}
-    .msg-text{color:var(--text);font-size:.95rem;white-space:pre-wrap;word-wrap:break-word;}
-    .meta{margin-top:10px;display:flex;justify-content:space-between;align-items:center;gap:6px;flex-wrap:wrap;}
-    .meta-time{font-size:.78rem;color:var(--text-meta);font-weight:600;}
-    .votes{display:flex;gap:5px;}
-    .votes button{background:var(--vote-bg);border:1px solid var(--vote-border);color:var(--vote-text);padding:4px 10px;border-radius:10px;cursor:pointer;font-weight:700;font-size:.82rem;transition:all .13s;}
-    .votes button:hover{filter:brightness(1.1);transform:scale(1.06);}
-    /* Skeletons */
-    .skel-card{background:var(--card-bg);border-radius:16px;padding:20px;border:1px solid var(--card-border);min-height:120px;}
-    .skel-line{border-radius:6px;margin-bottom:10px;background:var(--skel);background-size:200% 100%;animation:shimmer 1.4s infinite;}
-    .skel-line.a{height:13px;width:80%;}
-    .skel-line.b{height:13px;width:55%;}
-    .skel-line.c{height:13px;width:70%;}
-    .skel-line.d{height:9px;width:35%;margin-top:13px;}
-    @keyframes shimmer{0%{background-position:200% 0}100%{background-position:-200% 0}}
-    .upd-box{margin-top:18px;}
-    .upd-box h3{margin:0 0 9px;color:var(--accent);}
-    .upd-box ul{padding-left:18px;color:var(--upd-text);}
-    .upd-box li{margin-bottom:4px;font-size:.88rem;}
-    .heart{position:fixed;bottom:22px;left:50%;transform:translateX(-50%);font-size:24px;animation:hbeat 1.4s ease-in-out infinite;pointer-events:none;z-index:50;}
-    @keyframes hbeat{0%,100%{transform:translateX(-50%) scale(1);}40%{transform:translateX(-50%) scale(1.15);}}
-    @media(max-width:768px){
-      .container{padding:13px 10px 68px;}
-      .title{font-size:1.65rem;}
-      .header{flex-direction:column;}
-      .header-right{flex-direction:row;flex-wrap:wrap;}
-      .grid{grid-template-columns:1fr;gap:11px;}
-      .notice{font-size:.85rem;padding:10px 18px;white-space:normal;text-align:center;width:88%;}
-    }
-  </style>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1.0"/>
+<title>GIET Confessions 💌</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"/>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,700;1,400&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet"/>
+<style>
+/* ── Reset ───────────────────────────────────────────── */
+*{margin:0;padding:0;box-sizing:border-box;}
+:root{
+  --rose:    #ff2d6f;
+  --rose2:   #ff6b9d;
+  --crimson: #c0144c;
+  --gold:    #ffb347;
+  --deep:    #1a0010;
+  --glass:   rgba(255,255,255,0.07);
+  --glass2:  rgba(255,255,255,0.12);
+  --border:  rgba(255,100,150,0.25);
+  --text:    #fff0f5;
+  --muted:   rgba(255,200,220,0.7);
+  --card-shadow: 0 8px 40px rgba(255,45,111,0.18);
+}
+
+/* ── Background ──────────────────────────────────────── */
+body{
+  min-height:100vh;
+  background: #0d0008;
+  color:var(--text);
+  font-family:'DM Sans',sans-serif;
+  overflow-x:hidden;
+}
+
+/* Animated mesh background */
+.bg{
+  position:fixed;inset:0;z-index:0;
+  background:
+    radial-gradient(ellipse 80% 60% at 20% 10%, rgba(192,20,76,0.35) 0%, transparent 60%),
+    radial-gradient(ellipse 60% 80% at 80% 90%, rgba(255,45,111,0.25) 0%, transparent 55%),
+    radial-gradient(ellipse 50% 50% at 50% 50%, rgba(40,0,20,1) 0%, #0d0008 100%);
+  animation: bgShift 12s ease-in-out infinite alternate;
+}
+@keyframes bgShift{
+  0%  { background-position: 0% 0%, 100% 100%, 50% 50%; }
+  100%{ background-position: 10% 20%, 90% 80%, 50% 50%; }
+}
+
+/* Floating particles canvas */
+#particles{ position:fixed;inset:0;z-index:1;pointer-events:none; }
+
+/* ── Layout ──────────────────────────────────────────── */
+.page{ position:relative;z-index:2;max-width:780px;margin:0 auto;padding:0 16px 100px; }
+
+/* ── Header ──────────────────────────────────────────── */
+header{
+  text-align:center;
+  padding:52px 0 32px;
+  position:relative;
+}
+.header-glow{
+  position:absolute;top:0;left:50%;transform:translateX(-50%);
+  width:400px;height:200px;
+  background:radial-gradient(ellipse, rgba(255,45,111,0.3) 0%, transparent 70%);
+  pointer-events:none;
+}
+.logo-icon{
+  font-size:2.8rem;
+  display:block;
+  animation:float 3s ease-in-out infinite;
+  margin-bottom:12px;
+  filter:drop-shadow(0 0 20px rgba(255,45,111,0.8));
+}
+@keyframes float{
+  0%,100%{transform:translateY(0);}
+  50%{transform:translateY(-8px);}
+}
+.site-title{
+  font-family:'Playfair Display',serif;
+  font-size:clamp(2rem,6vw,3.2rem);
+  font-weight:700;
+  letter-spacing:-0.02em;
+  line-height:1.1;
+  background:linear-gradient(135deg,#fff 0%,var(--rose2) 50%,var(--gold) 100%);
+  -webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;
+  margin-bottom:8px;
+}
+.site-sub{
+  font-size:0.95rem;
+  color:var(--muted);
+  font-style:italic;
+  font-family:'Playfair Display',serif;
+  margin-bottom:18px;
+}
+.stats-bar{
+  display:inline-flex;gap:20px;
+  background:var(--glass);
+  border:1px solid var(--border);
+  border-radius:40px;
+  padding:8px 22px;
+  font-size:0.78rem;
+  color:var(--muted);
+  backdrop-filter:blur(10px);
+}
+.stats-bar span{ display:flex;align-items:center;gap:5px; }
+.stats-dot{ width:6px;height:6px;border-radius:50%;background:var(--rose);
+  animation:pulse 2s infinite; display:inline-block;}
+@keyframes pulse{0%,100%{opacity:1;transform:scale(1);}50%{opacity:0.5;transform:scale(1.4);}}
+
+/* ── Top bar ─────────────────────────────────────────── */
+.top-bar{
+  display:flex;align-items:center;justify-content:space-between;
+  margin-bottom:20px;gap:10px;flex-wrap:wrap;
+}
+.ig-pill{
+  display:inline-flex;align-items:center;gap:7px;
+  background:linear-gradient(135deg,#f09433,#e6683c,#dc2743,#cc2366,#bc1888);
+  color:#fff;padding:8px 16px;border-radius:40px;
+  text-decoration:none;font-size:0.82rem;font-weight:600;
+  box-shadow:0 4px 20px rgba(220,59,121,0.4);
+  transition:transform .2s,box-shadow .2s;
+}
+.ig-pill:hover{transform:scale(1.05);box-shadow:0 6px 28px rgba(220,59,121,0.6);}
+.theme-pill{
+  background:var(--glass);border:1px solid var(--border);
+  color:var(--text);border-radius:40px;padding:8px 16px;
+  cursor:pointer;font-size:0.82rem;font-weight:500;
+  backdrop-filter:blur(10px);transition:all .2s;
+  font-family:'DM Sans',sans-serif;
+}
+.theme-pill:hover{background:var(--glass2);}
+
+/* ── Glass card ──────────────────────────────────────── */
+.glass-card{
+  background:var(--glass);
+  border:1px solid var(--border);
+  border-radius:24px;
+  padding:28px;
+  backdrop-filter:blur(16px);
+  box-shadow:var(--card-shadow);
+  position:relative;overflow:hidden;
+}
+.glass-card::before{
+  content:'';position:absolute;inset:0;border-radius:24px;
+  background:linear-gradient(135deg,rgba(255,255,255,0.08) 0%,transparent 60%);
+  pointer-events:none;
+}
+
+/* ── Submit section ──────────────────────────────────── */
+.submit-card{ margin-bottom:28px; }
+.submit-card h2{
+  font-family:'Playfair Display',serif;
+  font-size:1.4rem;font-weight:700;
+  margin-bottom:18px;
+  display:flex;align-items:center;gap:10px;
+}
+
+/* Category pills */
+.cat-row{ display:flex;gap:8px;margin-bottom:16px;flex-wrap:wrap; }
+.cat-pill{
+  background:rgba(255,45,111,0.1);
+  border:1px solid rgba(255,45,111,0.3);
+  color:var(--rose2);
+  border-radius:30px;padding:6px 16px;
+  font-size:0.8rem;font-weight:600;cursor:pointer;
+  transition:all .2s;font-family:'DM Sans',sans-serif;
+}
+.cat-pill:hover,.cat-pill.active{
+  background:var(--rose);color:#fff;
+  border-color:var(--rose);
+  box-shadow:0 0 20px rgba(255,45,111,0.4);
+  transform:translateY(-1px);
+}
+
+/* Textarea */
+.textarea-wrap{ position:relative;margin-bottom:12px; }
+textarea{
+  width:100%;min-height:120px;
+  background:rgba(0,0,0,0.3);
+  border:1.5px solid var(--border);
+  border-radius:16px;padding:16px;
+  color:var(--text);font-size:0.95rem;
+  font-family:'DM Sans',sans-serif;
+  resize:vertical;outline:none;
+  transition:border-color .2s,box-shadow .2s;
+  line-height:1.6;
+}
+textarea::placeholder{color:rgba(255,200,220,0.4);}
+textarea:focus{
+  border-color:var(--rose);
+  box-shadow:0 0 0 3px rgba(255,45,111,0.15);
+}
+
+/* Word counter */
+.word-row{
+  display:flex;justify-content:space-between;align-items:center;
+  margin-bottom:14px;gap:12px;
+}
+.wbar-bg{flex:1;height:4px;background:rgba(255,255,255,0.1);border-radius:4px;overflow:hidden;}
+.wbar{height:100%;width:0;background:linear-gradient(90deg,var(--rose2),var(--rose));
+  border-radius:4px;transition:width .2s,background .2s;}
+.wbar.warn{background:linear-gradient(90deg,#ffaa00,#ff6600);}
+.wbar.over{background:#ff2200;}
+.wcount{font-size:0.75rem;color:var(--muted);white-space:nowrap;}
+
+/* Submit button */
+.submit-btn{
+  width:100%;padding:14px;
+  background:linear-gradient(135deg,var(--rose),var(--crimson));
+  color:#fff;border:none;border-radius:16px;
+  font-size:1rem;font-weight:600;cursor:pointer;
+  font-family:'DM Sans',sans-serif;
+  box-shadow:0 8px 30px rgba(255,45,111,0.35);
+  transition:all .25s;position:relative;overflow:hidden;
+}
+.submit-btn::after{
+  content:'';position:absolute;inset:0;
+  background:linear-gradient(135deg,transparent 0%,rgba(255,255,255,0.1) 100%);
+}
+.submit-btn:hover:not(:disabled){
+  transform:translateY(-2px);
+  box-shadow:0 12px 40px rgba(255,45,111,0.5);
+}
+.submit-btn:disabled{opacity:0.6;cursor:not-allowed;transform:none;}
+#fStatus{margin-top:10px;font-size:0.85rem;min-height:18px;text-align:center;}
+
+/* ── Filter section ──────────────────────────────────── */
+.section-head{
+  display:flex;align-items:center;justify-content:space-between;
+  margin:8px 0 16px;
+}
+.section-label{
+  font-family:'Playfair Display',serif;
+  font-size:1.2rem;font-style:italic;color:var(--muted);
+}
+.filter-row{ display:flex;gap:8px;flex-wrap:wrap; }
+.ftag{
+  background:rgba(255,255,255,0.05);
+  border:1px solid rgba(255,255,255,0.1);
+  color:var(--muted);border-radius:30px;
+  padding:5px 14px;font-size:0.78rem;font-weight:500;
+  cursor:pointer;transition:all .18s;
+}
+.ftag:hover,.ftag.active{
+  background:var(--rose);color:#fff;
+  border-color:var(--rose);
+  box-shadow:0 0 16px rgba(255,45,111,0.3);
+}
+
+/* ── Confession cards ────────────────────────────────── */
+.feed{ display:flex;flex-direction:column;gap:16px; }
+
+.conf-card{
+  background:var(--glass);
+  border:1px solid var(--border);
+  border-radius:20px;
+  padding:22px 24px;
+  backdrop-filter:blur(12px);
+  position:relative;overflow:hidden;
+  transition:transform .2s,box-shadow .2s,border-color .2s;
+  animation:cardIn .4s ease both;
+}
+@keyframes cardIn{
+  from{opacity:0;transform:translateY(20px);}
+  to{opacity:1;transform:translateY(0);}
+}
+.conf-card:hover{
+  transform:translateY(-3px);
+  box-shadow:0 12px 40px rgba(255,45,111,0.2);
+  border-color:rgba(255,100,150,0.4);
+}
+/* Decorative quote mark */
+.conf-card::before{
+  content:'"';
+  position:absolute;top:-10px;right:16px;
+  font-family:'Playfair Display',serif;
+  font-size:7rem;color:rgba(255,45,111,0.08);
+  line-height:1;pointer-events:none;
+  user-select:none;
+}
+.card-cat{
+  display:inline-flex;align-items:center;gap:5px;
+  background:rgba(255,45,111,0.15);
+  border:1px solid rgba(255,45,111,0.3);
+  color:var(--rose2);border-radius:20px;
+  padding:3px 12px;font-size:0.72rem;font-weight:600;
+  margin-bottom:12px;
+}
+.card-msg{
+  font-size:1rem;line-height:1.75;
+  color:rgba(255,240,245,0.92);
+  white-space:pre-wrap;word-wrap:break-word;
+  margin-bottom:16px;
+}
+.card-footer{
+  display:flex;justify-content:space-between;align-items:center;
+  flex-wrap:wrap;gap:10px;
+}
+.card-time{
+  font-size:0.75rem;color:var(--muted);
+  display:flex;align-items:center;gap:5px;
+}
+.vote-row{ display:flex;gap:8px; }
+.vote-btn{
+  display:flex;align-items:center;gap:5px;
+  background:rgba(255,255,255,0.06);
+  border:1px solid rgba(255,255,255,0.12);
+  color:var(--muted);border-radius:30px;
+  padding:6px 14px;font-size:0.82rem;font-weight:600;
+  cursor:pointer;transition:all .18s;
+  font-family:'DM Sans',sans-serif;
+}
+.vote-btn:hover{ background:rgba(255,45,111,0.15);border-color:rgba(255,45,111,0.4);color:#fff; }
+.vote-btn.liked{ background:rgba(255,45,111,0.2);border-color:var(--rose);color:var(--rose2); }
+.vote-btn.disliked{ background:rgba(80,80,80,0.2);border-color:rgba(150,150,150,0.4);color:#aaa; }
+
+/* ── Skeleton ────────────────────────────────────────── */
+.skel-card{
+  background:var(--glass);border:1px solid var(--border);
+  border-radius:20px;padding:22px 24px;
+}
+.skel-line{
+  border-radius:6px;margin-bottom:12px;
+  background:linear-gradient(90deg,rgba(255,255,255,0.04) 25%,rgba(255,255,255,0.09) 50%,rgba(255,255,255,0.04) 75%);
+  background-size:200% 100%;
+  animation:shimmer 1.6s infinite;
+}
+.skel-line.a{height:12px;width:30%;}
+.skel-line.b{height:14px;width:85%;}
+.skel-line.c{height:14px;width:70%;}
+.skel-line.d{height:14px;width:55%;margin-bottom:20px;}
+.skel-line.e{height:10px;width:25%;}
+@keyframes shimmer{0%{background-position:200% 0}100%{background-position:-200% 0}}
+
+/* ── Empty state ─────────────────────────────────────── */
+.empty{
+  text-align:center;padding:60px 20px;
+  font-family:'Playfair Display',serif;
+  font-style:italic;color:var(--muted);font-size:1.1rem;
+}
+.empty-icon{ font-size:3rem;display:block;margin-bottom:12px;opacity:0.5; }
+
+/* ── Toast ───────────────────────────────────────────── */
+.toast{
+  position:fixed;bottom:28px;left:50%;
+  transform:translateX(-50%) translateY(100px);
+  opacity:0;
+  background:linear-gradient(135deg,var(--rose),var(--crimson));
+  color:#fff;padding:12px 28px;border-radius:40px;
+  font-size:0.88rem;font-weight:600;
+  box-shadow:0 8px 30px rgba(255,45,111,0.5);
+  transition:all .4s cubic-bezier(.34,1.56,.64,1);
+  z-index:9999;white-space:nowrap;
+  font-family:'DM Sans',sans-serif;
+}
+.toast.show{ transform:translateX(-50%) translateY(0);opacity:1; }
+
+/* ── Updates box ─────────────────────────────────────── */
+.updates-card{ margin-top:28px; }
+.updates-card h3{
+  font-family:'Playfair Display',serif;
+  font-size:1rem;font-style:italic;
+  color:var(--muted);margin-bottom:12px;
+}
+.updates-list{ list-style:none;display:flex;flex-direction:column;gap:6px; }
+.updates-list li{
+  font-size:0.8rem;color:rgba(255,200,220,0.55);
+  padding-left:16px;position:relative;
+}
+.updates-list li::before{
+  content:'·';position:absolute;left:0;color:var(--rose);font-size:1.2rem;line-height:1;
+}
+
+/* ── Disclaimer ──────────────────────────────────────── */
+.disc{
+  text-align:center;font-size:0.75rem;
+  color:rgba(255,200,220,0.35);
+  margin-bottom:24px;line-height:1.5;
+}
+
+/* ── Light theme ─────────────────────────────────────── */
+[data-theme="light"] body{ background:#fff2f6; }
+[data-theme="light"] .bg{
+  background:
+    radial-gradient(ellipse 80% 60% at 20% 10%, rgba(255,180,210,0.5) 0%, transparent 60%),
+    radial-gradient(ellipse 60% 80% at 80% 90%, rgba(255,100,150,0.3) 0%, transparent 55%),
+    radial-gradient(ellipse 50% 50% at 50% 50%, #fff0f5 0%, #fce3f0 100%);
+}
+[data-theme="light"] { --glass:rgba(255,255,255,0.65); --glass2:rgba(255,255,255,0.85); --border:rgba(255,100,150,0.2); --text:#3d0022; --muted:rgba(150,50,90,0.8); --card-shadow:0 8px 40px rgba(255,45,111,0.1); }
+[data-theme="light"] textarea{ background:rgba(255,255,255,0.7);color:#3d0022; }
+[data-theme="light"] textarea::placeholder{color:rgba(180,80,120,0.4);}
+[data-theme="light"] .cat-pill{ background:rgba(255,45,111,0.08);color:#c0144c; }
+[data-theme="light"] .ftag{ background:rgba(255,45,111,0.06);color:rgba(150,50,90,0.8);border-color:rgba(255,100,150,0.2); }
+[data-theme="light"] .card-msg{ color:#3d0022; }
+[data-theme="light"] .vote-btn{ background:rgba(255,255,255,0.6);color:rgba(150,50,90,0.8);border-color:rgba(255,100,150,0.2); }
+[data-theme="light"] .skel-line{ background:linear-gradient(90deg,rgba(255,150,180,0.15) 25%,rgba(255,150,180,0.3) 50%,rgba(255,150,180,0.15) 75%);background-size:200% 100%;animation:shimmer 1.6s infinite; }
+[data-theme="light"] .updates-list li{ color:rgba(150,50,90,0.55); }
+
+/* ── Responsive ──────────────────────────────────────── */
+@media(max-width:600px){
+  .page{padding:0 12px 90px;}
+  header{padding:36px 0 24px;}
+  .site-title{font-size:1.9rem;}
+  .glass-card{padding:20px 18px;}
+  .conf-card{padding:18px;}
+  .card-msg{font-size:0.93rem;}
+  .stats-bar{gap:12px;padding:7px 16px;}
+  .toast{width:90%;text-align:center;white-space:normal;}
+}
+</style>
 </head>
-<body>
-  <div id="notif" class="notice">💌 NEW CONFESSION!</div>
-  <div class="heart">💗</div>
+<body data-theme="dark">
 
-  <div class="container">
-    <div class="header">
-      <div>
-        <div class="title">GIET Confession Page</div>
-        <div class="subtitle">Share anonymous crush messages, love secrets &amp; positive vibes.</div>
-        <div id="analyticsInfo">Visits: — | Unique: — | Live: —</div>
-      </div>
-      <div class="header-right">
-        <button class="theme-btn" id="themeBtn">🌙 Dark Mode</button>
-        <a href="https://www.instagram.com/" target="_blank" class="ig-link">📷 Instagram Confessions</a>
-      </div>
+<div class="bg"></div>
+<canvas id="particles"></canvas>
+
+<div class="toast" id="toast"></div>
+
+<div class="page">
+
+  <!-- Header -->
+  <header>
+    <div class="header-glow"></div>
+    <span class="logo-icon">💌</span>
+    <h1 class="site-title">GIET Confessions</h1>
+    <p class="site-sub">"Say what your heart won't let you speak aloud"</p>
+    <div class="stats-bar">
+      <span><span class="stats-dot"></span> <span id="statLive">0</span> online</span>
+      <span>👁 <span id="statVisits">0</span> visits</span>
+      <span>💌 <span id="statUnique">0</span> souls</span>
     </div>
+  </header>
 
-    <div class="disc">
-      <strong>Disclaimer:</strong> For entertainment only. Keep messages friendly &amp; respectful.
-      Offensive content is filtered and may be rejected by admin.
+  <!-- Top bar -->
+  <div class="top-bar">
+    <a href="https://www.instagram.com/gietconfessionwebsite/" target="_blank" class="ig-pill">📷 Instagram Page</a>
+    <button class="theme-pill" id="themeBtn">☀️ Light</button>
+  </div>
+
+  <!-- Disclaimer -->
+  <div class="disc">Anonymous · Safe · For GIET students only · Admin reviews every message</div>
+
+  <!-- Submit -->
+  <div class="glass-card submit-card">
+    <h2>✍️ Send a Confession</h2>
+    <div class="cat-row" id="catPicker">
+      <div class="cat-pill active" data-cat="💘 Crush">💘 Crush</div>
+      <div class="cat-pill" data-cat="🌹 Shayari">🌹 Shayari</div>
+      <div class="cat-pill" data-cat="💭 Random">💭 Random</div>
     </div>
-
-    <div class="card" style="margin-bottom:8px;">
-      <h2>Submit a Confession</h2>
-      <div class="tags-row" id="catPicker">
-        <span>Tag:</span>
-        <div class="tag active" data-cat="💘 Crush">💘 Crush</div>
-        <div class="tag" data-cat="🌹 Shayari">🌹 Shayari</div>
-        <div class="tag" data-cat="💭 Random">💭 Random</div>
-      </div>
-      <textarea id="confInput" maxlength="2400" placeholder="Type your anonymous message (max 400 words)…"></textarea>
-      <div class="wbar-wrap">
-        <div class="wbar-bg"><div class="wbar" id="wbar"></div></div>
-        <div class="winfo" id="winfo">0 / 400 words</div>
-      </div>
-      <button class="submit-btn" id="submitBtn">Send Anonymous 💌</button>
-      <div id="fStatus"></div>
+    <div class="textarea-wrap">
+      <textarea id="confInput" maxlength="3000" placeholder="Write your confession... it'll reach them, anonymously 💕"></textarea>
     </div>
+    <div class="word-row">
+      <div class="wbar-bg"><div class="wbar" id="wbar"></div></div>
+      <div class="wcount" id="wcount">0 / 400 words</div>
+    </div>
+    <button class="submit-btn" id="submitBtn">Send Anonymously 💌</button>
+    <div id="fStatus"></div>
+  </div>
 
-    <div class="filter-bar">
-      <span>Filter:</span>
+  <!-- Feed -->
+  <div class="section-head">
+    <span class="section-label">Recent confessions</span>
+    <div class="filter-row">
       <div class="ftag active" data-f="all">All</div>
-      <div class="ftag" data-f="💘 Crush">💘 Crush</div>
-      <div class="ftag" data-f="🌹 Shayari">🌹 Shayari</div>
-      <div class="ftag" data-f="💭 Random">💭 Random</div>
-    </div>
-
-    <div class="grid" id="grid">
-      <div class="skel-card"><div class="skel-line a"></div><div class="skel-line c"></div><div class="skel-line b"></div><div class="skel-line d"></div></div>
-      <div class="skel-card"><div class="skel-line b"></div><div class="skel-line a"></div><div class="skel-line c"></div><div class="skel-line d"></div></div>
-      <div class="skel-card"><div class="skel-line c"></div><div class="skel-line b"></div><div class="skel-line a"></div><div class="skel-line d"></div></div>
-    </div>
-
-    <div class="card upd-box">
-      <h3>Website Updates</h3>
-      <ul>
-        <li>v1.0 — Initial confession features</li>
-        <li>v1.1 — Like/dislike &amp; 24h auto-expiry</li>
-        <li>v1.2 — Admin moderation + delete</li>
-        <li>v1.3 — Dark mode, categories, improved UI</li>
-        <li>v1.4 — MongoDB: confessions now persist permanently</li>
-      </ul>
+      <div class="ftag" data-f="💘 Crush">💘</div>
+      <div class="ftag" data-f="🌹 Shayari">🌹</div>
+      <div class="ftag" data-f="💭 Random">💭</div>
     </div>
   </div>
 
-  <script>
-    const API_BASE = 'https://confession-app-1w0s.onrender.com';
-    const abusive = ['fuck','shit','bitch','asshole','cunt','dick','piss','slut'];
+  <div class="feed" id="feed">
+    <div class="skel-card"><div class="skel-line a"></div><div class="skel-line b"></div><div class="skel-line c"></div><div class="skel-line d"></div><div class="skel-line e"></div></div>
+    <div class="skel-card"><div class="skel-line a"></div><div class="skel-line c"></div><div class="skel-line b"></div><div class="skel-line d"></div><div class="skel-line e"></div></div>
+    <div class="skel-card"><div class="skel-line a"></div><div class="skel-line b"></div><div class="skel-line d"></div><div class="skel-line e"></div></div>
+  </div>
 
-    // Dark mode
-    const html = document.documentElement;
-    const themeBtn = document.getElementById('themeBtn');
-    const savedTheme = localStorage.getItem('giet_theme') || 'light';
-    html.setAttribute('data-theme', savedTheme);
-    themeBtn.textContent = savedTheme === 'dark' ? '☀️ Light Mode' : '🌙 Dark Mode';
-    themeBtn.addEventListener('click', () => {
-      const next = html.getAttribute('data-theme') === 'dark' ? 'light' : 'dark';
-      html.setAttribute('data-theme', next);
-      localStorage.setItem('giet_theme', next);
-      themeBtn.textContent = next === 'dark' ? '☀️ Light Mode' : '🌙 Dark Mode';
-    });
+  <!-- Updates -->
+  <div class="glass-card updates-card">
+    <h3>Changelog</h3>
+    <ul class="updates-list">
+      <li>v1.0 — Initial confession features</li>
+      <li>v1.1 — Like / dislike &amp; 24h auto-expiry</li>
+      <li>v1.2 — Admin moderation panel</li>
+      <li>v1.3 — Dark mode, categories, improved UI</li>
+      <li>v1.4 — MongoDB: confessions persist permanently</li>
+      <li>v1.5 — Full redesign: immersive UI + animations</li>
+    </ul>
+  </div>
 
-    // Category picker
-    let selCat = '💘 Crush';
-    document.querySelectorAll('#catPicker .tag').forEach(t => {
-      t.addEventListener('click', () => {
-        document.querySelectorAll('#catPicker .tag').forEach(x => x.classList.remove('active'));
-        t.classList.add('active');
-        selCat = t.dataset.cat;
-      });
-    });
+</div><!-- /page -->
 
-    // Filter
-    let activeFilter = 'all';
-    document.querySelectorAll('.ftag').forEach(t => {
-      t.addEventListener('click', () => {
-        document.querySelectorAll('.ftag').forEach(x => x.classList.remove('active'));
-        t.classList.add('active');
-        activeFilter = t.dataset.f;
-        render();
-      });
-    });
+<script>
+// ── Config ────────────────────────────────────────────
+const API = 'https://confession-app-1w0s.onrender.com';
 
-    // Utils
-    function cid() {
-      let id = localStorage.getItem('giet_cid');
-      if (!id) { id = crypto.randomUUID(); localStorage.setItem('giet_cid', id); }
-      return id;
-    }
-    function words(t){ return t.trim().split(/\s+/).filter(Boolean).length; }
-    function clean(t){ return t; }
-    function ago(ts) {
-      const d = Math.floor((Date.now()-ts)/1000);
-      if(d<60) return 'just now';
-      if(d<3600) return Math.floor(d/60)+'m ago';
-      if(d<86400) return Math.floor(d/3600)+'h ago';
-      return Math.floor(d/86400)+'d ago';
-    }
+// ── Particles ─────────────────────────────────────────
+(function(){
+  const c = document.getElementById('particles');
+  const ctx = c.getContext('2d');
+  let W, H, pts = [];
+  function resize(){ W=c.width=innerWidth; H=c.height=innerHeight; }
+  resize(); window.addEventListener('resize',resize);
 
-    // Toast
-    let tTimer;
-    function toast(msg) {
-      const el = document.getElementById('notif');
-      clearTimeout(tTimer);
-      el.classList.remove('show'); void el.offsetWidth;
-      el.textContent = msg; el.classList.add('show');
-      tTimer = setTimeout(() => el.classList.remove('show'), 4500);
-    }
+  const isDark = () => document.body.getAttribute('data-theme') !== 'light';
 
-    // Word bar
-    const confInput = document.getElementById('confInput');
-    const wbar = document.getElementById('wbar');
-    const winfo = document.getElementById('winfo');
-    confInput.addEventListener('input', () => {
-      const wc = words(confInput.value);
-      const pct = Math.min((wc/400)*100,100);
-      wbar.style.width = pct+'%';
-      wbar.className = 'wbar'+(wc>400?' over':wc>350?' warn':'');
-      winfo.textContent = wc+' / 400 words';
-    });
-
-    // State
-    let allConf = [], seenIds = new Set(), firstLoad = true;
-
-    function render() {
-      const grid = document.getElementById('grid');
-      const list = activeFilter === 'all' ? allConf : allConf.filter(c => c.category === activeFilter);
-      if (!list.length) {
-        grid.innerHTML = `<p style="grid-column:1/-1;text-align:center;color:var(--text-meta);padding:26px;background:var(--card-bg);border-radius:14px;">${
-          activeFilter==='all' ? 'No approved confessions yet. Be the first! 💌' : 'No confessions in this category yet.'
-        }</p>`;
-        return;
-      }
-      grid.innerHTML = '';
-      list.forEach(m => {
-        const d = document.createElement('div');
-        d.className = 'message-card';
-        d.innerHTML = `${m.category?`<div class="cat-badge">${m.category}</div>`:''}
-          <div class="msg-text">${m.message}</div>
-          <div class="meta">
-            <span class="meta-time" title="${new Date(m.createdAt).toLocaleString()}">${ago(m.createdAt)}</span>
-            <div class="votes">
-              <button onclick="vote('${m.id}','like')">👍 ${m.likes}</button>
-              <button onclick="vote('${m.id}','dislike')">👎 ${m.dislikes}</button>
-            </div>
-          </div>`;
-        grid.appendChild(d);
-      });
-    }
-
-    function fetchConf() {
-      fetch(`${API_BASE}/api/confessions`)
-        .then(r=>r.json()).then(data=>{
-          const newOnes = data.filter(m=>!seenIds.has(m.id));
-          if(newOnes.length && !firstLoad) toast(`💌 ${newOnes.length} new confession${newOnes.length>1?'s':''}!`);
-          seenIds = new Set(data.map(m=>m.id));
-          allConf = data; firstLoad = false;
-          render();
-        }).catch(()=>{
-          if(firstLoad) document.getElementById('grid').innerHTML=
-            `<p style="grid-column:1/-1;text-align:center;color:var(--text-meta);padding:24px;">Could not connect. Retrying…</p>`;
-        });
-    }
-
-    window.vote = function(id, type) {
-      fetch(`${API_BASE}/api/${type}/${id}`,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({clientId:cid()})})
-        .then(r=>r.json()).then(()=>fetchConf()).catch(console.error);
+  function spawn(){
+    return {
+      x:Math.random()*W, y:Math.random()*H,
+      r:Math.random()*2+0.5,
+      vx:(Math.random()-0.5)*0.3,
+      vy:-Math.random()*0.5-0.2,
+      o:Math.random()*0.5+0.1,
+      life:1, decay:Math.random()*0.003+0.001,
+      emoji: Math.random()<0.15 ? (Math.random()<0.5?'💕':'✨') : null
     };
+  }
+  for(let i=0;i<60;i++) pts.push(spawn());
 
-    // Submit
-    const submitBtn = document.getElementById('submitBtn');
-    const fStatus   = document.getElementById('fStatus');
-    submitBtn.addEventListener('click', () => {
-      let msg = confInput.value.trim();
-      const wc = words(msg);
-      if(!wc){ fStatus.textContent='Please type a message.'; fStatus.style.color='var(--accent)'; return; }
-      if(wc>400){ fStatus.textContent='Max 400 words.'; fStatus.style.color='var(--accent)'; return; }
-      msg = clean(msg);
-      if(!msg.trim()){ fStatus.textContent='Message empty after filtering.'; return; }
-
-      submitBtn.disabled=true; submitBtn.textContent='Sending…';
-      fetch(`${API_BASE}/api/confessions`,{method:'POST',headers:{'Content-Type':'application/json'},
-        body:JSON.stringify({message:msg,clientId:cid(),category:selCat})})
-        .then(r=>r.json()).then(data=>{
-          if(data.error){ fStatus.textContent=data.error; fStatus.style.color='var(--accent)'; }
-          else{
-            toast('✅ Saved for admin review. Thank you!');
-            fStatus.textContent=''; confInput.value='';
-            wbar.style.width='0%'; winfo.textContent='0 / 400 words';
-          }
-        }).catch(()=>{ fStatus.textContent='Network error. Try again.'; fStatus.style.color='var(--accent)'; })
-        .finally(()=>{ submitBtn.disabled=false; submitBtn.textContent='Send Anonymous 💌'; });
+  function draw(){
+    ctx.clearRect(0,0,W,H);
+    const dark = isDark();
+    pts.forEach((p,i)=>{
+      p.x+=p.vx; p.y+=p.vy; p.life-=p.decay;
+      if(p.life<=0||p.y<-20) pts[i]=spawn();
+      const alpha = p.o*p.life;
+      if(p.emoji){
+        ctx.globalAlpha = alpha*0.6;
+        ctx.font=`${p.r*8}px serif`;
+        ctx.fillText(p.emoji,p.x,p.y);
+      } else {
+        ctx.globalAlpha = alpha;
+        ctx.beginPath();
+        ctx.arc(p.x,p.y,p.r,0,Math.PI*2);
+        ctx.fillStyle = dark ? `rgba(255,100,150,1)` : `rgba(255,45,111,1)`;
+        ctx.fill();
+      }
     });
+    ctx.globalAlpha=1;
+    requestAnimationFrame(draw);
+  }
+  draw();
+})();
 
-    // Analytics
-    async function analytics() {
-      try {
-        const r = await fetch(`${API_BASE}/api/visit`,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({clientId:cid()})});
-        const d = await r.json();
-        document.getElementById('analyticsInfo').textContent=`Visits: ${d.visits} | Unique: ${d.uniqueVisitors} | Live: ${d.activeVisitors}`;
-      } catch(e){}
+// ── Theme ─────────────────────────────────────────────
+const themeBtn = document.getElementById('themeBtn');
+const saved = localStorage.getItem('giet_theme') || 'dark';
+document.body.setAttribute('data-theme', saved);
+themeBtn.textContent = saved === 'dark' ? '☀️ Light' : '🌙 Dark';
+themeBtn.addEventListener('click',()=>{
+  const next = document.body.getAttribute('data-theme')==='dark'?'light':'dark';
+  document.body.setAttribute('data-theme',next);
+  localStorage.setItem('giet_theme',next);
+  themeBtn.textContent = next==='dark'?'☀️ Light':'🌙 Dark';
+});
+
+// ── Utils ─────────────────────────────────────────────
+function cid(){ let i=localStorage.getItem('giet_cid'); if(!i){i=crypto.randomUUID();localStorage.setItem('giet_cid',i);} return i; }
+function words(t){ return t.trim().split(/\s+/).filter(Boolean).length; }
+function ago(ts){
+  const d=Math.floor((Date.now()-ts)/1000);
+  if(d<60) return 'just now';
+  if(d<3600) return Math.floor(d/60)+'m ago';
+  if(d<86400) return Math.floor(d/3600)+'h ago';
+  return Math.floor(d/86400)+'d ago';
+}
+
+// ── Toast ─────────────────────────────────────────────
+let tTimer;
+function toast(msg, duration=4000){
+  const el=document.getElementById('toast');
+  clearTimeout(tTimer);
+  el.textContent=msg; el.classList.add('show');
+  tTimer=setTimeout(()=>el.classList.remove('show'),duration);
+}
+
+// ── Word bar ──────────────────────────────────────────
+const confInput=document.getElementById('confInput');
+const wbar=document.getElementById('wbar');
+const wcount=document.getElementById('wcount');
+confInput.addEventListener('input',()=>{
+  const wc=words(confInput.value);
+  const pct=Math.min((wc/400)*100,100);
+  wbar.style.width=pct+'%';
+  wbar.className='wbar'+(wc>400?' over':wc>340?' warn':'');
+  wcount.textContent=wc+' / 400 words';
+  wcount.style.color=wc>400?'#ff6644':wc>340?'#ffaa44':'';
+});
+
+// ── Category ──────────────────────────────────────────
+let selCat='💘 Crush';
+document.querySelectorAll('#catPicker .cat-pill').forEach(p=>{
+  p.addEventListener('click',()=>{
+    document.querySelectorAll('#catPicker .cat-pill').forEach(x=>x.classList.remove('active'));
+    p.classList.add('active'); selCat=p.dataset.cat;
+  });
+});
+
+// ── Filter ────────────────────────────────────────────
+let activeF='all';
+document.querySelectorAll('.ftag').forEach(t=>{
+  t.addEventListener('click',()=>{
+    document.querySelectorAll('.ftag').forEach(x=>x.classList.remove('active'));
+    t.classList.add('active'); activeF=t.dataset.f; render();
+  });
+});
+
+// ── State ─────────────────────────────────────────────
+let allConf=[], seenIds=new Set(), firstLoad=true;
+
+function render(){
+  const feed=document.getElementById('feed');
+  const list=activeF==='all'?allConf:allConf.filter(c=>c.category===activeF);
+  if(!list.length){
+    feed.innerHTML=`<div class="empty"><span class="empty-icon">💭</span>${activeF==='all'?'No confessions yet — be the first to send one 💌':'No confessions in this category yet'}</div>`;
+    return;
+  }
+  feed.innerHTML='';
+  list.forEach((m,i)=>{
+    const d=document.createElement('div');
+    d.className='conf-card';
+    d.style.animationDelay=(i*0.06)+'s';
+    d.innerHTML=`
+      <div class="card-cat">${m.category||'💭 Random'}</div>
+      <div class="card-msg">${m.message}</div>
+      <div class="card-footer">
+        <span class="card-time">🕐 ${ago(m.createdAt)}</span>
+        <div class="vote-row">
+          <button class="vote-btn" onclick="vote('${m.id}','like',this)">❤️ ${m.likes}</button>
+          <button class="vote-btn" onclick="vote('${m.id}','dislike',this)">💔 ${m.dislikes}</button>
+        </div>
+      </div>`;
+    feed.appendChild(d);
+  });
+}
+
+function fetchConf(){
+  fetch(`${API}/api/confessions`)
+    .then(r=>r.json()).then(data=>{
+      const newOnes=data.filter(m=>!seenIds.has(m.id));
+      if(newOnes.length&&!firstLoad) toast(`💌 ${newOnes.length} new confession${newOnes.length>1?'s arrived':'arrived'}!`);
+      seenIds=new Set(data.map(m=>m.id));
+      allConf=data; firstLoad=false;
+      render();
+    }).catch(()=>{
+      if(firstLoad) document.getElementById('feed').innerHTML=`<div class="empty"><span class="empty-icon">📡</span>Connecting to server… please wait</div>`;
+    });
+}
+
+// ── Vote ──────────────────────────────────────────────
+window.vote=function(id,type,btn){
+  btn.style.opacity='0.5';
+  fetch(`${API}/api/${type}/${id}`,{
+    method:'POST',headers:{'Content-Type':'application/json'},
+    body:JSON.stringify({clientId:cid()})
+  }).then(r=>r.json()).then(()=>fetchConf()).catch(()=>{btn.style.opacity='1';});
+};
+
+// ── Submit ────────────────────────────────────────────
+const submitBtn=document.getElementById('submitBtn');
+const fStatus=document.getElementById('fStatus');
+submitBtn.addEventListener('click',()=>{
+  const msg=confInput.value.trim();
+  const wc=words(msg);
+  if(!wc){fStatus.textContent='Please write something first 💭';fStatus.style.color='var(--rose2)';return;}
+  if(wc>400){fStatus.textContent='Too long! Please stay under 400 words.';fStatus.style.color='var(--rose2)';return;}
+  submitBtn.disabled=true;submitBtn.textContent='Sending… 💌';fStatus.textContent='';
+  fetch(`${API}/api/confessions`,{
+    method:'POST',headers:{'Content-Type':'application/json'},
+    body:JSON.stringify({message:msg,clientId:cid(),category:selCat})
+  }).then(r=>r.json()).then(data=>{
+    if(data.error){fStatus.textContent=data.error;fStatus.style.color='var(--rose2)';}
+    else{
+      toast('✅ Confession sent! Admin will review it shortly 💌');
+      fStatus.textContent=''; confInput.value='';
+      wbar.style.width='0%'; wcount.textContent='0 / 400 words';
     }
+  }).catch(()=>{fStatus.textContent='Network error. Try again.';fStatus.style.color='var(--rose2)';})
+  .finally(()=>{submitBtn.disabled=false;submitBtn.textContent='Send Anonymously 💌';});
+});
 
-    setInterval(render, 30000); // refresh relative timestamps
-    window.addEventListener('load', ()=>{
-      fetchConf(); analytics();
-      setInterval(fetchConf,12000);
-      setInterval(analytics,15000);
-    });
-  </script>
+// ── Analytics ─────────────────────────────────────────
+async function analytics(){
+  try{
+    const r=await fetch(`${API}/api/visit`,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({clientId:cid()})});
+    const d=await r.json();
+    document.getElementById('statLive').textContent=d.activeVisitors||0;
+    document.getElementById('statVisits').textContent=d.visits||0;
+    document.getElementById('statUnique').textContent=d.uniqueVisitors||0;
+  }catch(e){}
+}
+
+// ── Timestamps auto-refresh ───────────────────────────
+setInterval(render,30000);
+
+// ── Boot ──────────────────────────────────────────────
+window.addEventListener('load',()=>{
+  fetchConf(); analytics();
+  setInterval(fetchConf,12000);
+  setInterval(analytics,15000);
+});
+</script>
 </body>
 </html>
