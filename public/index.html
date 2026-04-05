@@ -526,8 +526,13 @@ submitBtn.addEventListener('click',()=>{
     .then(r=>r.json()).then(data=>{
       if(data.error){fStatus.textContent=data.error;fStatus.style.color='var(--rose2)';}
       else{
-        const msg2=data.status==='approved'?'✅ Confession posted! 💌':'✅ Sent! Admin will review it shortly 💌';
-        toast(msg2);fStatus.textContent='';confInput.value='';wbar.style.width='0%';wcount.textContent='0 / 400 words';
+        let msg2=data.status==='approved'?'✅ Confession posted! 💌':'✅ Sent! Admin will review it shortly 💌';
+        // If filter edited the message, tell the user honestly what was changed
+        if(data.edited&&data.editedFields&&data.editedFields.length){
+          const what=data.editedFields.map(f=>({phone:'phone number',email:'email',handle:'social handle',link:'link',abuse:'some words',name:'a name'})[f]||f).join(', ');
+          msg2+=`\n✏️ Note: ${what} was auto-hidden to protect privacy.`;
+        }
+        toast(msg2,data.edited?6000:4000);fStatus.textContent='';confInput.value='';wbar.style.width='0%';wcount.textContent='0 / 400 words';
         if(data.status==='approved')setTimeout(fetchConf,1000);
       }
     }).catch(()=>{fStatus.textContent='Network error. Try again.';fStatus.style.color='var(--rose2)';})

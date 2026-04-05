@@ -90,6 +90,17 @@ body{min-height:100vh;background:#0d0008;color:var(--text);font-family:'DM Sans'
 .empty-msg{text-align:center;padding:30px;color:var(--muted);font-style:italic;font-family:'Playfair Display',serif;}
 #modStatus{margin-top:12px;font-size:0.85rem;font-weight:600;min-height:18px;}
 
+/* Filter tags shown on admin items */
+.filter-tags{display:flex;gap:5px;flex-wrap:wrap;margin-top:6px;margin-bottom:8px;}
+.ftag-badge{font-size:0.68rem;font-weight:700;padding:2px 8px;border-radius:10px;border:1px solid;}
+.ftag-badge.phone{color:#60a5fa;border-color:rgba(96,165,250,0.4);background:rgba(96,165,250,0.1);}
+.ftag-badge.email{color:#a78bfa;border-color:rgba(167,139,250,0.4);background:rgba(167,139,250,0.1);}
+.ftag-badge.handle{color:#34d399;border-color:rgba(52,211,153,0.4);background:rgba(52,211,153,0.1);}
+.ftag-badge.abuse{color:#f87171;border-color:rgba(248,113,113,0.4);background:rgba(248,113,113,0.1);}
+.ftag-badge.name{color:#fbbf24;border-color:rgba(251,191,36,0.4);background:rgba(251,191,36,0.1);}
+.ftag-badge.link{color:#fb923c;border-color:rgba(251,146,60,0.4);background:rgba(251,146,60,0.1);}
+.edited-note{font-size:0.72rem;color:rgba(251,191,36,0.8);margin-bottom:6px;display:flex;align-items:center;gap:4px;}
+
 /* In-page notification banner */
 .notif-banner{position:fixed;top:16px;left:50%;transform:translateX(-50%) translateY(-120px);opacity:0;background:linear-gradient(135deg,#f59e0b,#d97706);color:#fff;padding:12px 28px;border-radius:40px;font-size:0.9rem;font-weight:700;box-shadow:0 8px 30px rgba(245,158,11,0.5);transition:all .5s cubic-bezier(.34,1.56,.64,1);z-index:9999;white-space:nowrap;font-family:'DM Sans',sans-serif;cursor:pointer;}
 .notif-banner.show{transform:translateX(-50%) translateY(0);opacity:1;}
@@ -357,12 +368,25 @@ async function loadPending(){
   arr.forEach(item=>{
     const div=document.createElement('div');
     div.className='item'+(((item.flags||0)>0)?' flagged-item':'');
+
+    // Build filter tags
+    const fFlags=item.filterFlags||[];
+    const flagLabels={'phone':'📞 phone hidden','email':'📧 email hidden','handle':'@ handle hidden','abuse':'🤬 words blurred','name':'👤 name replaced','link':'🔗 link removed'};
+    const filterTagsHtml=fFlags.length
+      ?`<div class="filter-tags">${fFlags.map(f=>`<span class="ftag-badge ${f}">${flagLabels[f]||f}</span>`).join('')}</div>`
+      :'';
+    const editedNote=item.wasEdited
+      ?`<div class="edited-note">✏️ Auto-cleaned by filter — original preserved in DB</div>`
+      :'';
+
     div.innerHTML=`
       <div class="item-meta">
         <span class="item-cat">${item.category||'💭 Random'}</span>
         <span class="item-time">🕐 ${ago(item.createdAt)}</span>
         ${(item.flags||0)>0?`<span class="flag-count">⚑ ${item.flags} flag${item.flags>1?'s':''}</span>`:''}
       </div>
+      ${editedNote}
+      ${filterTagsHtml}
       <div class="item-msg">${item.message}</div>
       <div class="item-actions">
         <button class="ia-btn approve" onclick="moderate('${item.id}','approve')">✅ Approve</button>
