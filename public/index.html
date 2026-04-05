@@ -97,22 +97,19 @@ textarea:focus{border-color:var(--rose);box-shadow:0 0 0 3px rgba(255,45,111,0.1
 .act-btn.liked{background:rgba(255,45,111,0.2);border-color:var(--rose);color:var(--rose2);}
 .act-btn.flagged{background:rgba(255,150,0,0.15);border-color:rgba(255,150,0,0.4);color:#ffaa44;}
 
-/* Replies */
-.replies-toggle-row{margin-top:10px;display:flex;align-items:center;gap:8px;}
-.show-replies-btn{display:inline-flex;align-items:center;gap:5px;background:rgba(255,45,111,0.08);border:1px solid rgba(255,45,111,0.2);color:var(--rose2);border-radius:20px;padding:4px 12px;font-size:0.76rem;font-weight:600;cursor:pointer;transition:all .18s;font-family:'DM Sans',sans-serif;}
-.show-replies-btn:hover{background:rgba(255,45,111,0.18);border-color:var(--rose);}
-.reply-count-dot{width:5px;height:5px;border-radius:50%;background:var(--rose);display:inline-block;animation:pulse 2s infinite;}
-.replies-wrap{margin-top:14px;border-top:1px solid rgba(255,100,150,0.12);padding-top:14px;display:none;}
-.replies-wrap.open{display:block;}
-.reply-item{background:var(--reply-bg);border:1px solid var(--reply-border);border-radius:12px;padding:10px 14px;margin-bottom:8px;font-size:0.88rem;color:var(--reply-text);line-height:1.6;}
+/* Replies — always visible, no toggle */
+.replies-section{margin-top:16px;border-top:1px solid rgba(255,100,150,0.12);padding-top:14px;}
+.replies-label{font-size:0.75rem;font-weight:700;color:var(--rose2);letter-spacing:.04em;text-transform:uppercase;margin-bottom:10px;display:flex;align-items:center;gap:6px;}
+.replies-list{display:flex;flex-direction:column;gap:8px;margin-bottom:10px;}
+.reply-item{background:var(--reply-bg);border:1px solid var(--reply-border);border-radius:12px;padding:10px 14px;font-size:0.88rem;color:var(--reply-text);line-height:1.6;}
 .reply-time{font-size:0.7rem;color:var(--muted);margin-top:4px;}
-.reply-input-wrap{display:flex;gap:8px;margin-top:10px;}
+.no-replies{font-size:0.82rem;color:var(--muted);font-style:italic;padding:4px 0 8px;}
+.reply-input-wrap{display:flex;gap:8px;}
 .reply-input{flex:1;background:rgba(0,0,0,0.3);border:1px solid var(--border);border-radius:12px;padding:9px 13px;color:var(--text);font-size:0.85rem;font-family:'DM Sans',sans-serif;outline:none;transition:border-color .2s;}
 .reply-input:focus{border-color:var(--rose);}
 .reply-input::placeholder{color:rgba(255,200,220,0.3);}
 .reply-send{background:var(--rose);border:none;color:#fff;border-radius:12px;padding:9px 16px;font-size:0.82rem;font-weight:600;cursor:pointer;font-family:'DM Sans',sans-serif;transition:all .2s;white-space:nowrap;}
 .reply-send:hover{background:var(--crimson);}
-.no-replies{font-size:0.82rem;color:var(--muted);font-style:italic;text-align:center;padding:10px 0;}
 
 /* Skeleton */
 .skel-card{background:var(--glass);border:1px solid var(--border);border-radius:20px;padding:22px 24px;}
@@ -159,8 +156,6 @@ textarea:focus{border-color:var(--rose);box-shadow:0 0 0 3px rgba(255,45,111,0.1
   --reply-bg:rgba(255,45,111,0.06);--reply-border:rgba(255,45,111,0.18);
   --reply-text:#4a0028;  /* ← FIX: dark readable text for replies in light mode */
 }
-[data-theme="light"] textarea{background:rgba(255,255,255,0.7);color:#3d0022;}
-[data-theme="light"] textarea::placeholder{color:rgba(180,80,120,0.4);}
 [data-theme="light"] .reply-input{background:rgba(255,255,255,0.8);color:#3d0022;border-color:rgba(255,100,150,0.3);}
 [data-theme="light"] .reply-input::placeholder{color:rgba(180,80,120,0.4);}
 [data-theme="light"] .card-msg{color:#3d0022;}
@@ -170,9 +165,9 @@ textarea:focus{border-color:var(--rose);box-shadow:0 0 0 3px rgba(255,45,111,0.1
 [data-theme="light"] .modal-close{color:rgba(150,50,90,0.7);border-color:rgba(255,100,150,0.2);}
 [data-theme="light"] .skel-line{background:linear-gradient(90deg,rgba(255,150,180,0.15) 25%,rgba(255,150,180,0.3) 50%,rgba(255,150,180,0.15) 75%);background-size:200% 100%;animation:shimmer 1.6s infinite;}
 [data-theme="light"] .act-btn{background:rgba(255,255,255,0.6);border-color:rgba(255,100,150,0.2);color:rgba(150,50,90,0.9);}
-[data-theme="light"] .show-replies-btn{color:var(--crimson);}
 [data-theme="light"] .no-replies{color:rgba(150,50,90,0.6);}
 [data-theme="light"] .reply-time{color:rgba(150,50,90,0.6);}
+[data-theme="light"] .replies-label{color:var(--crimson);}
 
 @media(max-width:600px){
   .page{padding:0 12px 90px;}
@@ -272,7 +267,8 @@ textarea:focus{border-color:var(--rose);box-shadow:0 0 0 3px rgba(255,45,111,0.1
       <li>v1.4 — MongoDB: confessions persist permanently</li>
       <li>v1.5 — Full redesign: immersive UI + animations</li>
       <li>v1.6 — Replies, flag system, share to WhatsApp</li>
-      <li>v1.7 — Push notifications, PWA, reply fix, light mode fix</li>
+      <li>v1.7 — Push notifications, PWA, light mode fix</li>
+      <li>v1.8 — Replies always visible, no dropdown, smoother refresh</li>
     </ul>
   </div>
 </div>
@@ -360,10 +356,9 @@ document.getElementById('shareModal').addEventListener('click',e=>{if(e.target==
 
 // ── State ─────────────────────────────────────────────
 let allConf=[],seenIds=new Set(),firstLoad=true;
-const openReplies={};
 const replyCounts={};
 
-// ── Render (full rebuild — only called when safe) ─────
+// ── Render: surgical update — only add new cards, update existing in-place ──
 function render(){
   const feed=document.getElementById('feed');
   const list=activeF==='all'?allConf:allConf.filter(c=>c.category===activeF);
@@ -371,15 +366,25 @@ function render(){
     feed.innerHTML=`<div class="empty"><span class="empty-icon">💭</span>${activeF==='all'?'No confessions yet — be the first 💌':'No confessions in this category yet'}</div>`;
     return;
   }
-  feed.innerHTML='';
+  // Remove cards no longer in list
+  const listIds=new Set(list.map(m=>m.id));
+  feed.querySelectorAll('.conf-card').forEach(el=>{if(!listIds.has(el.dataset.id))el.remove();});
+
   list.forEach((m,i)=>{
+    const existing=feed.querySelector(`.conf-card[data-id="${m.id}"]`);
+    if(existing){
+      // Update counts in-place — never touch reply input/list
+      const lb=existing.querySelector('.like-btn');
+      const db=existing.querySelector('.dislike-btn');
+      if(lb)lb.innerHTML=`❤️ ${m.likes}`;
+      if(db)db.innerHTML=`💔 ${m.dislikes}`;
+      const tc=existing.querySelector('.card-time');
+      if(tc)tc.textContent=`🕐 ${ago(m.createdAt)}`;
+      return;
+    }
+    // New card
     const d=document.createElement('div');
-    d.className='conf-card';d.style.animationDelay=(i*0.06)+'s';
-    const replyOpen=openReplies[m.id]?'open':'';
-    const rc=replyCounts[m.id]||0;
-    const showRepliesBtn=rc>0
-      ?`<button class="show-replies-btn" onclick="toggleReplies('${m.id}',this)"><span class="reply-count-dot"></span> ${openReplies[m.id]?'Hide':'Show'} ${rc} repl${rc===1?'y':'ies'}</button>`
-      :'';
+    d.className='conf-card';d.dataset.id=m.id;d.style.animationDelay=(i*0.05)+'s';
     d.innerHTML=`
       <div class="card-cat">${m.category||'💭 Random'}</div>
       <div class="card-msg">${m.message}</div>
@@ -388,49 +393,36 @@ function render(){
         <div class="action-row">
           <button class="act-btn like-btn" onclick="vote('${m.id}','like',this)">❤️ ${m.likes}</button>
           <button class="act-btn dislike-btn" onclick="vote('${m.id}','dislike',this)">💔 ${m.dislikes}</button>
-          <button class="act-btn" onclick="toggleReplies('${m.id}',null)">💬 Reply</button>
           <button class="act-btn" onclick="openShare(\`${m.message.replace(/`/g,"'")}\`,'${m.id}')">📤 Share</button>
           <button class="act-btn${(m.flags||0)>0?' flagged':''}" onclick="flagConfession('${m.id}',this)">⚑ ${(m.flags||0)>0?'Flagged':'Flag'}</button>
         </div>
       </div>
-      ${showRepliesBtn?`<div class="replies-toggle-row">${showRepliesBtn}</div>`:''}
-      <div class="replies-wrap ${replyOpen}" id="rw-${m.id}">
-        <div id="rl-${m.id}"></div>
+      <div class="replies-section" id="rs-${m.id}">
+        <div class="replies-label">💬 Replies</div>
+        <div class="replies-list" id="rl-${m.id}"><div class="no-replies">Loading…</div></div>
         <div class="reply-input-wrap">
           <input class="reply-input" id="ri-${m.id}" placeholder="Write an anonymous reply…" maxlength="500"/>
           <button class="reply-send" onclick="sendReply('${m.id}')">Send</button>
         </div>
       </div>`;
-    feed.appendChild(d);
-    if(openReplies[m.id]) loadReplies(m.id);
+    const refCard=feed.querySelectorAll('.conf-card')[i];
+    if(refCard)feed.insertBefore(d,refCard);else feed.appendChild(d);
+    loadReplies(m.id);
   });
 }
 
-// ── Safe render: defer if a reply input has focus ────
+// ── Safe render: skip if reply input focused ──────────
 let pendingRender=false;
 function safeRender(){
   const focused=document.activeElement;
-  if(focused&&focused.classList.contains('reply-input')){
-    pendingRender=true;
-  } else {
-    render();pendingRender=false;
-  }
+  if(focused&&focused.classList.contains('reply-input')){pendingRender=true;}
+  else{render();pendingRender=false;}
 }
 document.addEventListener('focusout',e=>{
   if(e.target.classList.contains('reply-input')&&pendingRender){
     setTimeout(()=>{if(pendingRender){render();pendingRender=false;}},350);
   }
 });
-
-// ── Bulk reply counts ─────────────────────────────────
-async function fetchReplyCountsBulk(ids){
-  if(!ids.length)return;
-  try{
-    const r=await fetch(`${API}/api/replies/counts`,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({ids})});
-    const map=await r.json();
-    Object.assign(replyCounts,map);
-  }catch(e){}
-}
 
 // ── Fetch confessions ─────────────────────────────────
 function fetchConf(){
@@ -446,8 +438,6 @@ function fetchConf(){
       seenIds=new Set(data.map(m=>m.id));
       allConf=data;
       // Fetch reply counts — bulk API for all on first load, only new ones after
-      const idsNeeded=firstLoad?data.map(m=>m.id):newOnes.map(m=>m.id);
-      await fetchReplyCountsBulk(idsNeeded);
       firstLoad=false;
       safeRender();
     }).catch(()=>{
@@ -455,36 +445,16 @@ function fetchConf(){
     });
 }
 
-// ── Replies ───────────────────────────────────────────
-async function toggleReplies(confId,showBtn){
-  const wrap=document.getElementById('rw-'+confId);
-  if(!wrap)return;
-  const isOpen=wrap.classList.contains('open');
-  if(isOpen){
-    wrap.classList.remove('open');openReplies[confId]=false;
-    const rc=replyCounts[confId]||0;
-    if(showBtn)showBtn.innerHTML=`<span class="reply-count-dot"></span> Show ${rc} repl${rc===1?'y':'ies'}`;
-    return;
-  }
-  wrap.classList.add('open');openReplies[confId]=true;
-  await loadReplies(confId);
-  const rc=replyCounts[confId]||0;
-  if(showBtn)showBtn.innerHTML=`<span class="reply-count-dot"></span> Hide ${rc} repl${rc===1?'y':'ies'}`;
-}
-
+// ── Replies — always visible, no toggle ───────────────
 async function loadReplies(confId){
   const list=document.getElementById('rl-'+confId);
   if(!list)return;
-  list.innerHTML='<div style="text-align:center;padding:8px;color:var(--muted);font-size:0.8rem;">Loading…</div>';
   try{
     const r=await fetch(`${API}/api/replies/${confId}`);
     const replies=await r.json();
     replyCounts[confId]=replies.length;
     if(!replies.length){list.innerHTML='<div class="no-replies">No replies yet — be the first 💬</div>';return;}
     list.innerHTML=replies.map(r=>`<div class="reply-item">${r.message}<div class="reply-time">${ago(r.createdAt)}</div></div>`).join('');
-    // Update show-replies button label
-    const card=list.closest('.conf-card');
-    if(card){const btn=card.querySelector('.show-replies-btn');if(btn){const open=openReplies[confId];btn.innerHTML=`<span class="reply-count-dot"></span> ${open?'Hide':'Show'} ${replies.length} repl${replies.length===1?'y':'ies'}`;}}
   }catch(e){list.innerHTML='<div class="no-replies">Could not load replies</div>';}
 }
 
@@ -500,14 +470,6 @@ async function sendReply(confId){
     inp.value='';inp.disabled=false;
     toast('💬 Reply sent!');
     await loadReplies(confId);
-    // Inject show-replies button if this was the first reply
-    const card=inp.closest('.conf-card');
-    if(card&&!card.querySelector('.show-replies-btn')){
-      const row=document.createElement('div');row.className='replies-toggle-row';
-      const rc=replyCounts[confId]||1;
-      row.innerHTML=`<button class="show-replies-btn" onclick="toggleReplies('${confId}',this)"><span class="reply-count-dot"></span> Hide ${rc} repl${rc===1?'y':'ies'}</button>`;
-      card.insertBefore(row,document.getElementById('rw-'+confId));
-    }
   }catch(e){toast('Network error');inp.disabled=false;}
 }
 
