@@ -3,6 +3,9 @@
 <head>
 <meta charset="UTF-8"/>
 <meta name="viewport" content="width=device-width,initial-scale=1.0"/>
+<meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate"/>
+<meta http-equiv="Pragma" content="no-cache"/>
+<meta http-equiv="Expires" content="0"/>
 <title>GIET Confessions 💌</title>
 <link rel="manifest" href="/manifest.json"/>
 <meta name="theme-color" content="#ff2d6f"/>
@@ -269,6 +272,7 @@ textarea:focus{border-color:var(--rose);box-shadow:0 0 0 3px rgba(255,45,111,0.1
       <li>v1.6 — Replies, flag system, share to WhatsApp</li>
       <li>v1.7 — Push notifications, PWA, light mode fix</li>
       <li>v1.8 — Replies always visible, no dropdown, smoother refresh</li>
+      <li>v1.9 — Skeleton glitch fixed, mobile cache fixed (no stale pages)</li>
     </ul>
   </div>
 </div>
@@ -362,53 +366,63 @@ const replyCounts={};
 function render(){
   const feed=document.getElementById('feed');
   const list=activeF==='all'?allConf:allConf.filter(c=>c.category===activeF);
+
+  // Always wipe non-conf-card nodes (skeletons, empty divs) on first real render
+  feed.querySelectorAll(':scope > :not(.conf-card)').forEach(el=>el.remove());
+
   if(!list.length){
     feed.innerHTML=`<div class="empty"><span class="empty-icon">💭</span>${activeF==='all'?'No confessions yet — be the first 💌':'No confessions in this category yet'}</div>`;
     return;
   }
-  // Remove cards no longer in list
+
+  // Remove cards whose id is no longer in the list
   const listIds=new Set(list.map(m=>m.id));
   feed.querySelectorAll('.conf-card').forEach(el=>{if(!listIds.has(el.dataset.id))el.remove();});
 
+  // Build ordered list of card elements, creating new ones as needed
+  const fragment=document.createDocumentFragment();
   list.forEach((m,i)=>{
-    const existing=feed.querySelector(`.conf-card[data-id="${m.id}"]`);
-    if(existing){
-      // Update counts in-place — never touch reply input/list
-      const lb=existing.querySelector('.like-btn');
-      const db=existing.querySelector('.dislike-btn');
+    let card=feed.querySelector(`.conf-card[data-id="${m.id}"]`);
+    if(card){
+      // Update counts in-place — never touch reply input or reply list
+      const lb=card.querySelector('.like-btn');
+      const db=card.querySelector('.dislike-btn');
       if(lb)lb.innerHTML=`❤️ ${m.likes}`;
       if(db)db.innerHTML=`💔 ${m.dislikes}`;
-      const tc=existing.querySelector('.card-time');
+      const tc=card.querySelector('.card-time');
       if(tc)tc.textContent=`🕐 ${ago(m.createdAt)}`;
-      return;
+    } else {
+      // Brand new card
+      card=document.createElement('div');
+      card.className='conf-card';card.dataset.id=m.id;card.style.animationDelay=(i*0.05)+'s';
+      card.innerHTML=`
+        <div class="card-cat">${m.category||'💭 Random'}</div>
+        <div class="card-msg">${m.message}</div>
+        <div class="card-footer">
+          <span class="card-time">🕐 ${ago(m.createdAt)}</span>
+          <div class="action-row">
+            <button class="act-btn like-btn" onclick="vote('${m.id}','like',this)">❤️ ${m.likes}</button>
+            <button class="act-btn dislike-btn" onclick="vote('${m.id}','dislike',this)">💔 ${m.dislikes}</button>
+            <button class="act-btn" onclick="openShare(\`${m.message.replace(/`/g,"'")}\`,'${m.id}')">📤 Share</button>
+            <button class="act-btn${(m.flags||0)>0?' flagged':''}" onclick="flagConfession('${m.id}',this)">⚑ ${(m.flags||0)>0?'Flagged':'Flag'}</button>
+          </div>
+        </div>
+        <div class="replies-section" id="rs-${m.id}">
+          <div class="replies-label">💬 Replies</div>
+          <div class="replies-list" id="rl-${m.id}"><div class="no-replies">Loading…</div></div>
+          <div class="reply-input-wrap">
+            <input class="reply-input" id="ri-${m.id}" placeholder="Write an anonymous reply…" maxlength="500"/>
+            <button class="reply-send" onclick="sendReply('${m.id}')">Send</button>
+          </div>
+        </div>`;
+      // Load replies asynchronously after inserting
+      setTimeout(()=>loadReplies(m.id),0);
     }
-    // New card
-    const d=document.createElement('div');
-    d.className='conf-card';d.dataset.id=m.id;d.style.animationDelay=(i*0.05)+'s';
-    d.innerHTML=`
-      <div class="card-cat">${m.category||'💭 Random'}</div>
-      <div class="card-msg">${m.message}</div>
-      <div class="card-footer">
-        <span class="card-time">🕐 ${ago(m.createdAt)}</span>
-        <div class="action-row">
-          <button class="act-btn like-btn" onclick="vote('${m.id}','like',this)">❤️ ${m.likes}</button>
-          <button class="act-btn dislike-btn" onclick="vote('${m.id}','dislike',this)">💔 ${m.dislikes}</button>
-          <button class="act-btn" onclick="openShare(\`${m.message.replace(/`/g,"'")}\`,'${m.id}')">📤 Share</button>
-          <button class="act-btn${(m.flags||0)>0?' flagged':''}" onclick="flagConfession('${m.id}',this)">⚑ ${(m.flags||0)>0?'Flagged':'Flag'}</button>
-        </div>
-      </div>
-      <div class="replies-section" id="rs-${m.id}">
-        <div class="replies-label">💬 Replies</div>
-        <div class="replies-list" id="rl-${m.id}"><div class="no-replies">Loading…</div></div>
-        <div class="reply-input-wrap">
-          <input class="reply-input" id="ri-${m.id}" placeholder="Write an anonymous reply…" maxlength="500"/>
-          <button class="reply-send" onclick="sendReply('${m.id}')">Send</button>
-        </div>
-      </div>`;
-    const refCard=feed.querySelectorAll('.conf-card')[i];
-    if(refCard)feed.insertBefore(d,refCard);else feed.appendChild(d);
-    loadReplies(m.id);
+    fragment.appendChild(card);
   });
+
+  // Re-append in correct order (existing cards get moved, not re-created)
+  feed.appendChild(fragment);
 }
 
 // ── Safe render: skip if reply input focused ──────────
@@ -614,7 +628,9 @@ window.addEventListener('load',()=>{
   setInterval(fetchConf,15000);
   setInterval(analytics,15000);
   if('serviceWorker' in navigator){
-    navigator.serviceWorker.register('/sw.js').then(()=>{
+    navigator.serviceWorker.register('/sw.js').then(reg=>{
+      // Force check for SW updates immediately (fixes mobile stale cache)
+      reg.update();
       // Only ask push if not already declined
       if(!localStorage.getItem('pushDeclined')) setupPushNotifications();
     }).catch(()=>{});
