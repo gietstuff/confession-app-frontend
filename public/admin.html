@@ -4,6 +4,11 @@
 <meta charset="UTF-8"/>
 <meta name="viewport" content="width=device-width,initial-scale=1.0"/>
 <title>GIET Admin Panel 🔐</title>
+<link rel="manifest" href="/manifest-admin.json"/>
+<meta name="theme-color" content="#ff2d6f"/>
+<meta name="apple-mobile-web-app-capable" content="yes"/>
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent"/>
+<meta name="apple-mobile-web-app-title" content="GIET Admin 🔐"/>
 <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet"/>
 <style>
 *{margin:0;padding:0;box-sizing:border-box;}
@@ -32,18 +37,16 @@ body{min-height:100vh;background:#0d0008;color:var(--text);font-family:'DM Sans'
 .logout-btn{background:rgba(255,45,111,0.1);border:1px solid rgba(255,45,111,0.3);color:var(--rose2);border-radius:30px;padding:7px 18px;cursor:pointer;font-size:0.82rem;font-weight:600;font-family:'DM Sans',sans-serif;transition:all .2s;}
 .logout-btn:hover{background:rgba(255,45,111,0.2);}
 
-/* Stats row */
+/* Stats */
 .stats-row{display:flex;gap:12px;margin-bottom:24px;flex-wrap:wrap;}
 .stat-box{flex:1;min-width:120px;background:var(--glass);border:1px solid var(--border);border-radius:16px;padding:16px;backdrop-filter:blur(10px);text-align:center;}
 .stat-num{font-size:1.8rem;font-weight:700;color:var(--rose2);}
 .stat-lbl{font-size:0.75rem;color:var(--muted);margin-top:4px;}
 
-/* Control panel */
+/* Controls */
 .control-panel{background:var(--glass);border:1px solid var(--border);border-radius:20px;padding:22px;backdrop-filter:blur(12px);margin-bottom:24px;}
 .control-panel h2{font-family:'Playfair Display',serif;font-size:1.1rem;margin-bottom:18px;color:var(--muted);}
 .controls{display:flex;gap:10px;flex-wrap:wrap;align-items:center;}
-
-/* Toggle switch */
 .toggle-wrap{display:flex;align-items:center;gap:10px;background:rgba(0,0,0,0.3);border:1px solid var(--border);border-radius:14px;padding:10px 16px;flex:1;min-width:220px;}
 .toggle-label{font-size:0.88rem;font-weight:600;flex:1;}
 .toggle-sub{font-size:0.72rem;color:var(--muted);display:block;margin-top:2px;}
@@ -53,7 +56,6 @@ body{min-height:100vh;background:#0d0008;color:var(--text);font-family:'DM Sans'
 .toggle-slider::before{content:'';position:absolute;width:20px;height:20px;left:3px;top:3px;background:#fff;border-radius:50%;transition:transform .3s;}
 .toggle input:checked+.toggle-slider{background:var(--green);}
 .toggle input:checked+.toggle-slider::before{transform:translateX(20px);}
-
 .ctrl-btn{display:flex;align-items:center;gap:7px;padding:11px 18px;border-radius:14px;border:none;cursor:pointer;font-size:0.85rem;font-weight:600;font-family:'DM Sans',sans-serif;transition:all .2s;}
 .approve-all-btn{background:linear-gradient(135deg,var(--green),#16a34a);color:#fff;box-shadow:0 4px 16px rgba(34,197,94,0.3);}
 .approve-all-btn:hover{transform:translateY(-2px);box-shadow:0 6px 22px rgba(34,197,94,0.45);}
@@ -68,7 +70,7 @@ body{min-height:100vh;background:#0d0008;color:var(--text);font-family:'DM Sans'
 .badge{background:var(--rose);color:#fff;border-radius:20px;padding:2px 10px;font-size:0.72rem;font-weight:700;margin-left:8px;}
 .badge.flagged-badge{background:var(--yellow);}
 
-/* Confession item */
+/* Items */
 .item{background:rgba(0,0,0,0.25);border:1px solid rgba(255,100,150,0.15);border-radius:14px;padding:16px;margin-bottom:12px;transition:border-color .2s;}
 .item:last-child{margin-bottom:0;}
 .item.flagged-item{border-color:rgba(245,158,11,0.4);background:rgba(245,158,11,0.04);}
@@ -85,7 +87,6 @@ body{min-height:100vh;background:#0d0008;color:var(--text);font-family:'DM Sans'
 .reject:hover{background:rgba(239,68,68,0.3);}
 .delete{background:rgba(80,80,80,0.2);color:#aaa;border:1px solid rgba(150,150,150,0.25);}
 .delete:hover{background:rgba(239,68,68,0.2);color:#fca5a5;}
-
 .empty-msg{text-align:center;padding:30px;color:var(--muted);font-style:italic;font-family:'Playfair Display',serif;}
 #modStatus{margin-top:12px;font-size:0.85rem;font-weight:600;min-height:18px;}
 
@@ -98,7 +99,7 @@ body{min-height:100vh;background:#0d0008;color:var(--text);font-family:'DM Sans'
 </head>
 <body>
 <div class="bg"></div>
-<div class="notif-banner" id="notifBanner" onclick="document.getElementById('notifBanner').classList.remove('show')">💌 New confessions waiting for review!</div>
+<div class="notif-banner" id="notifBanner" onclick="this.classList.remove('show')">💌 New confessions waiting for review!</div>
 
 <!-- Login -->
 <div class="login-wrap" id="loginWrap">
@@ -114,13 +115,11 @@ body{min-height:100vh;background:#0d0008;color:var(--text);font-family:'DM Sans'
 
 <!-- Admin panel -->
 <div class="page hidden" id="adminPanel">
-
   <div class="admin-header">
     <div class="admin-title">🔐 <span>Admin</span> Panel</div>
     <button class="logout-btn" onclick="logout()">Logout</button>
   </div>
 
-  <!-- Stats -->
   <div class="stats-row">
     <div class="stat-box"><div class="stat-num" id="sVisits">—</div><div class="stat-lbl">Total Visits</div></div>
     <div class="stat-box"><div class="stat-num" id="sUnique">—</div><div class="stat-lbl">Unique Visitors</div></div>
@@ -128,11 +127,9 @@ body{min-height:100vh;background:#0d0008;color:var(--text);font-family:'DM Sans'
     <div class="stat-box"><div class="stat-num" id="sPending">—</div><div class="stat-lbl">Pending</div></div>
   </div>
 
-  <!-- Controls -->
   <div class="control-panel">
     <h2>⚙️ Controls</h2>
     <div class="controls">
-      <!-- Auto-approve toggle -->
       <div class="toggle-wrap">
         <div>
           <div class="toggle-label">Auto-Approve</div>
@@ -143,14 +140,11 @@ body{min-height:100vh;background:#0d0008;color:var(--text);font-family:'DM Sans'
           <span class="toggle-slider"></span>
         </label>
       </div>
-      <!-- Bulk approve -->
       <button class="ctrl-btn approve-all-btn" onclick="approveAll()">✅ Approve All Pending</button>
-      <!-- Browser notifications -->
-      <button class="notif-btn" id="notifBtn" onclick="requestNotifPermission()">🔔 Enable Notifications</button>
+      <button class="notif-btn" id="notifBtn" onclick="requestPushPermission()">🔔 Enable Push Notifications</button>
     </div>
   </div>
 
-  <!-- Pending -->
   <div class="section">
     <div class="section-head">
       <h2>📥 Pending <span class="badge" id="pendingBadge">0</span> <span class="badge flagged-badge" id="flaggedBadge" style="display:none">⚑ Flagged</span></h2>
@@ -158,7 +152,6 @@ body{min-height:100vh;background:#0d0008;color:var(--text);font-family:'DM Sans'
     <div id="pendingList"><div class="empty-msg">No pending confessions 🎉</div></div>
   </div>
 
-  <!-- Approved -->
   <div class="section">
     <div class="section-head">
       <h2>✅ Approved <span class="badge" id="approvedBadge">0</span></h2>
@@ -172,14 +165,22 @@ body{min-height:100vh;background:#0d0008;color:var(--text);font-family:'DM Sans'
 <script>
 const API = 'https://confession-app-1w0s.onrender.com';
 let authToken = null;
-let notifEnabled = false;
 let lastPendingCount = -1; // -1 = not yet polled; avoids false notif on first load
+let pushSubscription = null;
 
 function adminH(){ return {'Content-Type':'application/json','x-admin-token':authToken||''}; }
-
 function setStatus(msg,color='var(--green)'){const el=document.getElementById('modStatus');el.textContent=msg;el.style.color=color;setTimeout(()=>el.textContent='',4000);}
-
 function ago(ts){const d=Math.floor((Date.now()-ts)/1000);if(d<60)return 'just now';if(d<3600)return Math.floor(d/60)+'m ago';if(d<86400)return Math.floor(d/3600)+'h ago';return Math.floor(d/86400)+'d ago';}
+
+// ── In-page banner ─────────────────────────────────────
+let bannerTimer;
+function showBanner(count){
+  const el=document.getElementById('notifBanner');
+  el.textContent=`💌 ${count} new confession${count>1?'s':''} waiting for review!`;
+  el.classList.add('show');
+  clearTimeout(bannerTimer);
+  bannerTimer=setTimeout(()=>el.classList.remove('show'),7000);
+}
 
 // ── Login ──────────────────────────────────────────────
 async function doLogin(){
@@ -196,6 +197,8 @@ async function doLogin(){
       setInterval(loadAll,12000);
       setInterval(loadAnalytics,15000);
       loadAutoApproveState();
+      // After login, set up push notifications for admin
+      setupAdminPush();
     }else{
       document.getElementById('loginMsg').textContent=d.error||'Login failed';
     }
@@ -203,6 +206,82 @@ async function doLogin(){
 }
 
 function logout(){authToken=null;location.reload();}
+
+// ── Push Notifications (Admin) ─────────────────────────
+async function setupAdminPush(){
+  if(!('serviceWorker' in navigator)||!('PushManager' in window))return;
+  const reg=await navigator.serviceWorker.register('/sw.js').catch(()=>null);
+  if(!reg)return;
+  await navigator.serviceWorker.ready;
+  // Check existing subscription
+  const existing=await reg.pushManager.getSubscription();
+  if(existing){
+    pushSubscription=existing;
+    await sendAdminSubToServer(existing);
+    updateNotifBtn(true);
+    return;
+  }
+  // If permission already granted, subscribe silently
+  if(Notification.permission==='granted'){
+    await subscribeAdminPush(reg);
+  }
+}
+
+async function requestPushPermission(){
+  if(!('serviceWorker' in navigator)||!('PushManager' in window)){
+    alert('Push notifications are not supported on this browser.');return;
+  }
+  if(Notification.permission==='denied'){
+    alert('Notifications are blocked. Please allow them in your browser/phone settings for this site.');return;
+  }
+  const perm=await Notification.requestPermission();
+  if(perm==='granted'){
+    const reg=await navigator.serviceWorker.ready;
+    await subscribeAdminPush(reg);
+  }
+}
+
+async function subscribeAdminPush(reg){
+  try{
+    const keyRes=await fetch(`${API}/api/push/vapid-public-key`);
+    const {key}=await keyRes.json();
+    if(!key){setStatus('Push not configured on server','var(--yellow)');return;}
+    const appServerKey=urlBase64ToUint8Array(key);
+    const sub=await reg.pushManager.subscribe({userVisibleOnly:true,applicationServerKey:appServerKey});
+    pushSubscription=sub;
+    await sendAdminSubToServer(sub);
+    updateNotifBtn(true);
+    setStatus('🔔 Push notifications enabled! You\'ll be notified of new confessions.','var(--green)');
+    // Send a test notification
+    new Notification('GIET Admin 🔐',{body:'Notifications enabled! New confessions will ping you.',icon:'https://em-content.zobj.net/source/twitter/376/love-letter_1f48c.png'});
+  }catch(e){
+    setStatus('Could not enable push notifications','var(--rose)');
+    console.warn('Admin push subscribe failed:',e);
+  }
+}
+
+async function sendAdminSubToServer(sub){
+  try{
+    await fetch(`${API}/api/admin/push/subscribe`,{
+      method:'POST',
+      headers:adminH(),
+      body:JSON.stringify({subscription:sub.toJSON()})
+    });
+  }catch(e){}
+}
+
+function updateNotifBtn(enabled){
+  const btn=document.getElementById('notifBtn');
+  if(enabled){btn.textContent='🔔 Notifications ON';btn.classList.add('enabled');}
+  else{btn.textContent='🔔 Enable Push Notifications';btn.classList.remove('enabled');}
+}
+
+function urlBase64ToUint8Array(base64String){
+  const padding='='.repeat((4-base64String.length%4)%4);
+  const base64=(base64String+padding).replace(/-/g,'+').replace(/_/g,'/');
+  const rawData=window.atob(base64);
+  return Uint8Array.from([...rawData].map(c=>c.charCodeAt(0)));
+}
 
 // ── Auto-approve ───────────────────────────────────────
 async function loadAutoApproveState(){
@@ -212,12 +291,11 @@ async function loadAutoApproveState(){
     document.getElementById('autoApproveToggle').checked=!!d.autoApprove;
   }catch(e){}
 }
-
 async function toggleAutoApprove(){
   const enabled=document.getElementById('autoApproveToggle').checked;
   try{
     await fetch(`${API}/api/admin/auto-approve`,{method:'POST',headers:adminH(),body:JSON.stringify({enabled})});
-    setStatus(enabled?'✅ Auto-approve ON — confessions go live instantly':'⏸ Auto-approve OFF — manual review required', enabled?'var(--green)':'var(--rose2)');
+    setStatus(enabled?'✅ Auto-approve ON — confessions go live instantly':'⏸ Auto-approve OFF — manual review required',enabled?'var(--green)':'var(--rose2)');
   }catch(e){setStatus('Failed to update setting','var(--rose)');document.getElementById('autoApproveToggle').checked=!enabled;}
 }
 
@@ -233,41 +311,6 @@ async function approveAll(){
   }catch(e){setStatus('Network error','var(--rose)');}
 }
 
-// ── Notifications ──────────────────────────────────────
-async function requestNotifPermission(){
-  if(!('Notification' in window)){alert('Your browser does not support notifications.');return;}
-  const perm=await Notification.requestPermission();
-  if(perm==='granted'){
-    notifEnabled=true;
-    document.getElementById('notifBtn').textContent='🔔 Notifications ON';
-    document.getElementById('notifBtn').classList.add('enabled');
-    new Notification('GIET Admin 🔐',{body:'Notifications enabled! You\'ll be alerted when new confessions arrive.',icon:'https://em-content.zobj.net/source/twitter/376/love-letter_1f48c.png'});
-  }
-}
-
-let bannerTimer;
-function showBanner(count){
-  const el=document.getElementById('notifBanner');
-  el.textContent=`💌 ${count} new confession${count>1?'s':''} waiting for review!`;
-  el.classList.add('show');
-  clearTimeout(bannerTimer);
-  bannerTimer=setTimeout(()=>el.classList.remove('show'),6000);
-}
-
-function sendNotif(count){
-  // Always show in-page banner
-  showBanner(count);
-  // Also try browser notification if permitted
-  if(notifEnabled&&Notification.permission==='granted'){
-    try{
-      new Notification(`💌 ${count} new confession${count>1?'s':''}!`,{
-        body:'New confessions are waiting for your review.',
-        icon:'https://em-content.zobj.net/source/twitter/376/love-letter_1f48c.png'
-      });
-    }catch(e){}
-  }
-}
-
 // ── Moderate ───────────────────────────────────────────
 async function moderate(id,action){
   try{
@@ -278,7 +321,6 @@ async function moderate(id,action){
     loadAll();
   }catch(e){setStatus('Network error','var(--rose)');}
 }
-
 async function deleteConf(id){
   if(!confirm('Delete this confession?'))return;
   try{
@@ -299,10 +341,10 @@ async function loadPending(){
   badge.textContent=arr.length;
   document.getElementById('sPending').textContent=arr.length;
 
-  // Notification on new arrivals — skip the very first poll (lastPendingCount === -1)
+  // Notify on new arrivals — skip very first poll (lastPendingCount === -1)
   if(lastPendingCount !== -1 && arr.length > lastPendingCount){
     const newCount=arr.length-lastPendingCount;
-    if(newCount>0)sendNotif(newCount);
+    showBanner(newCount);
   }
   lastPendingCount=arr.length;
 
@@ -332,7 +374,6 @@ async function loadPending(){
 }
 
 async function loadApproved(){
-  const cutoff=Date.now()-24*3600*1000;
   const r=await fetch(`${API}/api/confessions`);
   const arr=await r.json();
   const container=document.getElementById('approvedList');

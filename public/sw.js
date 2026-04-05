@@ -1,12 +1,10 @@
-// GIET Confessions — Service Worker v1.0
-// Enables PWA installability + offline shell caching
-
-const CACHE = 'giet-conf-v1';
-const SHELL = ['/', '/index.html'];
+// GIET Confessions — Service Worker v2.0
+const CACHE = 'giet-conf-v2';
+const SHELL = ['/', '/index.html', '/admin.html', '/manifest.json', '/manifest-admin.json'];
 
 self.addEventListener('install', e => {
   e.waitUntil(
-    caches.open(CACHE).then(c => c.addAll(SHELL)).then(() => self.skipWaiting())
+    caches.open(CACHE).then(c => c.addAll(SHELL).catch(()=>{})).then(() => self.skipWaiting())
   );
 });
 
@@ -19,36 +17,56 @@ self.addEventListener('activate', e => {
 });
 
 self.addEventListener('fetch', e => {
-  // Network-first for API calls
   if (e.request.url.includes('/api/')) {
-    e.respondWith(fetch(e.request).catch(() => new Response('{"error":"offline"}', {headers:{'Content-Type':'application/json'}})));
+    e.respondWith(fetch(e.request).catch(() =>
+      new Response('{"error":"offline"}', {headers:{'Content-Type':'application/json'}})
+    ));
     return;
   }
-  // Cache-first for the app shell
   e.respondWith(
     caches.match(e.request).then(cached => cached || fetch(e.request).then(resp => {
-      const clone = resp.clone();
-      caches.open(CACHE).then(c => c.put(e.request, clone));
+      if (resp && resp.status === 200) {
+        const clone = resp.clone();
+        caches.open(CACHE).then(c => c.put(e.request, clone));
+      }
       return resp;
     }))
   );
 });
 
-// Push notification support (for future use)
+// ── Push Notifications ────────────────────────────────
 self.addEventListener('push', e => {
-  const data = e.data ? e.data.json() : {};
+  let data = {};
+  try { data = e.data ? e.data.json() : {}; } catch(err) { data = { title: '💌 GIET Confessions', body: e.data ? e.data.text() : 'New update!' }; }
+
+  const options = {
+    body: data.body || 'Check out the latest confessions!',
+    icon: 'https://em-content.zobj.net/source/twitter/376/love-letter_1f48c.png',
+    badge: 'https://em-content.zobj.net/source/twitter/376/love-letter_1f48c.png',
+    vibrate: [200, 100, 200, 100, 200],
+    tag: 'giet-confession',   // replaces previous notification of same tag
+    renotify: true,
+    requireInteraction: false,
+    data: { url: data.url || 'https://page-confession.vercel.app' }
+  };
+
   e.waitUntil(
-    self.registration.showNotification(data.title || '💌 GIET Confessions', {
-      body: data.body || 'New confession arrived!',
-      icon: 'https://em-content.zobj.net/source/twitter/376/love-letter_1f48c.png',
-      badge: 'https://em-content.zobj.net/source/twitter/376/love-letter_1f48c.png',
-      vibrate: [200, 100, 200],
-      data: { url: data.url || '/' }
-    })
+    self.registration.showNotification(data.title || '💌 GIET Confessions', options)
   );
 });
 
 self.addEventListener('notificationclick', e => {
   e.notification.close();
-  e.waitUntil(clients.openWindow(e.notification.data?.url || '/'));
+  const url = e.notification.data?.url || 'https://page-confession.vercel.app';
+  e.waitUntil(
+    clients.matchAll({ type: 'window', includeUncontrolled: true }).then(wins => {
+      for (const win of wins) {
+        if (win.url.includes('page-confession.vercel.app') && 'focus' in win) {
+          win.navigate(url);
+          return win.focus();
+        }
+      }
+      return clients.openWindow(url);
+    })
+  );
 });

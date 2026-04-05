@@ -4,7 +4,6 @@
 <meta charset="UTF-8"/>
 <meta name="viewport" content="width=device-width,initial-scale=1.0"/>
 <title>GIET Confessions 💌</title>
-<!-- PWA -->
 <link rel="manifest" href="/manifest.json"/>
 <meta name="theme-color" content="#ff2d6f"/>
 <meta name="apple-mobile-web-app-capable" content="yes"/>
@@ -16,18 +15,18 @@
 <style>
 *{margin:0;padding:0;box-sizing:border-box;}
 :root{
-  --rose:#ff2d6f; --rose2:#ff6b9d; --crimson:#c0144c; --gold:#ffb347;
-  --glass:rgba(255,255,255,0.07); --glass2:rgba(255,255,255,0.12);
-  --border:rgba(255,100,150,0.25); --text:#fff0f5; --muted:rgba(255,200,220,0.7);
+  --rose:#ff2d6f;--rose2:#ff6b9d;--crimson:#c0144c;--gold:#ffb347;
+  --glass:rgba(255,255,255,0.07);--glass2:rgba(255,255,255,0.12);
+  --border:rgba(255,100,150,0.25);--text:#fff0f5;--muted:rgba(255,200,220,0.7);
   --card-shadow:0 8px 40px rgba(255,45,111,0.18);
-  --reply-bg:rgba(255,45,111,0.06); --reply-border:rgba(255,45,111,0.15);
+  --reply-bg:rgba(255,45,111,0.06);--reply-border:rgba(255,45,111,0.15);
+  --reply-text:rgba(255,240,245,0.85);
 }
-body{ min-height:100vh; background:#0d0008; color:var(--text); font-family:'DM Sans',sans-serif; overflow-x:hidden; }
-.bg{ position:fixed;inset:0;z-index:0;
+body{min-height:100vh;background:#0d0008;color:var(--text);font-family:'DM Sans',sans-serif;overflow-x:hidden;}
+.bg{position:fixed;inset:0;z-index:0;
   background:radial-gradient(ellipse 80% 60% at 20% 10%,rgba(192,20,76,0.35) 0%,transparent 60%),
              radial-gradient(ellipse 60% 80% at 80% 90%,rgba(255,45,111,0.25) 0%,transparent 55%),
-             radial-gradient(ellipse 50% 50% at 50% 50%,rgba(40,0,20,1) 0%,#0d0008 100%);
-}
+             radial-gradient(ellipse 50% 50% at 50% 50%,rgba(40,0,20,1) 0%,#0d0008 100%);}
 #particles{position:fixed;inset:0;z-index:1;pointer-events:none;}
 .page{position:relative;z-index:2;max-width:780px;margin:0 auto;padding:0 16px 100px;}
 
@@ -89,7 +88,7 @@ textarea:focus{border-color:var(--rose);box-shadow:0 0 0 3px rgba(255,45,111,0.1
 .card-cat{display:inline-flex;align-items:center;gap:5px;background:rgba(255,45,111,0.15);border:1px solid rgba(255,45,111,0.3);color:var(--rose2);border-radius:20px;padding:3px 12px;font-size:0.72rem;font-weight:600;margin-bottom:12px;}
 .card-msg{font-size:1rem;line-height:1.75;color:rgba(255,240,245,0.92);white-space:pre-wrap;word-wrap:break-word;margin-bottom:16px;}
 
-/* Card action row */
+/* Card footer */
 .card-footer{display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:10px;}
 .card-time{font-size:0.75rem;color:var(--muted);display:flex;align-items:center;gap:5px;}
 .action-row{display:flex;gap:6px;flex-wrap:wrap;}
@@ -98,10 +97,14 @@ textarea:focus{border-color:var(--rose);box-shadow:0 0 0 3px rgba(255,45,111,0.1
 .act-btn.liked{background:rgba(255,45,111,0.2);border-color:var(--rose);color:var(--rose2);}
 .act-btn.flagged{background:rgba(255,150,0,0.15);border-color:rgba(255,150,0,0.4);color:#ffaa44;}
 
-/* Replies section */
+/* Replies */
+.replies-toggle-row{margin-top:10px;display:flex;align-items:center;gap:8px;}
+.show-replies-btn{display:inline-flex;align-items:center;gap:5px;background:rgba(255,45,111,0.08);border:1px solid rgba(255,45,111,0.2);color:var(--rose2);border-radius:20px;padding:4px 12px;font-size:0.76rem;font-weight:600;cursor:pointer;transition:all .18s;font-family:'DM Sans',sans-serif;}
+.show-replies-btn:hover{background:rgba(255,45,111,0.18);border-color:var(--rose);}
+.reply-count-dot{width:5px;height:5px;border-radius:50%;background:var(--rose);display:inline-block;animation:pulse 2s infinite;}
 .replies-wrap{margin-top:14px;border-top:1px solid rgba(255,100,150,0.12);padding-top:14px;display:none;}
 .replies-wrap.open{display:block;}
-.reply-item{background:var(--reply-bg);border:1px solid var(--reply-border);border-radius:12px;padding:10px 14px;margin-bottom:8px;font-size:0.88rem;color:rgba(255,240,245,0.8);line-height:1.6;position:relative;}
+.reply-item{background:var(--reply-bg);border:1px solid var(--reply-border);border-radius:12px;padding:10px 14px;margin-bottom:8px;font-size:0.88rem;color:var(--reply-text);line-height:1.6;}
 .reply-time{font-size:0.7rem;color:var(--muted);margin-top:4px;}
 .reply-input-wrap{display:flex;gap:8px;margin-top:10px;}
 .reply-input{flex:1;background:rgba(0,0,0,0.3);border:1px solid var(--border);border-radius:12px;padding:9px 13px;color:var(--text);font-size:0.85rem;font-family:'DM Sans',sans-serif;outline:none;transition:border-color .2s;}
@@ -110,20 +113,11 @@ textarea:focus{border-color:var(--rose);box-shadow:0 0 0 3px rgba(255,45,111,0.1
 .reply-send{background:var(--rose);border:none;color:#fff;border-radius:12px;padding:9px 16px;font-size:0.82rem;font-weight:600;cursor:pointer;font-family:'DM Sans',sans-serif;transition:all .2s;white-space:nowrap;}
 .reply-send:hover{background:var(--crimson);}
 .no-replies{font-size:0.82rem;color:var(--muted);font-style:italic;text-align:center;padding:10px 0;}
-/* Show replies toggle row */
-.replies-toggle-row{margin-top:10px;display:flex;align-items:center;gap:8px;}
-.show-replies-btn{display:inline-flex;align-items:center;gap:5px;background:rgba(255,45,111,0.08);border:1px solid rgba(255,45,111,0.2);color:var(--rose2);border-radius:20px;padding:4px 12px;font-size:0.76rem;font-weight:600;cursor:pointer;transition:all .18s;font-family:'DM Sans',sans-serif;}
-.show-replies-btn:hover{background:rgba(255,45,111,0.18);border-color:var(--rose);}
-.reply-count-dot{width:5px;height:5px;border-radius:50%;background:var(--rose);display:inline-block;animation:pulse 2s infinite;}
 
 /* Skeleton */
 .skel-card{background:var(--glass);border:1px solid var(--border);border-radius:20px;padding:22px 24px;}
 .skel-line{border-radius:6px;margin-bottom:12px;background:linear-gradient(90deg,rgba(255,255,255,0.04) 25%,rgba(255,255,255,0.09) 50%,rgba(255,255,255,0.04) 75%);background-size:200% 100%;animation:shimmer 1.6s infinite;}
-.skel-line.a{height:12px;width:30%;}
-.skel-line.b{height:14px;width:85%;}
-.skel-line.c{height:14px;width:70%;}
-.skel-line.d{height:14px;width:55%;margin-bottom:20px;}
-.skel-line.e{height:10px;width:25%;}
+.skel-line.a{height:12px;width:30%;}.skel-line.b{height:14px;width:85%;}.skel-line.c{height:14px;width:70%;}.skel-line.d{height:14px;width:55%;margin-bottom:20px;}.skel-line.e{height:10px;width:25%;}
 @keyframes shimmer{0%{background-position:200% 0}100%{background-position:-200% 0}}
 
 /* Empty */
@@ -153,19 +147,32 @@ textarea:focus{border-color:var(--rose);box-shadow:0 0 0 3px rgba(255,45,111,0.1
 .updates-list{list-style:none;display:flex;flex-direction:column;gap:6px;}
 .updates-list li{font-size:0.8rem;color:rgba(255,200,220,0.55);padding-left:16px;position:relative;}
 .updates-list li::before{content:'·';position:absolute;left:0;color:var(--rose);font-size:1.2rem;line-height:1;}
-
 .disc{text-align:center;font-size:0.75rem;color:rgba(255,200,220,0.35);margin-bottom:24px;line-height:1.5;}
 
-/* Light theme */
+/* ── LIGHT THEME ── */
 [data-theme="light"] body{background:#fff2f6;}
 [data-theme="light"] .bg{background:radial-gradient(ellipse 80% 60% at 20% 10%,rgba(255,180,210,0.5) 0%,transparent 60%),radial-gradient(ellipse 60% 80% at 80% 90%,rgba(255,100,150,0.3) 0%,transparent 55%),radial-gradient(ellipse 50% 50% at 50% 50%,#fff0f5 0%,#fce3f0 100%);}
-[data-theme="light"]{--glass:rgba(255,255,255,0.65);--glass2:rgba(255,255,255,0.85);--border:rgba(255,100,150,0.2);--text:#3d0022;--muted:rgba(150,50,90,0.8);--card-shadow:0 8px 40px rgba(255,45,111,0.1);--reply-bg:rgba(255,45,111,0.04);--reply-border:rgba(255,45,111,0.1);}
+[data-theme="light"]{
+  --glass:rgba(255,255,255,0.65);--glass2:rgba(255,255,255,0.85);
+  --border:rgba(255,100,150,0.2);--text:#3d0022;--muted:rgba(150,50,90,0.8);
+  --card-shadow:0 8px 40px rgba(255,45,111,0.1);
+  --reply-bg:rgba(255,45,111,0.06);--reply-border:rgba(255,45,111,0.18);
+  --reply-text:#4a0028;  /* ← FIX: dark readable text for replies in light mode */
+}
 [data-theme="light"] textarea{background:rgba(255,255,255,0.7);color:#3d0022;}
 [data-theme="light"] textarea::placeholder{color:rgba(180,80,120,0.4);}
-[data-theme="light"] .reply-input{background:rgba(255,255,255,0.7);color:#3d0022;}
+[data-theme="light"] .reply-input{background:rgba(255,255,255,0.8);color:#3d0022;border-color:rgba(255,100,150,0.3);}
+[data-theme="light"] .reply-input::placeholder{color:rgba(180,80,120,0.4);}
 [data-theme="light"] .card-msg{color:#3d0022;}
 [data-theme="light"] .modal{background:#fff0f5;}
+[data-theme="light"] .modal h3{color:#3d0022;}
+[data-theme="light"] .share-btn{color:#3d0022;background:rgba(255,255,255,0.8);}
+[data-theme="light"] .modal-close{color:rgba(150,50,90,0.7);border-color:rgba(255,100,150,0.2);}
 [data-theme="light"] .skel-line{background:linear-gradient(90deg,rgba(255,150,180,0.15) 25%,rgba(255,150,180,0.3) 50%,rgba(255,150,180,0.15) 75%);background-size:200% 100%;animation:shimmer 1.6s infinite;}
+[data-theme="light"] .act-btn{background:rgba(255,255,255,0.6);border-color:rgba(255,100,150,0.2);color:rgba(150,50,90,0.9);}
+[data-theme="light"] .show-replies-btn{color:var(--crimson);}
+[data-theme="light"] .no-replies{color:rgba(150,50,90,0.6);}
+[data-theme="light"] .reply-time{color:rgba(150,50,90,0.6);}
 
 @media(max-width:600px){
   .page{padding:0 12px 90px;}
@@ -265,6 +272,7 @@ textarea:focus{border-color:var(--rose);box-shadow:0 0 0 3px rgba(255,45,111,0.1
       <li>v1.4 — MongoDB: confessions persist permanently</li>
       <li>v1.5 — Full redesign: immersive UI + animations</li>
       <li>v1.6 — Replies, flag system, share to WhatsApp</li>
+      <li>v1.7 — Push notifications, PWA, reply fix, light mode fix</li>
     </ul>
   </div>
 </div>
@@ -340,107 +348,22 @@ document.querySelectorAll('.ftag').forEach(t=>{
 let shareText='';
 function openShare(msg,id){
   shareText=msg;
-  const url=`https://page-confession.vercel.app`;
+  const url='https://page-confession.vercel.app';
   const waText=encodeURIComponent(`💌 Anonymous Confession from GIET:\n\n"${msg}"\n\nRead more: ${url}`);
   document.getElementById('shareWA').href=`https://wa.me/?text=${waText}`;
   document.getElementById('shareModal').classList.add('open');
 }
 function closeShare(){document.getElementById('shareModal').classList.remove('open');}
-function shareIG(){
-  navigator.clipboard.writeText(`💌 "${shareText}"\n\n— Anonymous confession from GIET Confessions\n👉 page-confession.vercel.app`);
-  toast('📋 Copied! Paste it in your Instagram story caption');closeShare();
-}
-function shareCopy(){
-  navigator.clipboard.writeText('https://page-confession.vercel.app');
-  toast('🔗 Link copied!');closeShare();
-}
+function shareIG(){navigator.clipboard.writeText(`💌 "${shareText}"\n\n— Anonymous confession from GIET Confessions\n👉 page-confession.vercel.app`);toast('📋 Copied! Paste it in your Instagram story caption');closeShare();}
+function shareCopy(){navigator.clipboard.writeText('https://page-confession.vercel.app');toast('🔗 Link copied!');closeShare();}
 document.getElementById('shareModal').addEventListener('click',e=>{if(e.target===e.currentTarget)closeShare();});
 
-// ── Replies ───────────────────────────────────────────
-async function toggleReplies(confId,showBtn){
-  const wrap=document.getElementById('rw-'+confId);
-  if(!wrap)return;
-  const isOpen=wrap.classList.contains('open');
-  if(isOpen){
-    wrap.classList.remove('open');openReplies[confId]=false;
-    // Update the show-replies button text
-    const rc=replyCounts[confId]||0;
-    if(showBtn)showBtn.innerHTML=`<span class="reply-count-dot"></span> Show ${rc} repl${rc===1?'y':'ies'}`;
-    return;
-  }
-  wrap.classList.add('open');openReplies[confId]=true;
-  await loadReplies(confId);
-  // Update button text
-  const rc=replyCounts[confId]||0;
-  if(showBtn)showBtn.innerHTML=`<span class="reply-count-dot"></span> Hide ${rc} repl${rc===1?'y':'ies'}`;
-}
-
-async function loadReplies(confId){
-  const list=document.getElementById('rl-'+confId);
-  if(!list)return;
-  list.innerHTML='<div style="text-align:center;padding:8px;color:var(--muted);font-size:0.8rem;">Loading…</div>';
-  try{
-    const r=await fetch(`${API}/api/replies/${confId}`);
-    const replies=await r.json();
-    // Store the count so render() can show the badge
-    replyCounts[confId]=replies.length;
-    if(!replies.length){list.innerHTML='<div class="no-replies">No replies yet — be the first 💬</div>';return;}
-    list.innerHTML=replies.map(r=>`<div class="reply-item">${r.message}<div class="reply-time">${ago(r.createdAt)}</div></div>`).join('');
-    // Refresh the show-replies toggle button label in-place (no full re-render needed)
-    const card=list.closest('.conf-card');
-    if(card){
-      const btn=card.querySelector('.show-replies-btn');
-      if(btn){
-        const open=openReplies[confId];
-        btn.innerHTML=`<span class="reply-count-dot"></span> ${open?'Hide':'Show'} ${replies.length} repl${replies.length===1?'y':'ies'}`;
-      }
-    }
-  }catch(e){list.innerHTML='<div class="no-replies">Could not load replies</div>';}
-}
-
-async function sendReply(confId){
-  const inp=document.getElementById('ri-'+confId);
-  const msg=inp.value.trim();
-  if(!msg)return;
-  inp.disabled=true;
-  try{
-    const r=await fetch(`${API}/api/replies/${confId}`,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({message:msg,clientId:cid()})});
-    const data=await r.json();
-    if(data.error){toast('❌ '+data.error);inp.disabled=false;return;}
-    inp.value='';inp.disabled=false;
-    toast('💬 Reply sent!');
-    await loadReplies(confId);
-    // After first reply, add the show-replies button if it doesn't exist yet
-    const card=inp.closest('.conf-card');
-    if(card&&!card.querySelector('.show-replies-btn')){
-      const toggleRow=document.createElement('div');
-      toggleRow.className='replies-toggle-row';
-      const rc=replyCounts[confId]||1;
-      toggleRow.innerHTML=`<button class="show-replies-btn" onclick="toggleReplies('${confId}',this)"><span class="reply-count-dot"></span> Hide ${rc} repl${rc===1?'y':'ies'}</button>`;
-      // Insert before the replies-wrap
-      const rw=document.getElementById('rw-'+confId);
-      card.insertBefore(toggleRow,rw);
-    }
-  }catch(e){toast('Network error');inp.disabled=false;}
-}
-
-// ── Flag ──────────────────────────────────────────────
-async function flagConfession(id,btn){
-  if(btn.classList.contains('flagged')){toast('⚑ Already flagged');return;}
-  try{
-    const r=await fetch(`${API}/api/flag/${id}`,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({clientId:cid()})});
-    const d=await r.json();
-    if(d.alreadyFlagged){toast('⚑ Already flagged');btn.classList.add('flagged');return;}
-    btn.classList.add('flagged');btn.innerHTML='⚑ Flagged';
-    toast('⚑ Flagged for admin review');
-  }catch(e){toast('Network error');}
-}
-
-// ── State & render ────────────────────────────────────
+// ── State ─────────────────────────────────────────────
 let allConf=[],seenIds=new Set(),firstLoad=true;
 const openReplies={};
-const replyCounts={};   // tracks reply counts per confession id
+const replyCounts={};
 
+// ── Render (full rebuild — only called when safe) ─────
 function render(){
   const feed=document.getElementById('feed');
   const list=activeF==='all'?allConf:allConf.filter(c=>c.category===activeF);
@@ -479,76 +402,138 @@ function render(){
         </div>
       </div>`;
     feed.appendChild(d);
-    // Re-open replies if they were open before re-render
     if(openReplies[m.id]) loadReplies(m.id);
   });
 }
 
+// ── Safe render: defer if a reply input has focus ────
 let pendingRender=false;
+function safeRender(){
+  const focused=document.activeElement;
+  if(focused&&focused.classList.contains('reply-input')){
+    pendingRender=true;
+  } else {
+    render();pendingRender=false;
+  }
+}
+document.addEventListener('focusout',e=>{
+  if(e.target.classList.contains('reply-input')&&pendingRender){
+    setTimeout(()=>{if(pendingRender){render();pendingRender=false;}},350);
+  }
+});
 
-async function fetchReplyCountsForAll(confessions){
-  // Batch-fetch reply counts for all confessions so we can show the "Show X replies" button
-  await Promise.all(confessions.map(async m=>{
-    try{
-      const r=await fetch(`${API}/api/replies/${m.id}`);
-      const replies=await r.json();
-      replyCounts[m.id]=replies.length;
-    }catch(e){}
-  }));
+// ── Bulk reply counts ─────────────────────────────────
+async function fetchReplyCountsBulk(ids){
+  if(!ids.length)return;
+  try{
+    const r=await fetch(`${API}/api/replies/counts`,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({ids})});
+    const map=await r.json();
+    Object.assign(replyCounts,map);
+  }catch(e){}
 }
 
+// ── Fetch confessions ─────────────────────────────────
 function fetchConf(){
   fetch(`${API}/api/confessions`)
     .then(r=>r.json()).then(async data=>{
       const newOnes=data.filter(m=>!seenIds.has(m.id));
       if(newOnes.length&&!firstLoad){
         toast(`💌 ${newOnes.length} new confession${newOnes.length>1?'s':''}!`);
-        // Update document title badge (visible on "Add to Home Screen" / browser tab)
         document.title=`(${newOnes.length}) GIET Confessions 💌`;
-        // Clear badge when user taps/focuses
-        const clearBadge=()=>{document.title='GIET Confessions 💌';window.removeEventListener('focus',clearBadge);document.removeEventListener('visibilitychange',clearBadge);};
+        const clearBadge=()=>{document.title='GIET Confessions 💌';window.removeEventListener('focus',clearBadge);};
         window.addEventListener('focus',clearBadge);
-        document.addEventListener('visibilitychange',()=>{if(!document.hidden)clearBadge();});
       }
-      seenIds=new Set(data.map(m=>m.id));allConf=data;
-      // Fetch reply counts on first load, or for new confessions
-      if(firstLoad){
-        await fetchReplyCountsForAll(data);
-      } else if(newOnes.length){
-        await fetchReplyCountsForAll(newOnes);
-      }
+      seenIds=new Set(data.map(m=>m.id));
+      allConf=data;
+      // Fetch reply counts — bulk API for all on first load, only new ones after
+      const idsNeeded=firstLoad?data.map(m=>m.id):newOnes.map(m=>m.id);
+      await fetchReplyCountsBulk(idsNeeded);
       firstLoad=false;
-      // Only re-render if no reply input is focused (keyboard safety)
-      const focused=document.activeElement;
-      const replyFocused=focused&&focused.classList.contains('reply-input');
-      if(replyFocused){pendingRender=true;}
-      else{render();pendingRender=false;}
-    }).catch(()=>{if(firstLoad)document.getElementById('feed').innerHTML=`<div class="empty"><span class="empty-icon">📡</span>Connecting to server… please wait</div>`;});
+      safeRender();
+    }).catch(()=>{
+      if(firstLoad)document.getElementById('feed').innerHTML=`<div class="empty"><span class="empty-icon">📡</span>Connecting to server… please wait</div>`;
+    });
 }
 
-// When user blurs a reply input, do the deferred render
-document.addEventListener('focusout',e=>{
-  if(e.target.classList.contains('reply-input')&&pendingRender){
-    // Small delay so the send button click still registers
-    setTimeout(()=>{if(pendingRender){render();pendingRender=false;}},300);
+// ── Replies ───────────────────────────────────────────
+async function toggleReplies(confId,showBtn){
+  const wrap=document.getElementById('rw-'+confId);
+  if(!wrap)return;
+  const isOpen=wrap.classList.contains('open');
+  if(isOpen){
+    wrap.classList.remove('open');openReplies[confId]=false;
+    const rc=replyCounts[confId]||0;
+    if(showBtn)showBtn.innerHTML=`<span class="reply-count-dot"></span> Show ${rc} repl${rc===1?'y':'ies'}`;
+    return;
   }
-});
+  wrap.classList.add('open');openReplies[confId]=true;
+  await loadReplies(confId);
+  const rc=replyCounts[confId]||0;
+  if(showBtn)showBtn.innerHTML=`<span class="reply-count-dot"></span> Hide ${rc} repl${rc===1?'y':'ies'}`;
+}
+
+async function loadReplies(confId){
+  const list=document.getElementById('rl-'+confId);
+  if(!list)return;
+  list.innerHTML='<div style="text-align:center;padding:8px;color:var(--muted);font-size:0.8rem;">Loading…</div>';
+  try{
+    const r=await fetch(`${API}/api/replies/${confId}`);
+    const replies=await r.json();
+    replyCounts[confId]=replies.length;
+    if(!replies.length){list.innerHTML='<div class="no-replies">No replies yet — be the first 💬</div>';return;}
+    list.innerHTML=replies.map(r=>`<div class="reply-item">${r.message}<div class="reply-time">${ago(r.createdAt)}</div></div>`).join('');
+    // Update show-replies button label
+    const card=list.closest('.conf-card');
+    if(card){const btn=card.querySelector('.show-replies-btn');if(btn){const open=openReplies[confId];btn.innerHTML=`<span class="reply-count-dot"></span> ${open?'Hide':'Show'} ${replies.length} repl${replies.length===1?'y':'ies'}`;}}
+  }catch(e){list.innerHTML='<div class="no-replies">Could not load replies</div>';}
+}
+
+async function sendReply(confId){
+  const inp=document.getElementById('ri-'+confId);
+  const msg=inp.value.trim();
+  if(!msg)return;
+  inp.disabled=true;
+  try{
+    const r=await fetch(`${API}/api/replies/${confId}`,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({message:msg,clientId:cid()})});
+    const data=await r.json();
+    if(data.error){toast('❌ '+data.error);inp.disabled=false;return;}
+    inp.value='';inp.disabled=false;
+    toast('💬 Reply sent!');
+    await loadReplies(confId);
+    // Inject show-replies button if this was the first reply
+    const card=inp.closest('.conf-card');
+    if(card&&!card.querySelector('.show-replies-btn')){
+      const row=document.createElement('div');row.className='replies-toggle-row';
+      const rc=replyCounts[confId]||1;
+      row.innerHTML=`<button class="show-replies-btn" onclick="toggleReplies('${confId}',this)"><span class="reply-count-dot"></span> Hide ${rc} repl${rc===1?'y':'ies'}</button>`;
+      card.insertBefore(row,document.getElementById('rw-'+confId));
+    }
+  }catch(e){toast('Network error');inp.disabled=false;}
+}
+
+// ── Flag ──────────────────────────────────────────────
+async function flagConfession(id,btn){
+  if(btn.classList.contains('flagged')){toast('⚑ Already flagged');return;}
+  try{
+    const r=await fetch(`${API}/api/flag/${id}`,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({clientId:cid()})});
+    const d=await r.json();
+    if(d.alreadyFlagged){toast('⚑ Already flagged');btn.classList.add('flagged');return;}
+    btn.classList.add('flagged');btn.innerHTML='⚑ Flagged';
+    toast('⚑ Flagged for admin review');
+  }catch(e){toast('Network error');}
+}
 
 // ── Vote ──────────────────────────────────────────────
 window.vote=function(id,type,btn){
   btn.style.opacity='0.5';
   fetch(`${API}/api/${type}/${id}`,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({clientId:cid()})})
     .then(r=>r.json()).then(d=>{
-      // Update the confession data in memory
       const conf=allConf.find(c=>c.id===id);
       if(conf){conf.likes=d.likes;conf.dislikes=d.dislikes;}
-      // Update buttons in-place without re-rendering the whole feed
       const card=btn.closest('.conf-card');
       if(card){
-        const likeBtn=card.querySelector('.like-btn');
-        const dislikeBtn=card.querySelector('.dislike-btn');
-        if(likeBtn)likeBtn.innerHTML=`❤️ ${d.likes}`;
-        if(dislikeBtn)dislikeBtn.innerHTML=`💔 ${d.dislikes}`;
+        const lb=card.querySelector('.like-btn');const db=card.querySelector('.dislike-btn');
+        if(lb)lb.innerHTML=`❤️ ${d.likes}`;if(db)db.innerHTML=`💔 ${d.dislikes}`;
       }
       btn.style.opacity='1';
     }).catch(()=>{btn.style.opacity='1';});
@@ -584,14 +569,93 @@ async function analytics(){
   }catch(e){}
 }
 
-// Periodic render removed — fetchConf handles updates safely
+// ── Push Notifications ────────────────────────────────
+async function setupPushNotifications(){
+  if(!('serviceWorker' in navigator)||!('PushManager' in window))return;
+  // Only ask for permission if user hasn't decided yet
+  if(Notification.permission==='denied')return;
+  // Check if already subscribed
+  const reg=await navigator.serviceWorker.ready;
+  let sub=await reg.pushManager.getSubscription();
+  if(sub){
+    // Already subscribed — re-register with server in case it was lost
+    await sendSubToServer(sub,'user');
+    return;
+  }
+  // Wait a moment before asking (better UX — don't ask instantly on load)
+  setTimeout(async()=>{
+    if(Notification.permission==='granted'){
+      await subscribeToPush(reg);
+    } else if(Notification.permission==='default'){
+      // Show a friendly in-page prompt first
+      showPushPrompt(reg);
+    }
+  }, 3000);
+}
+
+function showPushPrompt(reg){
+  const banner=document.createElement('div');
+  banner.id='pushPrompt';
+  banner.style.cssText='position:fixed;bottom:80px;left:50%;transform:translateX(-50%);background:linear-gradient(135deg,#1a0010,#2d0018);border:1px solid rgba(255,45,111,0.4);border-radius:20px;padding:16px 20px;max-width:340px;width:90%;z-index:9990;display:flex;flex-direction:column;gap:10px;box-shadow:0 8px 40px rgba(255,45,111,0.3);font-family:DM Sans,sans-serif;';
+  banner.innerHTML=`
+    <div style="display:flex;align-items:center;gap:10px;">
+      <span style="font-size:1.6rem">💌</span>
+      <div>
+        <div style="color:#fff0f5;font-weight:700;font-size:0.9rem;">Get notified of new confessions</div>
+        <div style="color:rgba(255,200,220,0.7);font-size:0.75rem;margin-top:2px;">We'll ping you when a new confession drops</div>
+      </div>
+    </div>
+    <div style="display:flex;gap:8px;">
+      <button id="pushYes" style="flex:1;padding:9px;background:linear-gradient(135deg,#ff2d6f,#c0144c);color:#fff;border:none;border-radius:12px;font-weight:700;font-size:0.85rem;cursor:pointer;font-family:DM Sans,sans-serif;">🔔 Yes please!</button>
+      <button id="pushNo" style="flex:1;padding:9px;background:rgba(255,255,255,0.06);color:rgba(255,200,220,0.7);border:1px solid rgba(255,255,255,0.1);border-radius:12px;font-size:0.85rem;cursor:pointer;font-family:DM Sans,sans-serif;">Not now</button>
+    </div>`;
+  document.body.appendChild(banner);
+  document.getElementById('pushYes').addEventListener('click',async()=>{
+    banner.remove();
+    const perm=await Notification.requestPermission();
+    if(perm==='granted') await subscribeToPush(reg);
+  });
+  document.getElementById('pushNo').addEventListener('click',()=>{
+    banner.remove();
+    localStorage.setItem('pushDeclined','1');
+  });
+}
+
+async function subscribeToPush(reg){
+  try{
+    // Get VAPID public key from server
+    const keyRes=await fetch(`${API}/api/push/vapid-public-key`);
+    const {key}=await keyRes.json();
+    if(!key)return;
+    const appServerKey=urlBase64ToUint8Array(key);
+    const sub=await reg.pushManager.subscribe({userVisibleOnly:true,applicationServerKey:appServerKey});
+    await sendSubToServer(sub,'user');
+  }catch(e){console.warn('Push subscribe failed:',e);}
+}
+
+async function sendSubToServer(sub,type){
+  try{
+    await fetch(`${API}/api/push/subscribe`,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({subscription:sub.toJSON()})});
+  }catch(e){}
+}
+
+function urlBase64ToUint8Array(base64String){
+  const padding='='.repeat((4-base64String.length%4)%4);
+  const base64=(base64String+padding).replace(/-/g,'+').replace(/_/g,'/');
+  const rawData=window.atob(base64);
+  return Uint8Array.from([...rawData].map(c=>c.charCodeAt(0)));
+}
+
+// ── Boot ──────────────────────────────────────────────
 window.addEventListener('load',()=>{
   fetchConf();analytics();
   setInterval(fetchConf,15000);
   setInterval(analytics,15000);
-  // Register service worker for PWA
   if('serviceWorker' in navigator){
-    navigator.serviceWorker.register('/sw.js').catch(()=>{});
+    navigator.serviceWorker.register('/sw.js').then(()=>{
+      // Only ask push if not already declined
+      if(!localStorage.getItem('pushDeclined')) setupPushNotifications();
+    }).catch(()=>{});
   }
 });
 </script>
