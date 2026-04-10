@@ -344,7 +344,8 @@ async function deleteConf(id){
 
 // ── Load data ──────────────────────────────────────────
 async function loadPending(){
-  const r=await fetch(`${API}/api/pending`);
+  const r=await fetch(`${API}/api/pending`,{headers:adminH()});
+  if(!r.ok){console.warn('loadPending failed:',r.status);return;}
   const arr=await r.json();
   const container=document.getElementById('pendingList');
   const badge=document.getElementById('pendingBadge');
@@ -398,8 +399,11 @@ async function loadPending(){
 }
 
 async function loadApproved(){
-  const r=await fetch(`${API}/api/confessions`);
-  const arr=await r.json();
+  const r=await fetch(`${API}/api/confessions`,{headers:adminH()});
+  if(!r.ok){console.warn('loadApproved failed:',r.status);return;}
+  const data=await r.json();
+  // Server returns { confessions: [...], cotdId } — handle both old array and new shape
+  const arr=Array.isArray(data)?data:(data.confessions||[]);
   const container=document.getElementById('approvedList');
   document.getElementById('approvedBadge').textContent=arr.length;
   if(!arr.length){container.innerHTML='<div class="empty-msg">No approved confessions yet</div>';return;}
@@ -423,7 +427,8 @@ async function loadApproved(){
 
 async function loadAnalytics(){
   try{
-    const r=await fetch(`${API}/api/analytics`);
+    const r=await fetch(`${API}/api/analytics`,{headers:adminH()});
+    if(!r.ok)return;
     const d=await r.json();
     document.getElementById('sVisits').textContent=d.visits||0;
     document.getElementById('sUnique').textContent=d.uniqueVisitors||0;
