@@ -369,6 +369,8 @@ textarea:focus{border-color:var(--rose);box-shadow:0 0 0 3px rgba(255,45,111,0.1
       <li>v1.8 — Replies always visible, smoother refresh</li>
       <li>v1.9 — Skeleton glitch fixed, mobile cache fixed</li>
       <li>v2.0 — Branch tag, Story mode, keep last 200, Confession of Day, emoji reactions, disclaimer</li>
+      <li>v2.1 — Security patches </li>
+      <li>v2.2 — Stats fix: DB-backed online count, visit rate-limit exemption</li>
     </ul>
   </div>
 </div>
@@ -755,10 +757,17 @@ submitBtn.addEventListener('click',()=>{
     .finally(()=>{submitBtn.disabled=false;submitBtn.textContent='Send Anonymously 💌';});
 });
 
-// ── Analytics ─────────────────────────────────────────
-async function analytics(){
+// ── Analytics / Visit ping ────────────────────────────────────────────────────
+// POST /api/visit does three things:
+//   1. Registers a new unique visitor (increments totals once per clientId)
+//   2. Updates lastSeen timestamp in DB (used to count "online now")
+//   3. Returns current stats: visits, uniqueVisitors, activeVisitors
+// We call it on load + every 30s to keep "online now" accurate.
+// It has its own rate limiter (1 per 20s) so it never hits the global 100/15min cap.
+async function pingVisit(){
   try{
     const r=await fetch(`${API}/api/visit`,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({clientId:cid()})});
+    if(!r.ok)return; // e.g. 429 — just skip, don't crash
     const d=await r.json();
     document.getElementById('statLive').textContent=d.activeVisitors||0;
     document.getElementById('statVisits').textContent=d.visits||0;
@@ -797,8 +806,9 @@ function urlBase64ToUint8Array(b){const p='='.repeat((4-b.length%4)%4);const s=(
 
 // ── Boot ──────────────────────────────────────────────
 window.addEventListener('load',()=>{
-  fetchConf();analytics();
-  setInterval(fetchConf,15000);setInterval(analytics,15000);
+  fetchConf();pingVisit();
+  setInterval(fetchConf,15000);
+  setInterval(pingVisit,30000); // 30s keeps lastSeen fresh, well within 20s rate limit window
   if('serviceWorker' in navigator){
     navigator.serviceWorker.register('/sw.js').then(reg=>{
       reg.update();
