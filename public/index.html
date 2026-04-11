@@ -369,7 +369,7 @@ textarea:focus{border-color:var(--rose);box-shadow:0 0 0 3px rgba(255,45,111,0.1
       <li>v1.8 — Replies always visible, smoother refresh</li>
       <li>v1.9 — Skeleton glitch fixed, mobile cache fixed</li>
       <li>v2.0 — Branch tag, Story mode, keep last 200, Confession of Day, emoji reactions, disclaimer</li>
-      <li>v2.1 — Security patches </li>
+      <li>v2.1 — Security hardening: helmet, rate limiting, NoSQL sanitize, admin auth</li>
       <li>v2.2 — Stats fix: DB-backed online count, visit rate-limit exemption</li>
     </ul>
   </div>
@@ -404,6 +404,7 @@ const EMOJI_LIST = ['❤️','😮','😂','🥺','🔥'];
 
 // ── Theme ─────────────────────────────────────────────
 const themeBtn=document.getElementById('themeBtn');
+// Dark is the default. Only use saved preference if user explicitly chose light before.
 const saved=localStorage.getItem('giet_theme')||'dark';
 document.body.setAttribute('data-theme',saved);
 themeBtn.textContent=saved==='dark'?'☀️ Light':'🌙 Dark';
@@ -740,7 +741,17 @@ submitBtn.addEventListener('click',()=>{
   const branch = (yearVal && branchVal) ? { year: yearVal, branch: branchVal } : null;
 
   fetch(`${API}/api/confessions`,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({message:msg,clientId:cid(),category:selCat,branch})})
-    .then(r=>r.json()).then(data=>{
+    .then(r=>{
+      if(r.status===429){
+        fStatus.textContent="You've sent quite a few confessions today 💌 Come back in a bit!";
+        fStatus.style.color='var(--muted)';
+        submitBtn.disabled=false; submitBtn.textContent='Send Anonymously 💌';
+        return null;
+      }
+      return r.json();
+    })
+    .then(data=>{
+      if(!data)return;
       if(data.error){fStatus.textContent=data.error;fStatus.style.color='var(--rose2)';}
       else{
         let msg2=data.status==='approved'?'✅ Confession posted! 💌':'✅ Sent! Admin will review it shortly 💌';
