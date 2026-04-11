@@ -33,8 +33,14 @@ body{min-height:100vh;background:#0d0008;color:var(--text);font-family:'DM Sans'
 #particles{position:fixed;inset:0;z-index:1;pointer-events:none;}
 .page{position:relative;z-index:2;max-width:780px;margin:0 auto;padding:0 16px 100px;}
 
+/* ── Feature 6: Disclaimer banner ── */
+.disclaimer{background:rgba(255,200,0,0.07);border:1px solid rgba(255,200,0,0.2);border-radius:14px;padding:12px 16px;margin-bottom:20px;display:flex;align-items:flex-start;gap:10px;}
+.disclaimer-icon{font-size:1.1rem;flex-shrink:0;margin-top:1px;}
+.disclaimer p{font-size:0.75rem;color:rgba(255,220,120,0.85);line-height:1.55;}
+.disclaimer strong{color:rgba(255,220,120,1);}
+
 /* Header */
-header{text-align:center;padding:52px 0 32px;position:relative;}
+header{text-align:center;padding:52px 0 24px;position:relative;}
 .header-glow{position:absolute;top:0;left:50%;transform:translateX(-50%);width:400px;height:200px;background:radial-gradient(ellipse,rgba(255,45,111,0.3) 0%,transparent 70%);pointer-events:none;}
 .logo-icon{font-size:2.8rem;display:block;animation:float 3s ease-in-out infinite;margin-bottom:12px;filter:drop-shadow(0 0 20px rgba(255,45,111,0.8));}
 @keyframes float{0%,100%{transform:translateY(0);}50%{transform:translateY(-8px);}}
@@ -47,9 +53,13 @@ header{text-align:center;padding:52px 0 32px;position:relative;}
 
 /* Top bar */
 .top-bar{display:flex;align-items:center;justify-content:space-between;margin-bottom:20px;gap:10px;flex-wrap:wrap;}
-.ig-pill{display:inline-flex;align-items:center;gap:7px;background:linear-gradient(135deg,#f09433,#e6683c,#dc2743,#cc2366,#bc1888);color:#fff;padding:8px 16px;border-radius:40px;text-decoration:none;font-size:0.82rem;font-weight:600;box-shadow:0 4px 20px rgba(220,59,121,0.4);transition:transform .2s,box-shadow .2s;}
+.ig-pill{display:inline-flex;align-items:center;gap:7px;background:linear-gradient(135deg,#f09433,#e6683c,#dc2743,#cc2366,#bc1888);color:#fff;padding:8px 16px;border-radius:40px;text-decoration:none;font-size:0.82rem;font-weight:600;box-shadow:0 4px 20px rgba(220,59,121,0.4);transition:transform .2s;}
 .ig-pill:hover{transform:scale(1.05);}
+.top-right{display:flex;gap:8px;align-items:center;}
 .theme-pill{background:var(--glass);border:1px solid var(--border);color:var(--text);border-radius:40px;padding:8px 16px;cursor:pointer;font-size:0.82rem;font-weight:500;backdrop-filter:blur(10px);transition:all .2s;font-family:'DM Sans',sans-serif;}
+/* ── Feature 2: Story mode button ── */
+.story-pill{background:linear-gradient(135deg,var(--rose),var(--crimson));border:none;color:#fff;border-radius:40px;padding:8px 16px;cursor:pointer;font-size:0.82rem;font-weight:600;font-family:'DM Sans',sans-serif;transition:all .2s;box-shadow:0 4px 16px rgba(255,45,111,0.35);}
+.story-pill:hover{transform:scale(1.05);}
 
 /* Glass card */
 .glass-card{background:var(--glass);border:1px solid var(--border);border-radius:24px;padding:28px;backdrop-filter:blur(16px);box-shadow:var(--card-shadow);position:relative;overflow:hidden;}
@@ -58,9 +68,18 @@ header{text-align:center;padding:52px 0 32px;position:relative;}
 /* Submit */
 .submit-card{margin-bottom:28px;}
 .submit-card h2{font-family:'Playfair Display',serif;font-size:1.4rem;font-weight:700;margin-bottom:18px;display:flex;align-items:center;gap:10px;}
-.cat-row{display:flex;gap:8px;margin-bottom:16px;flex-wrap:wrap;}
+.cat-row{display:flex;gap:8px;margin-bottom:12px;flex-wrap:wrap;}
 .cat-pill{background:rgba(255,45,111,0.1);border:1px solid rgba(255,45,111,0.3);color:var(--rose2);border-radius:30px;padding:6px 16px;font-size:0.8rem;font-weight:600;cursor:pointer;transition:all .2s;font-family:'DM Sans',sans-serif;}
 .cat-pill:hover,.cat-pill.active{background:var(--rose);color:#fff;border-color:var(--rose);box-shadow:0 0 20px rgba(255,45,111,0.4);transform:translateY(-1px);}
+
+/* ── Feature 1: Branch tag selector ── */
+.branch-row{display:flex;gap:8px;margin-bottom:16px;flex-wrap:wrap;align-items:center;}
+.branch-label{font-size:0.75rem;color:var(--muted);font-weight:600;letter-spacing:.04em;text-transform:uppercase;flex-basis:100%;margin-bottom:4px;}
+.branch-select{background:rgba(0,0,0,0.35);border:1px solid var(--border);color:var(--text);border-radius:12px;padding:7px 12px;font-size:0.8rem;font-family:'DM Sans',sans-serif;cursor:pointer;outline:none;transition:border-color .2s;appearance:none;-webkit-appearance:none;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath fill='rgba(255,107,157,0.8)' d='M6 8L0 0h12z'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 10px center;padding-right:28px;}
+.branch-select:focus{border-color:var(--rose);}
+.branch-select option{background:#1a0010;color:var(--text);}
+.branch-optional{font-size:0.72rem;color:var(--muted);font-style:italic;}
+
 textarea{width:100%;min-height:120px;background:rgba(0,0,0,0.3);border:1.5px solid var(--border);border-radius:16px;padding:16px;color:var(--text);font-size:0.95rem;font-family:'DM Sans',sans-serif;resize:vertical;outline:none;transition:border-color .2s,box-shadow .2s;line-height:1.6;}
 textarea::placeholder{color:rgba(255,200,220,0.4);}
 textarea:focus{border-color:var(--rose);box-shadow:0 0 0 3px rgba(255,45,111,0.15);}
@@ -70,12 +89,12 @@ textarea:focus{border-color:var(--rose);box-shadow:0 0 0 3px rgba(255,45,111,0.1
 .wbar.warn{background:linear-gradient(90deg,#ffaa00,#ff6600);}
 .wbar.over{background:#ff2200;}
 .wcount{font-size:0.75rem;color:var(--muted);white-space:nowrap;}
-.submit-btn{width:100%;padding:14px;background:linear-gradient(135deg,var(--rose),var(--crimson));color:#fff;border:none;border-radius:16px;font-size:1rem;font-weight:600;cursor:pointer;font-family:'DM Sans',sans-serif;box-shadow:0 8px 30px rgba(255,45,111,0.35);transition:all .25s;position:relative;overflow:hidden;}
+.submit-btn{width:100%;padding:14px;background:linear-gradient(135deg,var(--rose),var(--crimson));color:#fff;border:none;border-radius:16px;font-size:1rem;font-weight:600;cursor:pointer;font-family:'DM Sans',sans-serif;box-shadow:0 8px 30px rgba(255,45,111,0.35);transition:all .25s;}
 .submit-btn:hover:not(:disabled){transform:translateY(-2px);box-shadow:0 12px 40px rgba(255,45,111,0.5);}
 .submit-btn:disabled{opacity:0.6;cursor:not-allowed;transform:none;}
 #fStatus{margin-top:10px;font-size:0.85rem;min-height:18px;text-align:center;}
 
-/* Filter */
+/* Filter row */
 .section-head{display:flex;align-items:center;justify-content:space-between;margin:8px 0 16px;}
 .section-label{font-family:'Playfair Display',serif;font-size:1.2rem;font-style:italic;color:var(--muted);}
 .filter-row{display:flex;gap:8px;flex-wrap:wrap;}
@@ -88,19 +107,31 @@ textarea:focus{border-color:var(--rose);box-shadow:0 0 0 3px rgba(255,45,111,0.1
 @keyframes cardIn{from{opacity:0;transform:translateY(20px);}to{opacity:1;transform:translateY(0);}}
 .conf-card:hover{transform:translateY(-3px);box-shadow:0 12px 40px rgba(255,45,111,0.2);border-color:rgba(255,100,150,0.4);}
 .conf-card::before{content:'"';position:absolute;top:-10px;right:16px;font-family:'Playfair Display',serif;font-size:7rem;color:rgba(255,45,111,0.08);line-height:1;pointer-events:none;user-select:none;}
-.card-cat{display:inline-flex;align-items:center;gap:5px;background:rgba(255,45,111,0.15);border:1px solid rgba(255,45,111,0.3);color:var(--rose2);border-radius:20px;padding:3px 12px;font-size:0.72rem;font-weight:600;margin-bottom:12px;}
-.card-msg{font-size:1rem;line-height:1.75;color:rgba(255,240,245,0.92);white-space:pre-wrap;word-wrap:break-word;margin-bottom:16px;}
 
-/* Card footer */
+/* ── Feature 4: COTD card ── */
+.conf-card.cotd{border-color:rgba(255,179,71,0.5);box-shadow:0 0 30px rgba(255,179,71,0.2);}
+.cotd-badge{display:inline-flex;align-items:center;gap:5px;background:linear-gradient(135deg,rgba(255,179,71,0.2),rgba(255,140,0,0.15));border:1px solid rgba(255,179,71,0.4);color:#ffb347;border-radius:20px;padding:3px 12px;font-size:0.72rem;font-weight:700;margin-bottom:12px;}
+
+.card-cat{display:inline-flex;align-items:center;gap:5px;background:rgba(255,45,111,0.15);border:1px solid rgba(255,45,111,0.3);color:var(--rose2);border-radius:20px;padding:3px 12px;font-size:0.72rem;font-weight:600;margin-bottom:12px;}
+/* ── Feature 1: Branch tag badge on card ── */
+.branch-badge{display:inline-flex;align-items:center;gap:4px;background:rgba(100,200,255,0.08);border:1px solid rgba(100,200,255,0.2);color:rgba(150,220,255,0.85);border-radius:20px;padding:3px 10px;font-size:0.7rem;font-weight:600;margin-left:6px;}
+.card-meta{display:flex;align-items:center;flex-wrap:wrap;gap:4px;margin-bottom:12px;}
+.card-msg{font-size:1rem;line-height:1.75;color:rgba(255,240,245,0.92);white-space:pre-wrap;word-wrap:break-word;margin-bottom:16px;}
 .card-footer{display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:10px;}
 .card-time{font-size:0.75rem;color:var(--muted);display:flex;align-items:center;gap:5px;}
 .action-row{display:flex;gap:6px;flex-wrap:wrap;}
 .act-btn{display:flex;align-items:center;gap:4px;background:rgba(255,255,255,0.06);border:1px solid rgba(255,255,255,0.12);color:var(--muted);border-radius:30px;padding:5px 12px;font-size:0.78rem;font-weight:600;cursor:pointer;transition:all .18s;font-family:'DM Sans',sans-serif;}
 .act-btn:hover{background:rgba(255,45,111,0.15);border-color:rgba(255,45,111,0.4);color:#fff;}
-.act-btn.liked{background:rgba(255,45,111,0.2);border-color:var(--rose);color:var(--rose2);}
 .act-btn.flagged{background:rgba(255,150,0,0.15);border-color:rgba(255,150,0,0.4);color:#ffaa44;}
 
-/* Replies — always visible, no toggle */
+/* ── Feature 5: Emoji reaction bar ── */
+.reaction-bar{display:flex;gap:6px;flex-wrap:wrap;margin-top:12px;padding-top:12px;border-top:1px solid rgba(255,100,150,0.1);}
+.rxn-btn{display:flex;align-items:center;gap:4px;background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.1);border-radius:20px;padding:4px 10px;font-size:0.82rem;cursor:pointer;transition:all .18s;font-family:'DM Sans',sans-serif;color:var(--muted);}
+.rxn-btn:hover{background:rgba(255,45,111,0.12);border-color:rgba(255,45,111,0.3);transform:scale(1.1);}
+.rxn-btn.active{background:rgba(255,45,111,0.2);border-color:var(--rose);color:var(--text);}
+.rxn-count{font-size:0.72rem;font-weight:700;}
+
+/* Replies */
 .replies-section{margin-top:16px;border-top:1px solid rgba(255,100,150,0.12);padding-top:14px;}
 .replies-label{font-size:0.75rem;font-weight:700;color:var(--rose2);letter-spacing:.04em;text-transform:uppercase;margin-bottom:10px;display:flex;align-items:center;gap:6px;}
 .replies-list{display:flex;flex-direction:column;gap:8px;margin-bottom:10px;}
@@ -120,11 +151,9 @@ textarea:focus{border-color:var(--rose);box-shadow:0 0 0 3px rgba(255,45,111,0.1
 .skel-line.a{height:12px;width:30%;}.skel-line.b{height:14px;width:85%;}.skel-line.c{height:14px;width:70%;}.skel-line.d{height:14px;width:55%;margin-bottom:20px;}.skel-line.e{height:10px;width:25%;}
 @keyframes shimmer{0%{background-position:200% 0}100%{background-position:-200% 0}}
 
-/* Empty */
+/* Empty / Toast */
 .empty{text-align:center;padding:60px 20px;font-family:'Playfair Display',serif;font-style:italic;color:var(--muted);font-size:1.1rem;}
 .empty-icon{font-size:3rem;display:block;margin-bottom:12px;opacity:0.5;}
-
-/* Toast */
 .toast{position:fixed;bottom:28px;left:50%;transform:translateX(-50%) translateY(100px);opacity:0;background:linear-gradient(135deg,var(--rose),var(--crimson));color:#fff;padding:12px 28px;border-radius:40px;font-size:0.88rem;font-weight:600;box-shadow:0 8px 30px rgba(255,45,111,0.5);transition:all .4s cubic-bezier(.34,1.56,.64,1);z-index:9999;white-space:nowrap;font-family:'DM Sans',sans-serif;}
 .toast.show{transform:translateX(-50%) translateY(0);opacity:1;}
 
@@ -141,6 +170,27 @@ textarea:focus{border-color:var(--rose);box-shadow:0 0 0 3px rgba(255,45,111,0.1
 .share-btn.copy:hover{border-color:#aaa;}
 .modal-close{margin-top:14px;width:100%;padding:10px;background:transparent;border:1px solid rgba(255,255,255,0.1);color:var(--muted);border-radius:12px;cursor:pointer;font-size:0.85rem;font-family:'DM Sans',sans-serif;}
 
+/* ── Feature 2: Story mode overlay ── */
+.story-overlay{position:fixed;inset:0;z-index:9000;background:#000;display:flex;flex-direction:column;justify-content:center;align-items:center;opacity:0;pointer-events:none;transition:opacity .3s;}
+.story-overlay.open{opacity:1;pointer-events:all;}
+.story-progress{position:absolute;top:0;left:0;right:0;display:flex;gap:4px;padding:16px 16px 0;}
+.story-seg{flex:1;height:3px;background:rgba(255,255,255,0.25);border-radius:2px;overflow:hidden;}
+.story-seg-fill{height:100%;width:0%;background:#fff;transition:none;}
+.story-seg-fill.active{transition:width linear;}
+.story-content{max-width:480px;width:90%;padding:20px;}
+.story-card{background:linear-gradient(135deg,rgba(192,20,76,0.35),rgba(40,0,20,0.95));border:1px solid rgba(255,100,150,0.3);border-radius:24px;padding:32px 28px;text-align:center;min-height:300px;display:flex;flex-direction:column;justify-content:center;gap:16px;}
+.story-cat{font-size:0.8rem;font-weight:700;color:var(--rose2);letter-spacing:.06em;text-transform:uppercase;}
+.story-branch{font-size:0.72rem;color:rgba(150,220,255,0.8);margin-top:4px;}
+.story-msg{font-family:'Playfair Display',serif;font-size:clamp(1.05rem,3vw,1.35rem);font-style:italic;line-height:1.7;color:#fff0f5;}
+.story-meta{font-size:0.75rem;color:var(--muted);}
+.story-reactions{display:flex;justify-content:center;gap:10px;margin-top:8px;}
+.story-rxn{font-size:1.1rem;background:rgba(255,255,255,0.1);border:none;border-radius:20px;padding:6px 14px;cursor:pointer;color:#fff;font-family:'DM Sans',sans-serif;font-size:0.85rem;}
+.story-nav{position:absolute;top:50%;transform:translateY(-50%);display:flex;justify-content:space-between;width:100%;padding:0 12px;pointer-events:none;}
+.story-nav button{pointer-events:all;background:rgba(255,255,255,0.12);border:none;color:#fff;width:44px;height:44px;border-radius:50%;font-size:1.2rem;cursor:pointer;backdrop-filter:blur(8px);transition:background .2s;}
+.story-nav button:hover{background:rgba(255,255,255,0.22);}
+.story-close{position:absolute;top:16px;right:16px;background:rgba(255,255,255,0.12);border:none;color:#fff;width:36px;height:36px;border-radius:50%;font-size:1.1rem;cursor:pointer;z-index:10;}
+.story-counter{position:absolute;bottom:24px;left:50%;transform:translateX(-50%);font-size:0.75rem;color:rgba(255,255,255,0.5);}
+
 /* Updates */
 .updates-card{margin-top:28px;}
 .updates-card h3{font-family:'Playfair Display',serif;font-size:1rem;font-style:italic;color:var(--muted);margin-bottom:12px;}
@@ -152,13 +202,7 @@ textarea:focus{border-color:var(--rose);box-shadow:0 0 0 3px rgba(255,45,111,0.1
 /* ── LIGHT THEME ── */
 [data-theme="light"] body{background:#fff2f6;}
 [data-theme="light"] .bg{background:radial-gradient(ellipse 80% 60% at 20% 10%,rgba(255,180,210,0.5) 0%,transparent 60%),radial-gradient(ellipse 60% 80% at 80% 90%,rgba(255,100,150,0.3) 0%,transparent 55%),radial-gradient(ellipse 50% 50% at 50% 50%,#fff0f5 0%,#fce3f0 100%);}
-[data-theme="light"]{
-  --glass:rgba(255,255,255,0.65);--glass2:rgba(255,255,255,0.85);
-  --border:rgba(255,100,150,0.2);--text:#3d0022;--muted:rgba(150,50,90,0.8);
-  --card-shadow:0 8px 40px rgba(255,45,111,0.1);
-  --reply-bg:rgba(255,45,111,0.06);--reply-border:rgba(255,45,111,0.18);
-  --reply-text:#4a0028;  /* ← FIX: dark readable text for replies in light mode */
-}
+[data-theme="light"]{--glass:rgba(255,255,255,0.65);--glass2:rgba(255,255,255,0.85);--border:rgba(255,100,150,0.2);--text:#3d0022;--muted:rgba(150,50,90,0.8);--card-shadow:0 8px 40px rgba(255,45,111,0.1);--reply-bg:rgba(255,45,111,0.06);--reply-border:rgba(255,45,111,0.18);--reply-text:#4a0028;}
 [data-theme="light"] .reply-input{background:rgba(255,255,255,0.8);color:#3d0022;border-color:rgba(255,100,150,0.3);}
 [data-theme="light"] .reply-input::placeholder{color:rgba(180,80,120,0.4);}
 [data-theme="light"] .card-msg{color:#3d0022;}
@@ -171,6 +215,11 @@ textarea:focus{border-color:var(--rose);box-shadow:0 0 0 3px rgba(255,45,111,0.1
 [data-theme="light"] .no-replies{color:rgba(150,50,90,0.6);}
 [data-theme="light"] .reply-time{color:rgba(150,50,90,0.6);}
 [data-theme="light"] .replies-label{color:var(--crimson);}
+[data-theme="light"] .branch-badge{background:rgba(0,100,200,0.07);border-color:rgba(0,100,200,0.18);color:rgba(0,80,180,0.85);}
+[data-theme="light"] .disclaimer{background:rgba(180,120,0,0.06);border-color:rgba(180,120,0,0.18);}
+[data-theme="light"] .disclaimer p{color:rgba(120,80,0,0.85);}
+[data-theme="light"] .disclaimer strong{color:rgba(120,80,0,1);}
+[data-theme="light"] .rxn-btn{background:rgba(255,255,255,0.5);border-color:rgba(255,100,150,0.15);color:rgba(150,50,90,0.8);}
 
 @media(max-width:600px){
   .page{padding:0 12px 90px;}
@@ -194,18 +243,32 @@ textarea:focus{border-color:var(--rose);box-shadow:0 0 0 3px rgba(255,45,111,0.1
   <div class="modal">
     <h3>💌 Share this confession</h3>
     <div class="share-btns">
-      <a class="share-btn whatsapp" id="shareWA" href="#" target="_blank">
-        <span style="font-size:1.4rem">📱</span> Share on WhatsApp
-      </a>
-      <button class="share-btn" id="shareIG" onclick="shareIG()">
-        <span style="font-size:1.4rem">📷</span> Copy for Instagram
-      </button>
-      <button class="share-btn copy" id="shareCopy" onclick="shareCopy()">
-        <span style="font-size:1.4rem">🔗</span> Copy link
-      </button>
+      <a class="share-btn whatsapp" id="shareWA" href="#" target="_blank"><span style="font-size:1.4rem">📱</span> Share on WhatsApp</a>
+      <button class="share-btn" onclick="shareIG()"><span style="font-size:1.4rem">📷</span> Copy for Instagram</button>
+      <button class="share-btn copy" onclick="shareCopy()"><span style="font-size:1.4rem">🔗</span> Copy link</button>
     </div>
     <button class="modal-close" onclick="closeShare()">Cancel</button>
   </div>
+</div>
+
+<!-- Feature 2: Story Mode Overlay -->
+<div class="story-overlay" id="storyOverlay">
+  <div class="story-progress" id="storyProgress"></div>
+  <button class="story-close" onclick="closeStory()">✕</button>
+  <div class="story-content">
+    <div class="story-card" id="storyCard">
+      <div class="story-cat" id="storyCat"></div>
+      <div class="story-branch" id="storyBranch"></div>
+      <div class="story-msg" id="storyMsg"></div>
+      <div class="story-meta" id="storyMeta"></div>
+      <div class="story-reactions" id="storyReactions"></div>
+    </div>
+  </div>
+  <div class="story-nav">
+    <button onclick="storyNav(-1)">‹</button>
+    <button onclick="storyNav(1)">›</button>
+  </div>
+  <div class="story-counter" id="storyCounter"></div>
 </div>
 
 <div class="page">
@@ -223,18 +286,50 @@ textarea:focus{border-color:var(--rose);box-shadow:0 0 0 3px rgba(255,45,111,0.1
 
   <div class="top-bar">
     <a href="https://www.instagram.com/" target="_blank" class="ig-pill">📷 Instagram Page</a>
-    <button class="theme-pill" id="themeBtn">☀️ Light</button>
+    <div class="top-right">
+      <button class="story-pill" onclick="openStory()">▶ Story Mode</button>
+      <button class="theme-pill" id="themeBtn">☀️ Light</button>
+    </div>
+  </div>
+
+  <!-- Feature 6: Disclaimer -->
+  <div class="disclaimer">
+    <span class="disclaimer-icon">⚠️</span>
+    <p><strong>Entertainment purposes only.</strong> This site is meant for fun and anonymous expression among GIET students. It does not intend to harm, defame, or breach anyone's privacy. If any content causes harm, the site will be taken down immediately. All confessions are reviewed by admin before publishing.</p>
   </div>
 
   <div class="disc">Anonymous · Safe · For GIET students only · Admin reviews every message</div>
 
   <div class="glass-card submit-card">
     <h2>✍️ Send a Confession</h2>
+
+    <!-- Category pills -->
     <div class="cat-row" id="catPicker">
       <div class="cat-pill active" data-cat="💘 Crush">💘 Crush</div>
       <div class="cat-pill" data-cat="🌹 Shayari">🌹 Shayari</div>
       <div class="cat-pill" data-cat="💭 Random">💭 Random</div>
     </div>
+
+    <!-- Feature 1: Branch tag picker -->
+    <div class="branch-row">
+      <div class="branch-label">🎓 Your batch <span class="branch-optional">(optional — makes it feel personal)</span></div>
+      <select class="branch-select" id="yearSelect">
+        <option value="">Year...</option>
+        <option>1st Year</option>
+        <option>2nd Year</option>
+        <option>3rd Year</option>
+        <option>4th Year</option>
+      </select>
+      <select class="branch-select" id="branchSelect">
+        <option value="">Branch...</option>
+        <option>CSE</option>
+        <option>AIML</option>
+        <option>ECE</option>
+        <option>AGRI</option>
+        <option>Others</option>
+      </select>
+    </div>
+
     <textarea id="confInput" maxlength="3000" placeholder="Write your confession... it'll reach them, anonymously 💕"></textarea>
     <div class="word-row">
       <div class="wbar-bg"><div class="wbar" id="wbar"></div></div>
@@ -271,14 +366,16 @@ textarea:focus{border-color:var(--rose);box-shadow:0 0 0 3px rgba(255,45,111,0.1
       <li>v1.5 — Full redesign: immersive UI + animations</li>
       <li>v1.6 — Replies, flag system, share to WhatsApp</li>
       <li>v1.7 — Push notifications, PWA, light mode fix</li>
-      <li>v1.8 — Replies always visible, no dropdown, smoother refresh</li>
-      <li>v1.9 — Skeleton glitch fixed, mobile cache fixed (no stale pages)</li>
+      <li>v1.8 — Replies always visible, smoother refresh</li>
+      <li>v1.9 — Skeleton glitch fixed, mobile cache fixed</li>
+      <li>v2.0 — Branch tag, Story mode, keep last 200, Confession of Day, emoji reactions, disclaimer</li>
     </ul>
   </div>
 </div>
 
 <script>
 const API = 'https://confession-app-1w0s.onrender.com';
+const EMOJI_LIST = ['❤️','😮','😂','🥺','🔥'];
 
 // ── Particles ─────────────────────────────────────────
 (function(){
@@ -310,8 +407,7 @@ document.body.setAttribute('data-theme',saved);
 themeBtn.textContent=saved==='dark'?'☀️ Light':'🌙 Dark';
 themeBtn.addEventListener('click',()=>{
   const next=document.body.getAttribute('data-theme')==='dark'?'light':'dark';
-  document.body.setAttribute('data-theme',next);
-  localStorage.setItem('giet_theme',next);
+  document.body.setAttribute('data-theme',next);localStorage.setItem('giet_theme',next);
   themeBtn.textContent=next==='dark'?'☀️ Light':'🌙 Dark';
 });
 
@@ -319,8 +415,6 @@ themeBtn.addEventListener('click',()=>{
 function cid(){let i=localStorage.getItem('giet_cid');if(!i){i=crypto.randomUUID();localStorage.setItem('giet_cid',i);}return i;}
 function words(t){return t.trim().split(/\s+/).filter(Boolean).length;}
 function ago(ts){const d=Math.floor((Date.now()-ts)/1000);if(d<60)return 'just now';if(d<3600)return Math.floor(d/60)+'m ago';if(d<86400)return Math.floor(d/3600)+'h ago';return Math.floor(d/86400)+'d ago';}
-
-// ── Toast ─────────────────────────────────────────────
 let tTimer;
 function toast(msg,dur=4000){const el=document.getElementById('toast');clearTimeout(tTimer);el.textContent=msg;el.classList.add('show');tTimer=setTimeout(()=>el.classList.remove('show'),dur);}
 
@@ -346,11 +440,10 @@ document.querySelectorAll('.ftag').forEach(t=>{
 
 // ── Share modal ───────────────────────────────────────
 let shareText='';
-function openShare(msg,id){
+function openShare(msg){
   shareText=msg;
   const url='https://page-confession.vercel.app';
-  const waText=encodeURIComponent(`💌 Anonymous Confession from GIET:\n\n"${msg}"\n\nRead more: ${url}`);
-  document.getElementById('shareWA').href=`https://wa.me/?text=${waText}`;
+  document.getElementById('shareWA').href=`https://wa.me/?text=${encodeURIComponent('💌 Anonymous Confession from GIET:\n\n"'+msg+'"\n\nRead more: '+url)}`;
   document.getElementById('shareModal').classList.add('open');
 }
 function closeShare(){document.getElementById('shareModal').classList.remove('open');}
@@ -360,50 +453,95 @@ document.getElementById('shareModal').addEventListener('click',e=>{if(e.target==
 
 // ── State ─────────────────────────────────────────────
 let allConf=[],seenIds=new Set(),firstLoad=true;
-const replyCounts={};
 
-// ── Render: surgical update — only add new cards, update existing in-place ──
-function render(){
-  const feed=document.getElementById('feed');
-  const list=activeF==='all'?allConf:allConf.filter(c=>c.category===activeF);
+// ── Feature 5: React to confession ───────────────────
+async function react(confId, emoji, btn) {
+  try {
+    const r = await fetch(`${API}/api/react/${confId}`, {
+      method:'POST', headers:{'Content-Type':'application/json'},
+      body: JSON.stringify({ clientId: cid(), emoji })
+    });
+    const d = await r.json();
+    if (d.reactions) {
+      // Update the confession in memory
+      const conf = allConf.find(c=>c.id===confId);
+      if (conf) { conf.reactions = d.reactions; conf.myReaction = d.myReaction; }
+      // Update reaction bar in-place
+      const card = btn.closest('.conf-card');
+      if (card) updateReactionBar(card, confId, d.reactions, d.myReaction);
+    }
+  } catch(e) { toast('Network error'); }
+}
 
-  // Always wipe non-conf-card nodes (skeletons, empty divs) on first real render
+function updateReactionBar(card, confId, reactions, myReaction) {
+  const bar = card.querySelector('.reaction-bar');
+  if (!bar) return;
+  bar.innerHTML = EMOJI_LIST.map(e => {
+    const count = reactions?.[e] || 0;
+    const active = myReaction === e ? ' active' : '';
+    return `<button class="rxn-btn${active}" onclick="react('${confId}','${e}',this)">${e} <span class="rxn-count">${count||''}</span></button>`;
+  }).join('');
+}
+
+// ── Render ────────────────────────────────────────────
+function render() {
+  const feed = document.getElementById('feed');
+  const list = activeF==='all' ? allConf : allConf.filter(c=>c.category===activeF);
+
+  // Wipe skeletons / empty nodes
   feed.querySelectorAll(':scope > :not(.conf-card)').forEach(el=>el.remove());
 
-  if(!list.length){
-    feed.innerHTML=`<div class="empty"><span class="empty-icon">💭</span>${activeF==='all'?'No confessions yet — be the first 💌':'No confessions in this category yet'}</div>`;
+  if (!list.length) {
+    feed.innerHTML = `<div class="empty"><span class="empty-icon">💭</span>${activeF==='all'?'No confessions yet — be the first 💌':'No confessions in this category yet'}</div>`;
     return;
   }
 
-  // Remove cards whose id is no longer in the list
-  const listIds=new Set(list.map(m=>m.id));
+  const listIds = new Set(list.map(m=>m.id));
   feed.querySelectorAll('.conf-card').forEach(el=>{if(!listIds.has(el.dataset.id))el.remove();});
 
-  // Build ordered list of card elements, creating new ones as needed
-  const fragment=document.createDocumentFragment();
-  list.forEach((m,i)=>{
-    let card=feed.querySelector(`.conf-card[data-id="${m.id}"]`);
-    if(card){
-      // Update counts in-place — never touch reply input or reply list
-      const lb=card.querySelector('.like-btn');
-      const db=card.querySelector('.dislike-btn');
-      if(lb)lb.innerHTML=`❤️ ${m.likes}`;
-      if(db)db.innerHTML=`💔 ${m.dislikes}`;
-      const tc=card.querySelector('.card-time');
-      if(tc)tc.textContent=`🕐 ${ago(m.createdAt)}`;
+  const fragment = document.createDocumentFragment();
+  list.forEach((m, i) => {
+    let card = feed.querySelector(`.conf-card[data-id="${m.id}"]`);
+    if (card) {
+      // Update in-place — never touch reply section
+      const tc = card.querySelector('.card-time');
+      if (tc) tc.textContent = `🕐 ${ago(m.createdAt)}`;
+      updateReactionBar(card, m.id, m.reactions, m.myReaction);
     } else {
-      // Brand new card
-      card=document.createElement('div');
-      card.className='conf-card';card.dataset.id=m.id;card.style.animationDelay=(i*0.05)+'s';
-      card.innerHTML=`
-        <div class="card-cat">${m.category||'💭 Random'}</div>
+      card = document.createElement('div');
+      card.className = 'conf-card' + (m.isConfessionOfDay?' cotd':'');
+      card.dataset.id = m.id;
+      card.style.animationDelay = (i*0.05)+'s';
+
+      // Feature 4: COTD badge
+      const cotdBadge = m.isConfessionOfDay
+        ? `<div class="cotd-badge">👑 Confession of the Day</div>` : '';
+
+      // Feature 1: Category + branch meta row
+      const branchBadge = m.branchTag
+        ? `<span class="branch-badge">🎓 ${m.branchTag.year} · ${m.branchTag.branch}</span>` : '';
+
+      // Feature 5: Reaction bar
+      const rxnBar = `<div class="reaction-bar">${
+        EMOJI_LIST.map(e=>{
+          const count = m.reactions?.[e]||0;
+          const active = m.myReaction===e?' active':'';
+          return `<button class="rxn-btn${active}" onclick="react('${m.id}','${e}',this)">${e} <span class="rxn-count">${count||''}</span></button>`;
+        }).join('')
+      }</div>`;
+
+      card.innerHTML = `
+        ${cotdBadge}
+        <div class="card-meta">
+          <div class="card-cat">${m.category||'💭 Random'}</div>
+          ${branchBadge}
+        </div>
         <div class="card-msg">${m.message}</div>
+        ${rxnBar}
         <div class="card-footer">
           <span class="card-time">🕐 ${ago(m.createdAt)}</span>
           <div class="action-row">
-            <button class="act-btn like-btn" onclick="vote('${m.id}','like',this)">❤️ ${m.likes}</button>
-            <button class="act-btn dislike-btn" onclick="vote('${m.id}','dislike',this)">💔 ${m.dislikes}</button>
-            <button class="act-btn" onclick="openShare(\`${m.message.replace(/`/g,"'")}\`,'${m.id}')">📤 Share</button>
+            <button class="act-btn" onclick="openShare(\`${m.message.replace(/`/g,"'")}\`)">📤 Share</button>
             <button class="act-btn${(m.flags||0)>0?' flagged':''}" onclick="flagConfession('${m.id}',this)">⚑ ${(m.flags||0)>0?'Flagged':'Flag'}</button>
           </div>
         </div>
@@ -415,169 +553,202 @@ function render(){
             <button class="reply-send" onclick="sendReply('${m.id}')">Send</button>
           </div>
         </div>`;
-      // Load replies asynchronously after inserting
-      setTimeout(()=>loadReplies(m.id),0);
+      setTimeout(()=>loadReplies(m.id), 0);
     }
     fragment.appendChild(card);
   });
-
-  // Re-append in correct order (existing cards get moved, not re-created)
   feed.appendChild(fragment);
 }
 
-// ── Safe render: skip if reply input focused ──────────
-let pendingRender=false;
-function safeRender(){
-  const focused=document.activeElement;
-  if(focused&&focused.classList.contains('reply-input')){pendingRender=true;}
-  else{render();pendingRender=false;}
+// ── Safe render ───────────────────────────────────────
+let pendingRender = false;
+function safeRender() {
+  const focused = document.activeElement;
+  if (focused && focused.classList.contains('reply-input')) { pendingRender=true; }
+  else { render(); pendingRender=false; }
 }
-document.addEventListener('focusout',e=>{
-  if(e.target.classList.contains('reply-input')&&pendingRender){
-    setTimeout(()=>{if(pendingRender){render();pendingRender=false;}},350);
+document.addEventListener('focusout', e=>{
+  if (e.target.classList.contains('reply-input') && pendingRender) {
+    setTimeout(()=>{ if(pendingRender){render();pendingRender=false;} }, 350);
   }
 });
 
-// ── Fetch confessions — with cold-start retry & countdown ────────────────────
-// WHY: Render free tier sleeps after 15 min inactivity. First request wakes it
-// up but takes ~30s. Without retry, the catch fires once and stops — the page
-// stays stuck on "Connecting…" forever even though the server comes back fine.
-// FIX: exponential backoff retry (3s → 6s → 12s → 15s cap), live countdown
-// shown in the feed so the user knows something is happening, not broken.
-let fetchRetryTimer=null;
-let retryDelay=3000;      // starts at 3s, doubles each fail, caps at 15s
-let wakeCountdown=null;
-
-function showWaking(secsLeft){
-  const feed=document.getElementById('feed');
-  // Only update the waking message — don't stomp cards that may exist
-  let el=feed.querySelector('.waking-msg');
-  if(!el){
-    feed.innerHTML='';
-    el=document.createElement('div');
-    el.className='empty waking-msg';
-    feed.appendChild(el);
-  }
-  el.innerHTML=`<span class="empty-icon">📡</span>Server is waking up… <strong>${secsLeft}s</strong><br><small style="font-size:0.75rem;opacity:0.6;margin-top:6px;display:block">Render free tier sleeps — hang tight 💤</small>`;
-}
-
-function fetchConf(){
-  clearTimeout(fetchRetryTimer);
-  clearInterval(wakeCountdown);
-
+// ── Fetch ─────────────────────────────────────────────
+function fetchConf() {
   fetch(`${API}/api/confessions`)
-    .then(r=>{
-      if(!r.ok) throw new Error('non-2xx');
-      return r.json();
-    })
-    .then(data=>{
-      // ✅ Server responded — reset retry delay for next poll
-      retryDelay=3000;
-      clearInterval(wakeCountdown);
-
-      const newOnes=data.filter(m=>!seenIds.has(m.id));
-      if(newOnes.length&&!firstLoad){
+    .then(r=>r.json()).then(data=>{
+      const newOnes = data.filter(m=>!seenIds.has(m.id));
+      if (newOnes.length && !firstLoad) {
         toast(`💌 ${newOnes.length} new confession${newOnes.length>1?'s':''}!`);
-        document.title=`(${newOnes.length}) GIET Confessions 💌`;
-        const clearBadge=()=>{document.title='GIET Confessions 💌';window.removeEventListener('focus',clearBadge);};
-        window.addEventListener('focus',clearBadge);
+        document.title = `(${newOnes.length}) GIET Confessions 💌`;
+        const cb = ()=>{ document.title='GIET Confessions 💌'; window.removeEventListener('focus',cb); };
+        window.addEventListener('focus', cb);
       }
-      seenIds=new Set(data.map(m=>m.id));
-      allConf=data;
-      firstLoad=false;
+      seenIds = new Set(data.map(m=>m.id));
+      allConf = data;
+      firstLoad = false;
       safeRender();
-    })
-    .catch(()=>{
-      // ❌ Server not ready yet — show countdown and schedule retry
-      if(firstLoad){
-        let secs=Math.round(retryDelay/1000);
-        showWaking(secs);
-        wakeCountdown=setInterval(()=>{
-          secs--;
-          if(secs>0) showWaking(secs);
-          else clearInterval(wakeCountdown);
-        },1000);
-      }
-      // Exponential backoff — cap at 15s so we don't wait forever
-      fetchRetryTimer=setTimeout(fetchConf, retryDelay);
-      retryDelay=Math.min(retryDelay*2, 15000);
+    }).catch(()=>{
+      if (firstLoad) document.getElementById('feed').innerHTML = `<div class="empty"><span class="empty-icon">📡</span>Connecting to server… please wait</div>`;
     });
 }
 
-// ── Replies — always visible, no toggle ───────────────
-async function loadReplies(confId){
-  const list=document.getElementById('rl-'+confId);
-  if(!list)return;
-  try{
-    const r=await fetch(`${API}/api/replies/${confId}`);
-    const replies=await r.json();
-    replyCounts[confId]=replies.length;
-    if(!replies.length){list.innerHTML='<div class="no-replies">No replies yet — be the first 💬</div>';return;}
-    list.innerHTML=replies.map(r=>`<div class="reply-item">${r.message}<div class="reply-time">${ago(r.createdAt)}</div></div>`).join('');
-  }catch(e){list.innerHTML='<div class="no-replies">Could not load replies</div>';}
+// ── Replies ───────────────────────────────────────────
+async function loadReplies(confId) {
+  const list = document.getElementById('rl-'+confId);
+  if (!list) return;
+  try {
+    const r = await fetch(`${API}/api/replies/${confId}`);
+    const replies = await r.json();
+    if (!replies.length) { list.innerHTML='<div class="no-replies">No replies yet — be the first 💬</div>'; return; }
+    list.innerHTML = replies.map(r=>`<div class="reply-item">${r.message}<div class="reply-time">${ago(r.createdAt)}</div></div>`).join('');
+  } catch(e) { list.innerHTML='<div class="no-replies">Could not load replies</div>'; }
 }
-
-async function sendReply(confId){
-  const inp=document.getElementById('ri-'+confId);
-  const msg=inp.value.trim();
-  if(!msg)return;
-  inp.disabled=true;
-  try{
-    const r=await fetch(`${API}/api/replies/${confId}`,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({message:msg,clientId:cid()})});
-    const data=await r.json();
-    if(data.error){toast('❌ '+data.error);inp.disabled=false;return;}
-    inp.value='';inp.disabled=false;
+async function sendReply(confId) {
+  const inp = document.getElementById('ri-'+confId);
+  const msg = inp.value.trim();
+  if (!msg) return;
+  inp.disabled = true;
+  try {
+    const r = await fetch(`${API}/api/replies/${confId}`, {method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({message:msg,clientId:cid()})});
+    const data = await r.json();
+    if (data.error) { toast('❌ '+data.error); inp.disabled=false; return; }
+    inp.value=''; inp.disabled=false;
     toast('💬 Reply sent!');
     await loadReplies(confId);
-  }catch(e){toast('Network error');inp.disabled=false;}
+  } catch(e) { toast('Network error'); inp.disabled=false; }
 }
 
 // ── Flag ──────────────────────────────────────────────
-async function flagConfession(id,btn){
-  if(btn.classList.contains('flagged')){toast('⚑ Already flagged');return;}
-  try{
-    const r=await fetch(`${API}/api/flag/${id}`,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({clientId:cid()})});
-    const d=await r.json();
-    if(d.alreadyFlagged){toast('⚑ Already flagged');btn.classList.add('flagged');return;}
-    btn.classList.add('flagged');btn.innerHTML='⚑ Flagged';
+async function flagConfession(id, btn) {
+  if (btn.classList.contains('flagged')) { toast('⚑ Already flagged'); return; }
+  try {
+    const r = await fetch(`${API}/api/flag/${id}`, {method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({clientId:cid()})});
+    const d = await r.json();
+    if (d.alreadyFlagged) { btn.classList.add('flagged'); return; }
+    btn.classList.add('flagged'); btn.innerHTML='⚑ Flagged';
     toast('⚑ Flagged for admin review');
-  }catch(e){toast('Network error');}
+  } catch(e) { toast('Network error'); }
 }
 
-// ── Vote ──────────────────────────────────────────────
-window.vote=function(id,type,btn){
-  btn.style.opacity='0.5';
-  fetch(`${API}/api/${type}/${id}`,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({clientId:cid()})})
-    .then(r=>r.json()).then(d=>{
-      const conf=allConf.find(c=>c.id===id);
-      if(conf){conf.likes=d.likes;conf.dislikes=d.dislikes;}
-      const card=btn.closest('.conf-card');
-      if(card){
-        const lb=card.querySelector('.like-btn');const db=card.querySelector('.dislike-btn');
-        if(lb)lb.innerHTML=`❤️ ${d.likes}`;if(db)db.innerHTML=`💔 ${d.dislikes}`;
-      }
-      btn.style.opacity='1';
-    }).catch(()=>{btn.style.opacity='1';});
-};
+// ── Feature 2: Story Mode ─────────────────────────────
+let storyIdx = 0, storyList = [], storyTimer = null, storyDuration = 6000;
+
+function openStory() {
+  storyList = activeF==='all' ? allConf : allConf.filter(c=>c.category===activeF);
+  if (!storyList.length) { toast('No confessions to show 💭'); return; }
+  storyIdx = 0;
+  document.getElementById('storyOverlay').classList.add('open');
+  document.body.style.overflow = 'hidden';
+  showStorySlide(storyIdx);
+}
+function closeStory() {
+  clearTimeout(storyTimer);
+  document.getElementById('storyOverlay').classList.remove('open');
+  document.body.style.overflow = '';
+  // Reset all progress bars
+  document.querySelectorAll('.story-seg-fill').forEach(f=>{f.style.transition='none';f.style.width='0%';});
+}
+function storyNav(dir) {
+  clearTimeout(storyTimer);
+  storyIdx = Math.max(0, Math.min(storyList.length-1, storyIdx+dir));
+  showStorySlide(storyIdx);
+}
+function showStorySlide(idx) {
+  clearTimeout(storyTimer);
+  const m = storyList[idx];
+  if (!m) { closeStory(); return; }
+
+  // Update content
+  document.getElementById('storyCat').textContent = m.category||'💭 Random';
+  document.getElementById('storyBranch').textContent = m.branchTag ? `🎓 ${m.branchTag.year} · ${m.branchTag.branch}` : '';
+  document.getElementById('storyMsg').textContent = m.message;
+  document.getElementById('storyMeta').textContent = `🕐 ${ago(m.createdAt)}`;
+  document.getElementById('storyCounter').textContent = `${idx+1} / ${storyList.length}`;
+
+  // Reaction bar in story
+  const rxns = document.getElementById('storyReactions');
+  rxns.innerHTML = EMOJI_LIST.map(e=>{
+    const count = m.reactions?.[e]||0;
+    return `<button class="story-rxn" onclick="storyReact('${m.id}','${e}',this)">${e}${count?` ${count}`:''}`;
+  }).join('');
+
+  // Build/update progress segments
+  const prog = document.getElementById('storyProgress');
+  prog.innerHTML = storyList.map((_,i)=>`<div class="story-seg"><div class="story-seg-fill" id="spf-${i}"></div></div>`).join('');
+
+  // Fill past segments instantly
+  for (let i=0;i<idx;i++) { const f=document.getElementById(`spf-${i}`); if(f){f.style.transition='none';f.style.width='100%';} }
+
+  // Animate current segment
+  const fill = document.getElementById(`spf-${idx}`);
+  if (fill) {
+    fill.style.transition='none'; fill.style.width='0%';
+    requestAnimationFrame(()=>{
+      requestAnimationFrame(()=>{
+        fill.style.transition=`width ${storyDuration}ms linear`;
+        fill.style.width='100%';
+      });
+    });
+  }
+
+  // Auto-advance
+  storyTimer = setTimeout(()=>{
+    if (idx < storyList.length-1) storyNav(1);
+    else closeStory();
+  }, storyDuration);
+}
+
+// Tap left/right zones for navigation
+document.getElementById('storyOverlay').addEventListener('click', e=>{
+  if (e.target.closest('.story-nav,.story-close,.story-rxn,select,button')) return;
+  const x = e.clientX / window.innerWidth;
+  if (x < 0.35) storyNav(-1);
+  else if (x > 0.65) storyNav(1);
+});
+
+async function storyReact(confId, emoji, btn) {
+  try {
+    const r = await fetch(`${API}/api/react/${confId}`, {method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({clientId:cid(),emoji})});
+    const d = await r.json();
+    if (d.reactions) {
+      const conf = allConf.find(c=>c.id===confId);
+      if (conf) { conf.reactions=d.reactions; conf.myReaction=d.myReaction; }
+      // Refresh story reactions
+      const rxns = document.getElementById('storyReactions');
+      rxns.innerHTML = EMOJI_LIST.map(e=>{
+        const count = d.reactions?.[e]||0;
+        return `<button class="story-rxn${d.myReaction===e?' active':''}" onclick="storyReact('${confId}','${e}',this)">${e}${count?` ${count}`:''}`;
+      }).join('');
+    }
+  } catch(e) {}
+}
 
 // ── Submit ────────────────────────────────────────────
 const submitBtn=document.getElementById('submitBtn'),fStatus=document.getElementById('fStatus');
 submitBtn.addEventListener('click',()=>{
-  const msg=confInput.value.trim();const wc=words(msg);
+  const msg=confInput.value.trim(); const wc=words(msg);
   if(!wc){fStatus.textContent='Please write something first 💭';fStatus.style.color='var(--rose2)';return;}
   if(wc>400){fStatus.textContent='Too long! Stay under 400 words.';fStatus.style.color='var(--rose2)';return;}
-  submitBtn.disabled=true;submitBtn.textContent='Sending… 💌';fStatus.textContent='';
-  fetch(`${API}/api/confessions`,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({message:msg,clientId:cid(),category:selCat})})
+  submitBtn.disabled=true; submitBtn.textContent='Sending… 💌'; fStatus.textContent='';
+
+  // Feature 1: collect branch tag
+  const yearVal = document.getElementById('yearSelect').value;
+  const branchVal = document.getElementById('branchSelect').value;
+  const branch = (yearVal && branchVal) ? { year: yearVal, branch: branchVal } : null;
+
+  fetch(`${API}/api/confessions`,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({message:msg,clientId:cid(),category:selCat,branch})})
     .then(r=>r.json()).then(data=>{
       if(data.error){fStatus.textContent=data.error;fStatus.style.color='var(--rose2)';}
       else{
         let msg2=data.status==='approved'?'✅ Confession posted! 💌':'✅ Sent! Admin will review it shortly 💌';
-        // If filter edited the message, tell the user honestly what was changed
-        if(data.edited&&data.editedFields&&data.editedFields.length){
+        if(data.edited&&data.editedFields?.length){
           const what=data.editedFields.map(f=>({phone:'phone number',email:'email',handle:'social handle',link:'link',abuse:'some words',name:'a name'})[f]||f).join(', ');
           msg2+=`\n✏️ Note: ${what} was auto-hidden to protect privacy.`;
         }
-        toast(msg2,data.edited?6000:4000);fStatus.textContent='';confInput.value='';wbar.style.width='0%';wcount.textContent='0 / 400 words';
+        toast(msg2,data.edited?6000:4000);
+        fStatus.textContent=''; confInput.value=''; wbar.style.width='0%'; wcount.textContent='0 / 400 words';
+        document.getElementById('yearSelect').value=''; document.getElementById('branchSelect').value='';
         if(data.status==='approved')setTimeout(fetchConf,1000);
       }
     }).catch(()=>{fStatus.textContent='Network error. Try again.';fStatus.style.color='var(--rose2)';})
@@ -585,13 +756,9 @@ submitBtn.addEventListener('click',()=>{
 });
 
 // ── Analytics ─────────────────────────────────────────
-// NOTE: GET /api/analytics now requires admin auth (security fix).
-// But POST /api/visit is still public and returns the same stats
-// (visits, uniqueVisitors, activeVisitors) — so we just use that.
 async function analytics(){
   try{
     const r=await fetch(`${API}/api/visit`,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({clientId:cid()})});
-    if(!r.ok) return; // silently ignore if server not ready yet
     const d=await r.json();
     document.getElementById('statLive').textContent=d.activeVisitors||0;
     document.getElementById('statVisits').textContent=d.visits||0;
@@ -602,92 +769,40 @@ async function analytics(){
 // ── Push Notifications ────────────────────────────────
 async function setupPushNotifications(){
   if(!('serviceWorker' in navigator)||!('PushManager' in window))return;
-  // Only ask for permission if user hasn't decided yet
   if(Notification.permission==='denied')return;
-  // Check if already subscribed
   const reg=await navigator.serviceWorker.ready;
   let sub=await reg.pushManager.getSubscription();
-  if(sub){
-    // Already subscribed — re-register with server in case it was lost
-    await sendSubToServer(sub,'user');
-    return;
-  }
-  // Wait a moment before asking (better UX — don't ask instantly on load)
+  if(sub){await sendSubToServer(sub);return;}
   setTimeout(async()=>{
-    if(Notification.permission==='granted'){
-      await subscribeToPush(reg);
-    } else if(Notification.permission==='default'){
-      // Show a friendly in-page prompt first
-      showPushPrompt(reg);
-    }
-  }, 3000);
+    if(Notification.permission==='granted'){await subscribeToPush(reg);}
+    else if(Notification.permission==='default'){showPushPrompt(reg);}
+  },3000);
 }
-
 function showPushPrompt(reg){
   const banner=document.createElement('div');
   banner.id='pushPrompt';
   banner.style.cssText='position:fixed;bottom:80px;left:50%;transform:translateX(-50%);background:linear-gradient(135deg,#1a0010,#2d0018);border:1px solid rgba(255,45,111,0.4);border-radius:20px;padding:16px 20px;max-width:340px;width:90%;z-index:9990;display:flex;flex-direction:column;gap:10px;box-shadow:0 8px 40px rgba(255,45,111,0.3);font-family:DM Sans,sans-serif;';
-  banner.innerHTML=`
-    <div style="display:flex;align-items:center;gap:10px;">
-      <span style="font-size:1.6rem">💌</span>
-      <div>
-        <div style="color:#fff0f5;font-weight:700;font-size:0.9rem;">Get notified of new confessions</div>
-        <div style="color:rgba(255,200,220,0.7);font-size:0.75rem;margin-top:2px;">We'll ping you when a new confession drops</div>
-      </div>
-    </div>
-    <div style="display:flex;gap:8px;">
-      <button id="pushYes" style="flex:1;padding:9px;background:linear-gradient(135deg,#ff2d6f,#c0144c);color:#fff;border:none;border-radius:12px;font-weight:700;font-size:0.85rem;cursor:pointer;font-family:DM Sans,sans-serif;">🔔 Yes please!</button>
-      <button id="pushNo" style="flex:1;padding:9px;background:rgba(255,255,255,0.06);color:rgba(255,200,220,0.7);border:1px solid rgba(255,255,255,0.1);border-radius:12px;font-size:0.85rem;cursor:pointer;font-family:DM Sans,sans-serif;">Not now</button>
-    </div>`;
+  banner.innerHTML=`<div style="display:flex;align-items:center;gap:10px;"><span style="font-size:1.6rem">💌</span><div><div style="color:#fff0f5;font-weight:700;font-size:0.9rem;">Get notified of new confessions</div><div style="color:rgba(255,200,220,0.7);font-size:0.75rem;margin-top:2px;">We'll ping you when a new confession drops</div></div></div><div style="display:flex;gap:8px;"><button id="pushYes" style="flex:1;padding:9px;background:linear-gradient(135deg,#ff2d6f,#c0144c);color:#fff;border:none;border-radius:12px;font-weight:700;font-size:0.85rem;cursor:pointer;font-family:DM Sans,sans-serif;">🔔 Yes please!</button><button id="pushNo" style="flex:1;padding:9px;background:rgba(255,255,255,0.06);color:rgba(255,200,220,0.7);border:1px solid rgba(255,255,255,0.1);border-radius:12px;font-size:0.85rem;cursor:pointer;font-family:DM Sans,sans-serif;">Not now</button></div>`;
   document.body.appendChild(banner);
-  document.getElementById('pushYes').addEventListener('click',async()=>{
-    banner.remove();
-    const perm=await Notification.requestPermission();
-    if(perm==='granted') await subscribeToPush(reg);
-  });
-  document.getElementById('pushNo').addEventListener('click',()=>{
-    banner.remove();
-    localStorage.setItem('pushDeclined','1');
-  });
+  document.getElementById('pushYes').addEventListener('click',async()=>{banner.remove();const p=await Notification.requestPermission();if(p==='granted')await subscribeToPush(reg);});
+  document.getElementById('pushNo').addEventListener('click',()=>{banner.remove();localStorage.setItem('pushDeclined','1');});
 }
-
 async function subscribeToPush(reg){
-  try{
-    // Get VAPID public key from server
-    const keyRes=await fetch(`${API}/api/push/vapid-public-key`);
-    const {key}=await keyRes.json();
-    if(!key)return;
-    const appServerKey=urlBase64ToUint8Array(key);
-    const sub=await reg.pushManager.subscribe({userVisibleOnly:true,applicationServerKey:appServerKey});
-    await sendSubToServer(sub,'user');
-  }catch(e){console.warn('Push subscribe failed:',e);}
+  try{const kr=await fetch(`${API}/api/push/vapid-public-key`);const{key}=await kr.json();if(!key)return;const sub=await reg.pushManager.subscribe({userVisibleOnly:true,applicationServerKey:urlBase64ToUint8Array(key)});await sendSubToServer(sub);}catch(e){console.warn('Push subscribe failed:',e);}
 }
-
-async function sendSubToServer(sub,type){
-  try{
-    await fetch(`${API}/api/push/subscribe`,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({subscription:sub.toJSON()})});
-  }catch(e){}
+async function sendSubToServer(sub){
+  try{await fetch(`${API}/api/push/subscribe`,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({subscription:sub.toJSON()})});}catch(e){}
 }
-
-function urlBase64ToUint8Array(base64String){
-  const padding='='.repeat((4-base64String.length%4)%4);
-  const base64=(base64String+padding).replace(/-/g,'+').replace(/_/g,'/');
-  const rawData=window.atob(base64);
-  return Uint8Array.from([...rawData].map(c=>c.charCodeAt(0)));
-}
+function urlBase64ToUint8Array(b){const p='='.repeat((4-b.length%4)%4);const s=(b+p).replace(/-/g,'+').replace(/_/g,'/');const r=window.atob(s);return Uint8Array.from([...r].map(c=>c.charCodeAt(0)));}
 
 // ── Boot ──────────────────────────────────────────────
 window.addEventListener('load',()=>{
-  fetchConf();  // first call — retry loop handles itself on failure
-  analytics();
-  // Poll every 15s for new confessions (only fires after first success
-  // because fetchConf's own retry loop handles the waking-up phase)
-  setInterval(fetchConf,15000);
-  setInterval(analytics,30000);
+  fetchConf();analytics();
+  setInterval(fetchConf,15000);setInterval(analytics,15000);
   if('serviceWorker' in navigator){
     navigator.serviceWorker.register('/sw.js').then(reg=>{
       reg.update();
-      if(!localStorage.getItem('pushDeclined')) setupPushNotifications();
+      if(!localStorage.getItem('pushDeclined'))setupPushNotifications();
     }).catch(()=>{});
   }
 });
