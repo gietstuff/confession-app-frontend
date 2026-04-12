@@ -344,7 +344,8 @@ async function deleteConf(id){
 
 // ── Load data ──────────────────────────────────────────
 async function loadPending(){
-  const r=await fetch(`${API}/api/pending`);
+  const r=await fetch(`${API}/api/pending`,{headers:adminH()});
+  if(!r.ok){console.warn('loadPending failed:',r.status);return;}
   const arr=await r.json();
   const container=document.getElementById('pendingList');
   const badge=document.getElementById('pendingBadge');
@@ -398,8 +399,11 @@ async function loadPending(){
 }
 
 async function loadApproved(){
-  const r=await fetch(`${API}/api/confessions`);
-  const arr=await r.json();
+  const r=await fetch(`${API}/api/confessions`,{headers:adminH()});
+  if(!r.ok){console.warn('loadApproved failed:',r.status);return;}
+  const data=await r.json();
+  // Server returns { confessions: [...], cotdId } — handle both old array and new shape
+  const arr=Array.isArray(data)?data:(data.confessions||[]);
   const container=document.getElementById('approvedList');
   document.getElementById('approvedBadge').textContent=arr.length;
   if(!arr.length){container.innerHTML='<div class="empty-msg">No approved confessions yet</div>';return;}
@@ -410,11 +414,10 @@ async function loadApproved(){
     div.innerHTML=`
       <div class="item-meta">
         <span class="item-cat">${item.category||'💭 Random'}</span>
-        ${item.batch&&(item.batch.year||item.batch.branch)?`<span class="item-cat" style="background:rgba(124,58,237,0.15);border-color:rgba(124,58,237,0.3);color:#a855f7;">🎓 ${[item.batch.year,item.batch.branch].filter(Boolean).join(' · ')}</span>`:''}
-        <span class="item-time">🕐 ${ago(item.createdAt)} · ❤️ ${item.likes} 💔 ${item.dislikes}${Object.values(item.reactCounts||{}).some(v=>v>0)?' · 🎭 '+Object.entries(item.reactCounts||{}).filter(([,v])=>v>0).map(([e,v])=>e+v).join(''):''}</span>
+        <span class="item-time">🕐 ${ago(item.createdAt)} · ❤️ ${item.likes} 💔 ${item.dislikes}</span>
         ${(item.flags||0)>0?`<span class="flag-count">⚑ ${item.flags} flag${item.flags>1?'s':''}</span>`:''}
       </div>
-      <div class="item-msg">${item.pollQuestion?`🗳️ ${item.pollQuestion}\n${(item.pollOptions||['Yes','No']).map((o,i)=>o+': '+(item.pollVotes?.[i]||0)+' votes').join(' | ')}`:item.message}</div>
+      <div class="item-msg">${item.message}</div>
       <div class="item-actions">
         <button class="ia-btn delete" onclick="deleteConf('${item.id}')">🗑 Delete</button>
       </div>`;
@@ -424,7 +427,8 @@ async function loadApproved(){
 
 async function loadAnalytics(){
   try{
-    const r=await fetch(`${API}/api/analytics`);
+    const r=await fetch(`${API}/api/analytics`,{headers:adminH()});
+    if(!r.ok)return;
     const d=await r.json();
     document.getElementById('sVisits').textContent=d.visits||0;
     document.getElementById('sUnique').textContent=d.uniqueVisitors||0;
