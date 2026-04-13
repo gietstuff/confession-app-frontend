@@ -59,23 +59,25 @@ header{text-align:center;padding:52px 0 24px;position:relative;}
 @keyframes float{0%,100%{transform:translateY(0);}50%{transform:translateY(-8px);}}
 .site-title{font-family:'Playfair Display',serif;font-size:clamp(2rem,6vw,3.2rem);font-weight:700;letter-spacing:-0.02em;line-height:1.1;background:linear-gradient(135deg,#fff 0%,var(--rose2) 50%,var(--gold) 100%);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;margin-bottom:8px;}
 .site-sub{font-size:0.95rem;color:var(--muted);font-style:italic;font-family:'Playfair Display',serif;margin-bottom:18px;}
-.stats-bar{display:inline-flex;gap:20px;background:var(--glass);border:1px solid var(--border);border-radius:40px;padding:8px 22px;font-size:0.78rem;color:var(--muted);backdrop-filter:blur(10px);}
-.stats-bar span{display:flex;align-items:center;gap:5px;}
-.stats-dot{width:6px;height:6px;border-radius:50%;background:var(--rose);animation:pulse 2s infinite;display:inline-block;}
+.stats-bar{display:inline-flex;gap:0;background:var(--glass);border:1px solid var(--border);border-radius:20px;padding:0;backdrop-filter:blur(10px);overflow:hidden;}
+.stats-bar span{display:flex;flex-direction:column;align-items:center;gap:2px;padding:14px 28px;font-size:1.5rem;font-weight:700;color:var(--text);border-right:1px solid var(--border);}
+.stats-bar span:last-child{border-right:none;}
+.stats-bar span em{font-size:0.7rem;font-style:normal;color:var(--muted);font-weight:400;text-transform:uppercase;letter-spacing:.05em;}
+.stats-dot{width:8px;height:8px;border-radius:50%;background:#22c55e;animation:pulse 2s infinite;display:inline-block;box-shadow:0 0 8px #22c55e;}
 @keyframes pulse{0%,100%{opacity:1;transform:scale(1);}50%{opacity:0.5;transform:scale(1.4);}}
 
 /* Top bar */
-.top-bar{display:flex;align-items:center;justify-content:space-between;margin-bottom:20px;gap:10px;flex-wrap:wrap;}
-.ig-pill{display:inline-flex;align-items:center;gap:7px;background:linear-gradient(135deg,#f09433,#e6683c,#dc2743,#cc2366,#bc1888);color:#fff;padding:8px 16px;border-radius:40px;text-decoration:none;font-size:0.82rem;font-weight:600;box-shadow:0 4px 20px rgba(220,59,121,0.4);transition:transform .2s;}
-.ig-pill:hover{transform:scale(1.05);}
-.top-right{display:flex;gap:8px;align-items:center;}
-.theme-pill{background:var(--glass);border:1px solid var(--border);color:var(--text);border-radius:40px;padding:8px 16px;cursor:pointer;font-size:0.82rem;font-weight:500;backdrop-filter:blur(10px);transition:all .2s;font-family:'DM Sans',sans-serif;}
-.theme-pill{display:none;}/* light mode removed */
-.admin-pill{display:inline-flex;align-items:center;gap:6px;background:rgba(255,255,255,0.07);border:1px solid rgba(255,100,150,0.25);color:rgba(255,200,220,0.8);border-radius:40px;padding:8px 14px;font-size:0.8rem;font-weight:600;text-decoration:none;backdrop-filter:blur(10px);transition:all .2s;font-family:'DM Sans',sans-serif;}
+/* ── Mobile-first top nav: 3 stacked full-width buttons ── */
+.top-bar{display:flex;flex-direction:column;gap:10px;margin-bottom:20px;}
+.ig-pill{display:flex;align-items:center;justify-content:center;gap:10px;background:linear-gradient(135deg,#f09433,#e6683c,#dc2743,#cc2366,#bc1888);color:#fff;padding:16px 20px;border-radius:16px;text-decoration:none;font-size:1rem;font-weight:700;box-shadow:0 4px 20px rgba(220,59,121,0.4);transition:transform .2s;width:100%;}
+.ig-pill:hover{transform:scale(1.02);}
+.admin-pill{display:flex;align-items:center;justify-content:center;gap:10px;background:rgba(255,255,255,0.07);border:1px solid rgba(255,100,150,0.25);color:rgba(255,200,220,0.9);border-radius:16px;padding:16px 20px;font-size:1rem;font-weight:700;text-decoration:none;backdrop-filter:blur(10px);transition:all .2s;font-family:"DM Sans",sans-serif;width:100%;}
 .admin-pill:hover{background:rgba(255,45,111,0.15);border-color:rgba(255,45,111,0.4);color:#fff;}
+.theme-pill{display:none;}
 /* ── Feature 2: Story mode button ── */
-.story-pill{background:linear-gradient(135deg,var(--rose),var(--crimson));border:none;color:#fff;border-radius:40px;padding:8px 16px;cursor:pointer;font-size:0.82rem;font-weight:600;font-family:'DM Sans',sans-serif;transition:all .2s;box-shadow:0 4px 16px rgba(255,45,111,0.35);}
-.story-pill:hover{transform:scale(1.05);}
+.story-pill{background:linear-gradient(135deg,var(--rose),var(--crimson));border:none;color:#fff;border-radius:16px;padding:16px 20px;cursor:pointer;font-size:1rem;font-weight:700;font-family:"DM Sans",sans-serif;transition:all .2s;box-shadow:0 4px 16px rgba(255,45,111,0.35);width:100%;display:flex;align-items:center;justify-content:center;gap:10px;}
+.story-pill:hover{transform:scale(1.02);}
+.top-right{display:contents;}/* dissolve wrapper so children fill top-bar column */
 
 /* Glass card */
 .glass-card{background:var(--glass);border:1px solid var(--border);border-radius:24px;padding:28px;backdrop-filter:blur(16px);box-shadow:var(--card-shadow);position:relative;overflow:hidden;}
@@ -141,11 +143,11 @@ textarea:focus{border-color:var(--rose);box-shadow:0 0 0 3px rgba(255,45,111,0.1
 .act-btn.flagged{background:rgba(255,150,0,0.15);border-color:rgba(255,150,0,0.4);color:#ffaa44;}
 
 /* ── Feature 5: Emoji reaction bar ── */
-.reaction-bar{display:flex;gap:6px;flex-wrap:wrap;margin-top:12px;padding-top:12px;border-top:1px solid rgba(255,100,150,0.1);}
-.rxn-btn{display:flex;align-items:center;gap:4px;background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.1);border-radius:20px;padding:4px 10px;font-size:0.82rem;cursor:pointer;transition:all .18s;font-family:'DM Sans',sans-serif;color:var(--muted);}
-.rxn-btn:hover{background:rgba(255,45,111,0.12);border-color:rgba(255,45,111,0.3);transform:scale(1.1);}
-.rxn-btn.active{background:rgba(255,45,111,0.2);border-color:var(--rose);color:var(--text);}
-.rxn-count{font-size:0.72rem;font-weight:700;}
+.reaction-bar{display:flex;gap:8px;flex-wrap:wrap;margin-top:14px;padding-top:14px;border-top:1px solid rgba(255,100,150,0.1);}
+.rxn-btn{display:flex;align-items:center;gap:6px;background:rgba(255,255,255,0.07);border:1px solid rgba(255,255,255,0.12);border-radius:14px;padding:10px 14px;font-size:1.1rem;cursor:pointer;transition:all .18s;font-family:'DM Sans',sans-serif;color:var(--muted);min-width:52px;justify-content:center;}
+.rxn-btn:hover{background:rgba(255,45,111,0.15);border-color:rgba(255,45,111,0.4);transform:scale(1.08);}
+.rxn-btn.active{background:rgba(255,45,111,0.25);border-color:var(--rose);color:var(--text);box-shadow:0 0 12px rgba(255,45,111,0.3);}
+.rxn-count{font-size:0.82rem;font-weight:700;}
 
 /* Replies */
 .replies-section{margin-top:16px;border-top:1px solid rgba(255,100,150,0.12);padding-top:14px;}
@@ -391,18 +393,15 @@ body.exam-season .story-rxn{background:rgba(120,60,255,0.15);}
     <h1 class="site-title">GIET Confessions</h1>
     <p class="site-sub">"Say what your heart won't let you speak aloud"</p>
     <div class="stats-bar">
-      <span><span class="stats-dot"></span> <span id="statLive">0</span> online now</span>
-      <span>👁 <span id="statVisits">0</span> visits</span>
-      <span>💌 <span id="statUnique">0</span> visitors</span>
+      <span><span class="stats-dot"></span><span id="statLive">0</span><em>online now</em></span>
+      <span>💌<span id="statUnique">0</span><em>visitors</em></span>
     </div>
   </header>
 
   <div class="top-bar">
     <a href="https://www.instagram.com/" target="_blank" class="ig-pill">📷 Instagram Page</a>
-    <div class="top-right">
-      <a href="/admin.html" class="admin-pill">🔐 Admin</a>
-      <button class="story-pill" onclick="openStory()">▶ Story Mode</button>
-    </div>
+    <a href="/admin.html" class="admin-pill">🔐 Admin Panel</a>
+    <button class="story-pill" onclick="openStory()">▶ Story Mode</button>
   </div>
 
   <!-- Exam Season Banner (shown when exam season is active) -->
@@ -524,11 +523,7 @@ const EMOJI_LIST = ['❤️','😮','😂','🥺','🔥'];
 // localStorage key 'giet_captcha_pass' stores a timestamp so we only ask once per day.
 (function initCaptcha() {
   const gate = document.getElementById('captchaGate');
-  // Check if already passed today
-  const passed = localStorage.getItem('giet_captcha_pass');
-  if (passed && (Date.now() - parseInt(passed)) < 86400000) { // 24 hours
-    gate.style.display = 'none'; return;
-  }
+  // Always show captcha on every page visit — no localStorage skip
 
   // Generate question: mix of add/subtract/multiply with small numbers
   // LEARN: We use an IIFE (Immediately Invoked Function Expression) to keep
@@ -560,8 +555,7 @@ function checkCaptcha() {
     setTimeout(()=>box.style.animation='', 400);
     return;
   }
-  // Correct! Store timestamp and hide gate
-  localStorage.setItem('giet_captcha_pass', Date.now().toString());
+  // Correct! Hide gate
   const gate = document.getElementById('captchaGate');
   gate.style.transition = 'opacity 0.5s ease';
   gate.style.opacity = '0';
@@ -1010,7 +1004,9 @@ document.querySelectorAll('#catPicker .cat-pill').forEach(p=>{
 let storyIdx = 0, storyList = [], storyTimer = null, storyDuration = 6000;
 
 function openStory() {
-  storyList = activeF==='all' ? allConf : allConf.filter(c=>c.category===activeF);
+  // Skip polls in story mode — poll cards don't work well in swipe format
+  const base = activeF==='all' ? allConf : allConf.filter(c=>c.category===activeF);
+  storyList = base.filter(c=>!c.isPoll);
   if (!storyList.length) { toast('No confessions to show 💭'); return; }
   storyIdx = 0;
   document.getElementById('storyOverlay').classList.add('open');
@@ -1177,7 +1173,6 @@ async function pingVisit(){
     if(!r.ok)return; // e.g. 429 — just skip, don't crash
     const d=await r.json();
     document.getElementById('statLive').textContent=d.activeVisitors||0;
-    document.getElementById('statVisits').textContent=d.visits||0;
     document.getElementById('statUnique').textContent=d.uniqueVisitors||0;
   }catch(e){}
 }
@@ -1215,8 +1210,8 @@ function urlBase64ToUint8Array(b){const p='='.repeat((4-b.length%4)%4);const s=(
 window.addEventListener('load',()=>{
   applyExamTheme();
   fetchConf(); pingVisit();
-  setInterval(fetchConf,15000);
-  setInterval(pingVisit,30000);
+  setInterval(fetchConf,60000); // every 60s — less blink
+  setInterval(pingVisit,60000);
   if('serviceWorker' in navigator){
     navigator.serviceWorker.register('/sw.js').then(reg=>{
       reg.update();

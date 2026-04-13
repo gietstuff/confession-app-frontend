@@ -450,8 +450,10 @@ async function loadApproved(){
       </div>
       <div class="item-msg">${item.isPoll?`📊 ${item.message}\n${item.pollOptions?.a||'Yes'}: ${item.pollVotes?.a||0} votes | ${item.pollOptions?.b||'No'}: ${item.pollVotes?.b||0} votes`:item.message}</div>
       <div class="item-actions">
-        <button class="ia-btn delete" onclick="deleteConf('${item.id}')">🗑 Delete</button>
-      </div>`;
+        <button class="ia-btn delete" onclick="deleteConf('${item.id}')">🗑 Delete Confession</button>
+        <button class="ia-btn" style="background:rgba(96,165,250,0.15);color:#93c5fd;border:1px solid rgba(96,165,250,0.3);" onclick="toggleReplies('${item.id}',this)">💬 Replies</button>
+      </div>
+      <div class="replies-admin" id="ra-${item.id}" style="display:none;margin-top:10px;"></div>`;
     container.appendChild(div);
   });
 }
@@ -478,6 +480,40 @@ function applyAdminExamTheme(){
     const banner=document.getElementById('examBannerAdmin');
     if(banner) banner.style.display='flex';
   }
+}
+
+// ── Reply management in admin ─────────────────────────
+async function toggleReplies(confId, btn) {
+  const box = document.getElementById('ra-' + confId);
+  if (box.style.display !== 'none') { box.style.display='none'; btn.textContent='💬 Replies'; return; }
+  box.style.display = 'block';
+  btn.textContent = '💬 Hide Replies';
+  box.innerHTML = '<div style="color:var(--muted);font-size:0.8rem;padding:4px 0">Loading…</div>';
+  try {
+    const r = await fetch(`${API}/api/replies/${confId}`);
+    const replies = await r.json();
+    if (!replies.length) { box.innerHTML='<div style="color:var(--muted);font-size:0.8rem;font-style:italic;padding:4px 0">No replies yet</div>'; return; }
+    box.innerHTML = replies.map(rep => `
+      <div class="reply-admin-item" id="ri-${rep.id}" style="display:flex;justify-content:space-between;align-items:flex-start;gap:8px;padding:8px 10px;margin-bottom:6px;background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.08);border-radius:10px;">
+        <div style="font-size:0.82rem;color:rgba(255,240,245,0.8);flex:1;line-height:1.5;">${rep.message}<div style="font-size:0.68rem;color:var(--muted);margin-top:3px;">${ago(rep.createdAt)}</div></div>
+        <button class="ia-btn delete" style="flex-shrink:0;padding:5px 10px;font-size:0.72rem;" onclick="deleteReply('${rep.id}','${confId}')">🗑</button>
+      </div>`).join('');
+  } catch(e) { box.innerHTML='<div style="color:var(--rose);font-size:0.8rem;">Error loading replies</div>'; }
+}
+
+async function deleteReply(replyId, confId) {
+  if (!confirm('Delete this reply?')) return;
+  try {
+    const r = await fetch(`${API}/api/admin/reply/delete`, {
+      method: 'POST', headers: adminH(),
+      body: JSON.stringify({ replyId })
+    });
+    const d = await r.json();
+    if (d.error) { setStatus(d.error, 'var(--rose)'); return; }
+    const el = document.getElementById('ri-' + replyId);
+    if (el) el.remove();
+    setStatus('🗑 Reply deleted');
+  } catch(e) { setStatus('Network error', 'var(--rose)'); }
 }
 
 async function loadAll(){
