@@ -70,6 +70,9 @@ header{text-align:center;padding:52px 0 24px;position:relative;}
 .ig-pill:hover{transform:scale(1.05);}
 .top-right{display:flex;gap:8px;align-items:center;}
 .theme-pill{background:var(--glass);border:1px solid var(--border);color:var(--text);border-radius:40px;padding:8px 16px;cursor:pointer;font-size:0.82rem;font-weight:500;backdrop-filter:blur(10px);transition:all .2s;font-family:'DM Sans',sans-serif;}
+.theme-pill{display:none;}/* light mode removed */
+.admin-pill{display:inline-flex;align-items:center;gap:6px;background:rgba(255,255,255,0.07);border:1px solid rgba(255,100,150,0.25);color:rgba(255,200,220,0.8);border-radius:40px;padding:8px 14px;font-size:0.8rem;font-weight:600;text-decoration:none;backdrop-filter:blur(10px);transition:all .2s;font-family:'DM Sans',sans-serif;}
+.admin-pill:hover{background:rgba(255,45,111,0.15);border-color:rgba(255,45,111,0.4);color:#fff;}
 /* ── Feature 2: Story mode button ── */
 .story-pill{background:linear-gradient(135deg,var(--rose),var(--crimson));border:none;color:#fff;border-radius:40px;padding:8px 16px;cursor:pointer;font-size:0.82rem;font-weight:600;font-family:'DM Sans',sans-serif;transition:all .2s;box-shadow:0 4px 16px rgba(255,45,111,0.35);}
 .story-pill:hover{transform:scale(1.05);}
@@ -157,6 +160,15 @@ textarea:focus{border-color:var(--rose);box-shadow:0 0 0 3px rgba(255,45,111,0.1
 .reply-input::placeholder{color:rgba(255,200,220,0.3);}
 .reply-send{background:var(--rose);border:none;color:#fff;border-radius:12px;padding:9px 16px;font-size:0.82rem;font-weight:600;cursor:pointer;font-family:'DM Sans',sans-serif;transition:all .2s;white-space:nowrap;}
 .reply-send:hover{background:var(--crimson);}
+
+/* ── Search bar ── */
+.search-wrap{position:relative;margin-bottom:14px;}
+.search-input{width:100%;background:rgba(0,0,0,0.3);border:1.5px solid var(--border);border-radius:14px;padding:11px 16px 11px 40px;color:var(--text);font-size:0.9rem;font-family:'DM Sans',sans-serif;outline:none;transition:border-color .2s;}
+.search-input:focus{border-color:var(--rose);}
+.search-input::placeholder{color:rgba(255,200,220,0.35);}
+.search-icon{position:absolute;left:13px;top:50%;transform:translateY(-50%);font-size:1rem;opacity:0.5;pointer-events:none;}
+.search-clear{position:absolute;right:12px;top:50%;transform:translateY(-50%);background:none;border:none;color:rgba(255,200,220,0.5);cursor:pointer;font-size:1.1rem;display:none;padding:2px 6px;}
+body.exam-season .search-input:focus{border-color:#7c3aff;}
 
 /* Skeleton */
 .skel-card{background:var(--glass);border:1px solid var(--border);border-radius:20px;padding:22px 24px;}
@@ -257,6 +269,12 @@ body.exam-season :root{--rose:#7c3aff;--rose2:#a78bfa;--crimson:#5b00d4;--border
 .story-nav button:hover{background:rgba(255,255,255,0.22);}
 .story-close{position:absolute;top:16px;right:16px;background:rgba(255,255,255,0.12);border:none;color:#fff;width:36px;height:36px;border-radius:50%;font-size:1.1rem;cursor:pointer;z-index:10;}
 .story-counter{position:absolute;bottom:24px;left:50%;transform:translateX(-50%);font-size:0.75rem;color:rgba(255,255,255,0.5);}
+
+/* ── EXAM SEASON: Story Mode overrides ── */
+body.exam-season .story-card{background:linear-gradient(135deg,rgba(80,0,180,0.45),rgba(20,0,40,0.95));border-color:rgba(140,80,255,0.35);}
+body.exam-season .story-cat{color:#a78bfa;}
+body.exam-season .story-seg-fill{background:#a78bfa;}
+body.exam-season .story-rxn{background:rgba(120,60,255,0.15);}
 
 /* Updates */
 .updates-card{margin-top:28px;}
@@ -373,17 +391,17 @@ body.exam-season :root{--rose:#7c3aff;--rose2:#a78bfa;--crimson:#5b00d4;--border
     <h1 class="site-title">GIET Confessions</h1>
     <p class="site-sub">"Say what your heart won't let you speak aloud"</p>
     <div class="stats-bar">
-      <span><span class="stats-dot"></span> <span id="statLive">0</span> online</span>
+      <span><span class="stats-dot"></span> <span id="statLive">0</span> online now</span>
       <span>👁 <span id="statVisits">0</span> visits</span>
-      <span>💌 <span id="statUnique">0</span> souls</span>
+      <span>💌 <span id="statUnique">0</span> visitors</span>
     </div>
   </header>
 
   <div class="top-bar">
     <a href="https://www.instagram.com/" target="_blank" class="ig-pill">📷 Instagram Page</a>
     <div class="top-right">
+      <a href="/admin.html" class="admin-pill">🔐 Admin</a>
       <button class="story-pill" onclick="openStory()">▶ Story Mode</button>
-      <button class="theme-pill" id="themeBtn">☀️ Light</button>
     </div>
   </div>
 
@@ -461,6 +479,13 @@ body.exam-season :root{--rose:#7c3aff;--rose2:#a78bfa;--crimson:#5b00d4;--border
     </div>
   </div>
 
+  <!-- Search bar — filters feed client-side as you type -->
+  <div class="search-wrap">
+    <span class="search-icon">🔍</span>
+    <input class="search-input" id="searchInput" placeholder="Search confessions…" autocomplete="off"/>
+    <button class="search-clear" id="searchClear" onclick="clearSearch()">✕</button>
+  </div>
+
   <div class="feed" id="feed">
     <div class="skel-card"><div class="skel-line a"></div><div class="skel-line b"></div><div class="skel-line c"></div><div class="skel-line d"></div><div class="skel-line e"></div></div>
     <div class="skel-card"><div class="skel-line a"></div><div class="skel-line c"></div><div class="skel-line b"></div><div class="skel-line d"></div><div class="skel-line e"></div></div>
@@ -484,6 +509,7 @@ body.exam-season :root{--rose:#7c3aff;--rose2:#a78bfa;--crimson:#5b00d4;--border
       <li>v2.1 — Security hardening: helmet, rate limiting, NoSQL sanitize, admin auth</li>
       <li>v2.2 — Stats fix: DB-backed online count, visit rate-limit exemption</li>
       <li>v2.3 — Exam season theme, "This is me!" button, reply notifications, poll confessions</li>
+      <li>v2.4 — Captcha gate, poll fix, admin link, dark-only, DB-backed online count, confession reactions in story mode</li>
     </ul>
   </div>
 </div>
@@ -570,17 +596,9 @@ document.head.appendChild(shakeStyle);
   draw();
 })();
 
-// ── Theme ─────────────────────────────────────────────
-const themeBtn=document.getElementById('themeBtn');
-// Dark is the default. Only use saved preference if user explicitly chose light before.
-const saved=localStorage.getItem('giet_theme')||'dark';
-document.body.setAttribute('data-theme',saved);
-themeBtn.textContent=saved==='dark'?'☀️ Light':'🌙 Dark';
-themeBtn.addEventListener('click',()=>{
-  const next=document.body.getAttribute('data-theme')==='dark'?'light':'dark';
-  document.body.setAttribute('data-theme',next);localStorage.setItem('giet_theme',next);
-  themeBtn.textContent=next==='dark'?'☀️ Light':'🌙 Dark';
-});
+// ── Theme — dark only ─────────────────────────────────
+// Light mode removed. Always dark.
+document.body.setAttribute('data-theme','dark');
 
 // ── Utils ─────────────────────────────────────────────
 function cid(){let i=localStorage.getItem('giet_cid');if(!i){i=crypto.randomUUID();localStorage.setItem('giet_cid',i);}return i;}
@@ -599,9 +617,27 @@ confInput.addEventListener('input',()=>{
 
 // ── Filter ────────────────────────────────────────────
 let activeF='all';
+let searchQ = '';
 document.querySelectorAll('.ftag').forEach(t=>{
   t.addEventListener('click',()=>{document.querySelectorAll('.ftag').forEach(x=>x.classList.remove('active'));t.classList.add('active');activeF=t.dataset.f;render();});
 });
+
+// ── Search ────────────────────────────────────────────
+// LEARN: This is a pure client-side search — no server call needed.
+// We filter the already-loaded allConf array in render() using a query string.
+// The search clear button shows/hides based on whether input has text.
+const searchInput = document.getElementById('searchInput');
+const searchClear = document.getElementById('searchClear');
+searchInput.addEventListener('input', () => {
+  searchQ = searchInput.value.trim().toLowerCase();
+  searchClear.style.display = searchQ ? 'block' : 'none';
+  render();
+});
+function clearSearch() {
+  searchInput.value = ''; searchQ = '';
+  searchClear.style.display = 'none';
+  render();
+}
 
 // ── Share modal ───────────────────────────────────────
 let shareText='';
@@ -651,7 +687,15 @@ function updateReactionBar(card, confId, reactions, myReaction) {
 // ── Render ────────────────────────────────────────────
 function render() {
   const feed = document.getElementById('feed');
-  const list = activeF==='all' ? allConf : allConf.filter(c=>c.category===activeF);
+  let list = activeF==='all' ? allConf : allConf.filter(c=>c.category===activeF);
+  // Apply search filter — checks message text and poll question
+  if (searchQ) {
+    list = list.filter(c => {
+      const text = (c.message||'').toLowerCase();
+      const pollQ = (c.isPoll ? (c.pollOptions?.a+' '+c.pollOptions?.b) : '').toLowerCase();
+      return text.includes(searchQ) || pollQ.includes(searchQ);
+    });
+  }
 
   // Wipe skeletons / empty nodes
   feed.querySelectorAll(':scope > :not(.conf-card)').forEach(el=>el.remove());
@@ -753,19 +797,14 @@ document.addEventListener('focusout', e=>{
 });
 
 // ── Fetch ─────────────────────────────────────────────
-// ⚠️ LEARN: The API returns { confessions: [...], cotdId: "..." }
-// NOT a plain array. We destructure it here.
-// Before this fix, data.filter(...) crashed because data was an object,
-// causing "data.filter is not a function" and showing 0 confessions.
+// LEARN: The server returns a plain array of confession objects.
+// Each item already has isConfessionOfDay:true/false set server-side.
+// The COTD is pinned to the top by the server's sort.
 function fetchConf() {
   fetch(`${API}/api/confessions`)
-    .then(r=>r.json()).then(rawData=>{
-      // Handle both old array format and new { confessions, cotdId } format
-      const confessions = Array.isArray(rawData) ? rawData : (rawData.confessions || []);
-      const cotdId = Array.isArray(rawData) ? null : rawData.cotdId;
-
-      // Mark COTD on the confession object so render can use it
-      confessions.forEach(m => { m.isConfessionOfDay = (cotdId && m.id === cotdId); });
+    .then(r=>r.json()).then(data=>{
+      // Handle both plain array and {confessions,cotdId} shapes for safety
+      const confessions = Array.isArray(data) ? data : (data.confessions || []);
 
       const newOnes = confessions.filter(m=>!seenIds.has(m.id));
       if (newOnes.length && !firstLoad) {
@@ -778,7 +817,6 @@ function fetchConf() {
       allConf = confessions;
       firstLoad = false;
       safeRender();
-      // After first load, check for new replies to confessions the user submitted
       checkReplyNotifications();
     }).catch(()=>{
       if (firstLoad) document.getElementById('feed').innerHTML = `<div class="empty"><span class="empty-icon">📡</span>Connecting to server… please wait</div>`;
