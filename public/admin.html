@@ -193,6 +193,15 @@ body.exam-season .logout-btn{color:#a78bfa;border-color:rgba(140,80,255,0.3);}
     <div id="approvedList"><div class="empty-msg">No approved confessions yet</div></div>
   </div>
 
+  <!-- Reported Confessions Section -->
+  <div class="section" id="reportedSection" style="display:none">
+    <div class="section-head">
+      <h2>🚨 Reported <span class="badge" style="background:#ef4444" id="reportedBadge">0</span></h2>
+      <span style="font-size:0.75rem;color:var(--muted)">Auto-hidden after 3 reports. Review and restore or delete.</span>
+    </div>
+    <div id="reportedList"><div class="empty-msg">No reported confessions 🎉</div></div>
+  </div>
+
   <div id="modStatus"></div>
 </div>
 
@@ -407,6 +416,11 @@ async function loadPending(){
       ?`<div class="edited-note">✏️ Auto-cleaned by filter — original preserved in DB</div>`
       :'';
 
+    // Show AI reasoning if available
+    const aiNote = item.aiReasoning
+      ? `<div style="font-size:0.72rem;padding:6px 10px;margin-bottom:8px;background:rgba(139,92,246,0.1);border:1px solid rgba(139,92,246,0.25);border-radius:8px;color:rgba(196,181,253,0.9);display:flex;gap:6px;align-items:flex-start;"><span>🤖</span><span>${item.usedAI?'AI filter':'Regex filter'}: ${item.aiReasoning}</span></div>`
+      : '';
+
     div.innerHTML=`
       <div class="item-meta">
         <span class="item-cat">${item.category||'💭 Random'}</span>
@@ -415,6 +429,7 @@ async function loadPending(){
       </div>
       ${editedNote}
       ${filterTagsHtml}
+      ${aiNote}
       <div class="item-msg">${item.message}</div>
       <div class="item-actions">
         <button class="ia-btn approve" onclick="moderate('${item.id}','approve')">✅ Approve</button>
@@ -450,10 +465,8 @@ async function loadApproved(){
       </div>
       <div class="item-msg">${item.isPoll?`📊 ${item.message}\n${item.pollOptions?.a||'Yes'}: ${item.pollVotes?.a||0} votes | ${item.pollOptions?.b||'No'}: ${item.pollVotes?.b||0} votes`:item.message}</div>
       <div class="item-actions">
-        <button class="ia-btn delete" onclick="deleteConf('${item.id}')">🗑 Delete Confession</button>
-        <button class="ia-btn" style="background:rgba(96,165,250,0.15);color:#93c5fd;border:1px solid rgba(96,165,250,0.3);" onclick="toggleReplies('${item.id}',this)">💬 Replies</button>
-      </div>
-      <div class="replies-admin" id="ra-${item.id}" style="display:none;margin-top:10px;"></div>`;
+        <button class="ia-btn delete" onclick="deleteConf('${item.id}')">🗑 Delete</button>
+      </div>`;
     container.appendChild(div);
   });
 }
@@ -482,44 +495,57 @@ function applyAdminExamTheme(){
   }
 }
 
-// ── Reply management in admin ─────────────────────────
-async function toggleReplies(confId, btn) {
-  const box = document.getElementById('ra-' + confId);
-  if (box.style.display !== 'none') { box.style.display='none'; btn.textContent='💬 Replies'; return; }
-  box.style.display = 'block';
-  btn.textContent = '💬 Hide Replies';
-  box.innerHTML = '<div style="color:var(--muted);font-size:0.8rem;padding:4px 0">Loading…</div>';
-  try {
-    const r = await fetch(`${API}/api/replies/${confId}`);
-    const replies = await r.json();
-    if (!replies.length) { box.innerHTML='<div style="color:var(--muted);font-size:0.8rem;font-style:italic;padding:4px 0">No replies yet</div>'; return; }
-    box.innerHTML = replies.map(rep => `
-      <div class="reply-admin-item" id="ri-${rep.id}" style="display:flex;justify-content:space-between;align-items:flex-start;gap:8px;padding:8px 10px;margin-bottom:6px;background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.08);border-radius:10px;">
-        <div style="font-size:0.82rem;color:rgba(255,240,245,0.8);flex:1;line-height:1.5;">${rep.message}<div style="font-size:0.68rem;color:var(--muted);margin-top:3px;">${ago(rep.createdAt)}</div></div>
-        <button class="ia-btn delete" style="flex-shrink:0;padding:5px 10px;font-size:0.72rem;" onclick="deleteReply('${rep.id}','${confId}')">🗑</button>
-      </div>`).join('');
-  } catch(e) { box.innerHTML='<div style="color:var(--rose);font-size:0.8rem;">Error loading replies</div>'; }
+// ── Load reported confessions ──────────────────────────
+async function loadReported(){
+  try{
+    const r=await fetch(`${API}/api/reported`,{headers:adminH()});
+    const arr=await r.json();
+    const section=document.getElementById('reportedSection');
+    const badge=document.getElementById('reportedBadge');
+    const container=document.getElementById('reportedList');
+    badge.textContent=arr.length;
+    section.style.display=arr.length?'block':'none';
+    if(!arr.length){container.innerHTML='<div class="empty-msg">No reported confessions 🎉</div>';return;}
+    container.innerHTML='';
+    arr.forEach(item=>{
+      const div=document.createElement('div');
+      div.className='item'+(item.reportHidden?' flagged-item':'');
+      const reasonLabels={'identity':'🪪 Identity revealed','harassment':'😤 Harassment','fake':'🤥 Fake content','spam':'🗑 Spam','other':'💬 Other'};
+      const reportSummary=(item.reports||[]).reduce((acc,r)=>{acc[r.reason]=(acc[r.reason]||0)+1;return acc;},{});
+      const reportTags=Object.entries(reportSummary).map(([r,n])=>`<span style="font-size:0.68rem;padding:2px 8px;border-radius:8px;background:rgba(239,68,68,0.15);border:1px solid rgba(239,68,68,0.35);color:#fca5a5;">${reasonLabels[r]||r} ×${n}</span>`).join('');
+      div.innerHTML=`
+        <div class="item-meta">
+          <span class="item-cat">${item.category||'💭 Random'}</span>
+          <span class="item-time">🕐 ${ago(item.createdAt)}</span>
+          <span class="flag-count">⚑ ${(item.reports||[]).length} report${(item.reports||[]).length!==1?'s':''}</span>
+          ${item.reportHidden?'<span style="font-size:0.68rem;padding:2px 8px;border-radius:8px;background:rgba(239,68,68,0.2);color:#fca5a5;border:1px solid rgba(239,68,68,0.4);">🚫 Hidden from feed</span>':''}
+        </div>
+        <div style="display:flex;flex-wrap:wrap;gap:4px;margin-bottom:8px;">${reportTags}</div>
+        <div class="item-msg">${item.message}</div>
+        <div class="item-actions">
+          <button class="ia-btn approve" onclick="restoreConf('${item.id}')">✅ Restore (clear reports)</button>
+          <button class="ia-btn delete" onclick="deleteConf('${item.id}')">🗑 Delete</button>
+        </div>`;
+      container.appendChild(div);
+    });
+  }catch(e){console.error('loadReported error',e);}
 }
 
-async function deleteReply(replyId, confId) {
-  if (!confirm('Delete this reply?')) return;
-  try {
-    const r = await fetch(`${API}/api/admin/reply/delete`, {
-      method: 'POST', headers: adminH(),
-      body: JSON.stringify({ replyId })
-    });
-    const d = await r.json();
-    if (d.error) { setStatus(d.error, 'var(--rose)'); return; }
-    const el = document.getElementById('ri-' + replyId);
-    if (el) el.remove();
-    setStatus('🗑 Reply deleted');
-  } catch(e) { setStatus('Network error', 'var(--rose)'); }
+async function restoreConf(id){
+  try{
+    const r=await fetch(`${API}/api/admin/restore`,{method:'POST',headers:adminH(),body:JSON.stringify({confessionId:id})});
+    const d=await r.json();
+    if(d.error){setStatus(d.error,'var(--rose)');return;}
+    setStatus('✅ Confession restored — reports cleared');
+    loadAll();
+  }catch(e){setStatus('Network error','var(--rose)');}
 }
 
 async function loadAll(){
   try{await loadPending();}catch(e){}
   try{await loadApproved();}catch(e){}
   try{await loadAnalytics();}catch(e){}
+  try{await loadReported();}catch(e){}
 }
 </script>
 </body>
