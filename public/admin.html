@@ -105,6 +105,23 @@ body{min-height:100vh;background:#0d0008;color:var(--text);font-family:'DM Sans'
 .notif-banner{position:fixed;top:16px;left:50%;transform:translateX(-50%) translateY(-120px);opacity:0;background:linear-gradient(135deg,#f59e0b,#d97706);color:#fff;padding:12px 28px;border-radius:40px;font-size:0.9rem;font-weight:700;box-shadow:0 8px 30px rgba(245,158,11,0.5);transition:all .5s cubic-bezier(.34,1.56,.64,1);z-index:9999;white-space:nowrap;font-family:'DM Sans',sans-serif;cursor:pointer;}
 .notif-banner.show{transform:translateX(-50%) translateY(0);opacity:1;}
 
+/* ── COTD item highlight ── */
+.item.cotd-item{border-color:rgba(255,179,71,0.4);background:rgba(255,179,71,0.04);}
+
+/* ── EXAM SEASON THEME (admin) ── */
+/* LEARN: same CSS class trick as index.html — JS adds .exam-season to body,
+   which triggers these override rules via CSS specificity. */
+body.exam-season{background:#080010;}
+body.exam-season .bg{background:radial-gradient(ellipse 80% 60% at 20% 10%,rgba(80,0,180,0.3) 0%,transparent 60%),radial-gradient(ellipse 50% 50% at 50% 50%,rgba(20,0,40,1) 0%,#080010 100%);}
+body.exam-season .admin-title span{color:#a78bfa;}
+body.exam-season .login-btn,body.exam-season .approve-all-btn{background:linear-gradient(135deg,#7c3aff,#5b00d4);}
+body.exam-season .badge{background:#6d28d9;}
+body.exam-season .logout-btn{color:#a78bfa;border-color:rgba(140,80,255,0.3);}
+.exam-banner-admin{background:linear-gradient(135deg,rgba(120,60,255,0.12),rgba(80,0,200,0.08));border:1px solid rgba(140,80,255,0.3);border-radius:14px;padding:11px 16px;margin-bottom:20px;display:none;align-items:center;gap:10px;animation:examPulse 3s ease-in-out infinite;}
+@keyframes examPulse{0%,100%{border-color:rgba(140,80,255,0.3);}50%{border-color:rgba(140,80,255,0.65);box-shadow:0 0 18px rgba(120,60,255,0.18);}}
+.exam-banner-admin span{font-size:1.2rem;}
+.exam-banner-admin p{font-size:0.78rem;color:rgba(200,170,255,0.88);line-height:1.5;}
+
 .hidden{display:none;}
 </style>
 </head>
@@ -129,6 +146,12 @@ body{min-height:100vh;background:#0d0008;color:var(--text);font-family:'DM Sans'
   <div class="admin-header">
     <div class="admin-title">🔐 <span>Admin</span> Panel</div>
     <button class="logout-btn" onclick="logout()">Logout</button>
+  </div>
+
+  <!-- Exam season banner (shown in April / November) -->
+  <div class="exam-banner-admin" id="examBannerAdmin">
+    <span>📚</span>
+    <p><strong>Exam Season Active</strong> — Expect higher confession volume. Keep moderation on. Purple theme enabled.</p>
   </div>
 
   <div class="stats-row">
@@ -208,6 +231,7 @@ async function doLogin(){
       setInterval(loadAll,12000);
       setInterval(loadAnalytics,15000);
       loadAutoApproveState();
+      applyAdminExamTheme();
       // After login, set up push notifications for admin
       setupAdminPush();
     }else{
@@ -297,7 +321,8 @@ function urlBase64ToUint8Array(base64String){
 // ── Auto-approve ───────────────────────────────────────
 async function loadAutoApproveState(){
   try{
-    const r=await fetch(`${API}/api/settings`);
+    // LEARN: /api/settings is an admin-only endpoint — needs token
+    const r=await fetch(`${API}/api/settings`,{headers:adminH()});
     const d=await r.json();
     document.getElementById('autoApproveToggle').checked=!!d.autoApprove;
   }catch(e){}
@@ -344,8 +369,10 @@ async function deleteConf(id){
 
 // ── Load data ──────────────────────────────────────────
 async function loadPending(){
+  // LEARN: Always pass auth headers for admin endpoints!
+  // Without adminH(), the server returns 401 Unauthorized and arr is undefined,
+  // causing "arr.length is not a function" crash.
   const r=await fetch(`${API}/api/pending`,{headers:adminH()});
-  if(!r.ok){console.warn('loadPending failed:',r.status);return;}
   const arr=await r.json();
   const container=document.getElementById('pendingList');
   const badge=document.getElementById('pendingBadge');
@@ -399,25 +426,29 @@ async function loadPending(){
 }
 
 async function loadApproved(){
-  const r=await fetch(`${API}/api/confessions`,{headers:adminH()});
-  if(!r.ok){console.warn('loadApproved failed:',r.status);return;}
-  const data=await r.json();
-  // Server returns { confessions: [...], cotdId } — handle both old array and new shape
-  const arr=Array.isArray(data)?data:(data.confessions||[]);
+  // LEARN: The API returns { confessions: [...], cotdId: "..." } not a plain array.
+  // Same fix as the main index.html fetchConf() bug.
+  const r=await fetch(`${API}/api/confessions`);
+  const rawData=await r.json();
+  const arr = Array.isArray(rawData) ? rawData : (rawData.confessions || []);
+  const cotdId = Array.isArray(rawData) ? null : rawData.cotdId;
   const container=document.getElementById('approvedList');
   document.getElementById('approvedBadge').textContent=arr.length;
   if(!arr.length){container.innerHTML='<div class="empty-msg">No approved confessions yet</div>';return;}
   container.innerHTML='';
   arr.forEach(item=>{
+    const isCotd = cotdId && item.id === cotdId;
     const div=document.createElement('div');
-    div.className='item';
+    div.className='item'+(isCotd?' cotd-item':'');
     div.innerHTML=`
       <div class="item-meta">
+        ${isCotd?'<span class="item-cat" style="background:rgba(255,179,71,0.15);border-color:rgba(255,179,71,0.4);color:#ffb347;">👑 COTD</span>':''}
         <span class="item-cat">${item.category||'💭 Random'}</span>
-        <span class="item-time">🕐 ${ago(item.createdAt)} · ❤️ ${item.likes} 💔 ${item.dislikes}</span>
+        ${item.branchTag&&(item.branchTag.year||item.branchTag.branch)?`<span class="item-cat" style="background:rgba(124,58,237,0.15);border-color:rgba(124,58,237,0.3);color:#a855f7;">🎓 ${[item.branchTag.year,item.branchTag.branch].filter(Boolean).join(' · ')}</span>`:''}
+        <span class="item-time">🕐 ${ago(item.createdAt)} · ❤️ ${item.likes||0}${Object.values(item.reactions||{}).some(v=>v>0)?' · '+Object.entries(item.reactions||{}).filter(([,v])=>v>0).map(([e,v])=>e+v).join(''):''}${(item.thisIsMe||[]).length?' · 🫣 '+item.thisIsMe.length:''}</span>
         ${(item.flags||0)>0?`<span class="flag-count">⚑ ${item.flags} flag${item.flags>1?'s':''}</span>`:''}
       </div>
-      <div class="item-msg">${item.message}</div>
+      <div class="item-msg">${item.isPoll?`📊 ${item.message}\n${item.pollOptions?.a||'Yes'}: ${item.pollVotes?.a||0} votes | ${item.pollOptions?.b||'No'}: ${item.pollVotes?.b||0} votes`:item.message}</div>
       <div class="item-actions">
         <button class="ia-btn delete" onclick="deleteConf('${item.id}')">🗑 Delete</button>
       </div>`;
@@ -427,13 +458,26 @@ async function loadApproved(){
 
 async function loadAnalytics(){
   try{
+    // LEARN: /api/analytics requires the admin token header (x-admin-token).
+    // Without it, server returns 401 and we get an error response, not stats.
     const r=await fetch(`${API}/api/analytics`,{headers:adminH()});
-    if(!r.ok)return;
     const d=await r.json();
     document.getElementById('sVisits').textContent=d.visits||0;
     document.getElementById('sUnique').textContent=d.uniqueVisitors||0;
     document.getElementById('sLive').textContent=d.activeVisitors||0;
   }catch(e){}
+}
+
+// ── Exam Season Theme (Admin) ────────────────────────
+// LEARN: Same month-check as index.html. Runs once on login.
+// We call it inside doLogin() after the panel is shown.
+function applyAdminExamTheme(){
+  const m = new Date().getMonth(); // 0-indexed: 3=April, 10=November
+  if(m===3||m===10){
+    document.body.classList.add('exam-season');
+    const banner=document.getElementById('examBannerAdmin');
+    if(banner) banner.style.display='flex';
+  }
 }
 
 async function loadAll(){

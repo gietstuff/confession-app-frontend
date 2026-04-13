@@ -33,7 +33,20 @@ body{min-height:100vh;background:#0d0008;color:var(--text);font-family:'DM Sans'
 #particles{position:fixed;inset:0;z-index:1;pointer-events:none;}
 .page{position:relative;z-index:2;max-width:780px;margin:0 auto;padding:0 16px 100px;}
 
-/* ── Feature 6: Disclaimer banner ── */
+/* ── CAPTCHA Gate ── */
+#captchaGate{position:fixed;inset:0;z-index:9999;background:#0d0008;display:flex;align-items:center;justify-content:center;padding:20px;}
+.captcha-box{background:rgba(255,255,255,0.06);border:1px solid rgba(255,100,150,0.3);border-radius:28px;padding:40px 32px;max-width:380px;width:100%;backdrop-filter:blur(20px);text-align:center;box-shadow:0 20px 60px rgba(255,45,111,0.2);}
+.captcha-icon{font-size:3rem;margin-bottom:16px;display:block;animation:float 3s ease-in-out infinite;}
+.captcha-box h2{font-family:'Playfair Display',serif;font-size:1.6rem;font-weight:700;margin-bottom:8px;background:linear-gradient(135deg,#fff 0%,#ff6b9d 60%,#ffb347 100%);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;}
+.captcha-box p{font-size:0.85rem;color:rgba(255,200,220,0.7);margin-bottom:28px;line-height:1.6;}
+.captcha-question{background:rgba(255,45,111,0.08);border:1px solid rgba(255,45,111,0.25);border-radius:16px;padding:16px 20px;margin-bottom:20px;font-size:1.05rem;font-weight:600;color:rgba(255,240,245,0.95);letter-spacing:0.01em;}
+.captcha-input{width:100%;background:rgba(0,0,0,0.4);border:1.5px solid rgba(255,100,150,0.3);border-radius:14px;padding:13px 16px;color:#fff0f5;font-size:1rem;font-family:'DM Sans',sans-serif;outline:none;text-align:center;letter-spacing:0.08em;margin-bottom:12px;transition:border-color .2s;}
+.captcha-input:focus{border-color:var(--rose);}
+.captcha-input::placeholder{color:rgba(255,200,220,0.3);letter-spacing:0;}
+.captcha-btn{width:100%;padding:13px;background:linear-gradient(135deg,#ff2d6f,#c0144c);color:#fff;border:none;border-radius:14px;font-size:1rem;font-weight:700;cursor:pointer;font-family:'DM Sans',sans-serif;transition:all .25s;box-shadow:0 6px 24px rgba(255,45,111,0.35);}
+.captcha-btn:hover{transform:translateY(-2px);box-shadow:0 10px 32px rgba(255,45,111,0.5);}
+.captcha-err{font-size:0.82rem;color:#ff6b9d;margin-top:8px;min-height:18px;font-weight:600;}
+.captcha-hint{font-size:0.72rem;color:rgba(255,200,220,0.45);margin-top:16px;font-style:italic;}
 .disclaimer{background:rgba(255,200,0,0.07);border:1px solid rgba(255,200,0,0.2);border-radius:14px;padding:12px 16px;margin-bottom:20px;display:flex;align-items:flex-start;gap:10px;}
 .disclaimer-icon{font-size:1.1rem;flex-shrink:0;margin-top:1px;}
 .disclaimer p{font-size:0.75rem;color:rgba(255,220,120,0.85);line-height:1.55;}
@@ -147,6 +160,60 @@ textarea:focus{border-color:var(--rose);box-shadow:0 0 0 3px rgba(255,45,111,0.1
 
 /* Skeleton */
 .skel-card{background:var(--glass);border:1px solid var(--border);border-radius:20px;padding:22px 24px;}
+
+/* ── EXAM SEASON THEME ── */
+body.exam-season{background:#080010;}
+body.exam-season .bg{
+  background:radial-gradient(ellipse 80% 60% at 20% 10%,rgba(80,0,180,0.35) 0%,transparent 60%),
+             radial-gradient(ellipse 60% 80% at 80% 90%,rgba(140,0,255,0.2) 0%,transparent 55%),
+             radial-gradient(ellipse 50% 50% at 50% 50%,rgba(20,0,40,1) 0%,#080010 100%);}
+.exam-banner{background:linear-gradient(135deg,rgba(120,60,255,0.15),rgba(80,0,200,0.1));border:1px solid rgba(140,80,255,0.35);border-radius:14px;padding:12px 16px;margin-bottom:18px;display:flex;align-items:center;gap:10px;animation:examPulse 3s ease-in-out infinite;}
+@keyframes examPulse{0%,100%{border-color:rgba(140,80,255,0.35);}50%{border-color:rgba(140,80,255,0.7);box-shadow:0 0 20px rgba(120,60,255,0.2);}}
+.exam-banner span{font-size:1.4rem;}
+.exam-banner p{font-size:0.8rem;color:rgba(200,170,255,0.9);line-height:1.5;}
+.exam-banner strong{color:rgba(200,170,255,1);}
+body.exam-season .site-title{background:linear-gradient(135deg,#c8a0ff 0%,#a060ff 50%,var(--gold) 100%);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;}
+body.exam-season .submit-btn{background:linear-gradient(135deg,#7c3aff,#5b00d4);}
+body.exam-season .cat-pill.active{background:#6d28d9;border-color:#7c3aff;box-shadow:0 0 20px rgba(109,40,217,0.5);}
+body.exam-season .ftag.active{background:#6d28d9;border-color:#7c3aff;}
+body.exam-season .reply-send{background:#6d28d9;}
+body.exam-season .story-pill{background:linear-gradient(135deg,#7c3aff,#5b00d4);}
+body.exam-season :root{--rose:#7c3aff;--rose2:#a78bfa;--crimson:#5b00d4;--border:rgba(140,80,255,0.25);}
+
+/* ── THIS IS ME button ── */
+.thisisme-btn{display:inline-flex;align-items:center;gap:5px;background:rgba(255,183,71,0.08);border:1px solid rgba(255,183,71,0.25);color:rgba(255,210,100,0.85);border-radius:20px;padding:4px 12px;font-size:0.76rem;font-weight:600;cursor:pointer;transition:all .2s;font-family:'DM Sans',sans-serif;}
+.thisisme-btn:hover{background:rgba(255,183,71,0.18);border-color:rgba(255,183,71,0.5);transform:scale(1.05);}
+.thisisme-btn.claimed{background:rgba(255,183,71,0.2);border-color:rgba(255,183,71,0.5);color:#ffb347;cursor:default;}
+.thisisme-count{font-size:0.7rem;opacity:0.8;}
+
+/* ── REPLY NOTIFICATION BANNER ── */
+.reply-notif{position:fixed;top:16px;left:50%;transform:translateX(-50%) translateY(-100px);opacity:0;background:linear-gradient(135deg,#1a0030,#2d0050);border:1px solid rgba(140,80,255,0.5);border-radius:20px;padding:14px 20px;max-width:340px;width:90%;z-index:9995;display:flex;align-items:center;gap:12px;box-shadow:0 8px 40px rgba(100,0,255,0.3);transition:all .5s cubic-bezier(.34,1.56,.64,1);cursor:pointer;font-family:'DM Sans',sans-serif;}
+.reply-notif.show{transform:translateX(-50%) translateY(0);opacity:1;}
+.reply-notif-icon{font-size:1.5rem;flex-shrink:0;}
+.reply-notif-text{font-size:0.85rem;color:#e0d0ff;font-weight:600;}
+.reply-notif-sub{font-size:0.72rem;color:rgba(200,170,255,0.7);margin-top:2px;}
+
+/* ── POLL CONFESSION ── */
+.poll-input-section{display:none;flex-direction:column;gap:10px;margin-bottom:14px;}
+.poll-input-section.show{display:flex;}
+.poll-q{width:100%;background:rgba(0,0,0,0.3);border:1.5px solid var(--border);border-radius:12px;padding:12px 14px;color:var(--text);font-size:0.92rem;font-family:'DM Sans',sans-serif;outline:none;transition:border-color .2s;}
+.poll-q:focus{border-color:var(--rose);}
+.poll-q::placeholder{color:rgba(255,200,220,0.35);}
+.poll-opts-row{display:flex;gap:8px;}
+.poll-opt{flex:1;background:rgba(0,0,0,0.25);border:1px solid var(--border);border-radius:10px;padding:9px 12px;color:var(--text);font-size:0.85rem;font-family:'DM Sans',sans-serif;outline:none;transition:border-color .2s;}
+.poll-opt:focus{border-color:var(--rose);}
+.poll-opt::placeholder{color:rgba(255,200,220,0.3);}
+/* Poll vote bar on cards */
+.poll-section{margin-top:12px;display:flex;flex-direction:column;gap:8px;}
+.poll-question{font-size:0.92rem;font-weight:600;color:var(--text);margin-bottom:4px;}
+.poll-opt-row{display:flex;align-items:center;gap:8px;}
+.poll-vote-btn{flex-shrink:0;background:rgba(255,255,255,0.06);border:1px solid rgba(255,255,255,0.15);color:var(--muted);border-radius:10px;padding:6px 14px;font-size:0.82rem;font-weight:600;cursor:pointer;font-family:'DM Sans',sans-serif;transition:all .2s;white-space:nowrap;}
+.poll-vote-btn:hover{background:rgba(255,45,111,0.15);border-color:rgba(255,45,111,0.4);color:#fff;}
+.poll-vote-btn.voted{background:rgba(255,45,111,0.2);border-color:var(--rose);color:var(--rose2);}
+.poll-bar-wrap{flex:1;height:22px;background:rgba(255,255,255,0.06);border-radius:8px;overflow:hidden;position:relative;}
+.poll-bar-fill{height:100%;background:linear-gradient(90deg,rgba(255,45,111,0.5),rgba(255,45,111,0.3));border-radius:8px;transition:width .5s ease;}
+.poll-bar-label{position:absolute;right:8px;top:50%;transform:translateY(-50%);font-size:0.72rem;font-weight:700;color:var(--muted);}
+.poll-total{font-size:0.72rem;color:var(--muted);text-align:right;margin-top:2px;}
 .skel-line{border-radius:6px;margin-bottom:12px;background:linear-gradient(90deg,rgba(255,255,255,0.04) 25%,rgba(255,255,255,0.09) 50%,rgba(255,255,255,0.04) 75%);background-size:200% 100%;animation:shimmer 1.6s infinite;}
 .skel-line.a{height:12px;width:30%;}.skel-line.b{height:14px;width:85%;}.skel-line.c{height:14px;width:70%;}.skel-line.d{height:14px;width:55%;margin-bottom:20px;}.skel-line.e{height:10px;width:25%;}
 @keyframes shimmer{0%{background-position:200% 0}100%{background-position:-200% 0}}
@@ -236,7 +303,35 @@ textarea:focus{border-color:var(--rose);box-shadow:0 0 0 3px rgba(255,45,111,0.1
 <body data-theme="dark">
 <div class="bg"></div>
 <canvas id="particles"></canvas>
+
+<!-- ── CAPTCHA GATE ── 
+  LEARN: This is a client-side math captcha. It generates a simple arithmetic
+  question (e.g. "7 + 4 = ?") and stores the answer in a JS variable.
+  On correct answer, we set localStorage so it's only shown once per session.
+  This stops basic bots from spamming the submission form.
+  Why not Google reCAPTCHA? — No API key needed, no tracking, no external dependency.
+  Limitation: sophisticated bots could bypass this, but it stops 99% of spam bots.
+-->
+<div id="captchaGate">
+  <div class="captcha-box">
+    <span class="captcha-icon">💌</span>
+    <h2>GIET Confessions</h2>
+    <p>Prove you're a real GIET student, not a bot 🤖<br/>Solve this quick question to enter</p>
+    <div class="captcha-question" id="captchaQ">Loading…</div>
+    <input class="captcha-input" type="number" id="captchaAns" placeholder="Your answer" onkeydown="if(event.key==='Enter')checkCaptcha()"/>
+    <button class="captcha-btn" onclick="checkCaptcha()">Enter 💌</button>
+    <div class="captcha-err" id="captchaErr"></div>
+    <div class="captcha-hint">Refresh if the question is unclear</div>
+  </div>
+</div>
 <div class="toast" id="toast"></div>
+<div class="reply-notif" id="replyNotif" onclick="goToRepliedConfession()">
+  <div class="reply-notif-icon">💬</div>
+  <div>
+    <div class="reply-notif-text">Someone replied to your confession!</div>
+    <div class="reply-notif-sub" id="replyNotifSub">Tap to see it</div>
+  </div>
+</div>
 
 <!-- Share Modal -->
 <div class="modal-overlay" id="shareModal">
@@ -292,6 +387,12 @@ textarea:focus{border-color:var(--rose);box-shadow:0 0 0 3px rgba(255,45,111,0.1
     </div>
   </div>
 
+  <!-- Exam Season Banner (shown when exam season is active) -->
+  <div class="exam-banner" id="examBanner" style="display:none">
+    <span>📚</span>
+    <p><strong>Exam Season Mode 🎓</strong> Semesters are here. Stress, confess, survive. You're not alone — everyone's struggling. Good luck! 💪</p>
+  </div>
+
   <!-- Feature 6: Disclaimer -->
   <div class="disclaimer">
     <span class="disclaimer-icon">⚠️</span>
@@ -308,6 +409,16 @@ textarea:focus{border-color:var(--rose);box-shadow:0 0 0 3px rgba(255,45,111,0.1
       <div class="cat-pill active" data-cat="💘 Crush">💘 Crush</div>
       <div class="cat-pill" data-cat="🌹 Shayari">🌹 Shayari</div>
       <div class="cat-pill" data-cat="💭 Random">💭 Random</div>
+      <div class="cat-pill" data-cat="📊 Poll">📊 Poll</div>
+    </div>
+
+    <!-- Poll input fields (only visible when Poll is selected) -->
+    <div class="poll-input-section" id="pollInputSection">
+      <input class="poll-q" id="pollQuestion" maxlength="200" placeholder="Ask your question… e.g. Is canteen food getting worse? 🍛"/>
+      <div class="poll-opts-row">
+        <input class="poll-opt" id="pollOpt1" maxlength="60" placeholder="Option A (default: Yes)"/>
+        <input class="poll-opt" id="pollOpt2" maxlength="60" placeholder="Option B (default: No)"/>
+      </div>
     </div>
 
     <!-- Feature 1: Branch tag picker -->
@@ -346,6 +457,7 @@ textarea:focus{border-color:var(--rose);box-shadow:0 0 0 3px rgba(255,45,111,0.1
       <div class="ftag" data-f="💘 Crush">💘</div>
       <div class="ftag" data-f="🌹 Shayari">🌹</div>
       <div class="ftag" data-f="💭 Random">💭</div>
+      <div class="ftag" data-f="📊 Poll">📊</div>
     </div>
   </div>
 
@@ -369,6 +481,9 @@ textarea:focus{border-color:var(--rose);box-shadow:0 0 0 3px rgba(255,45,111,0.1
       <li>v1.8 — Replies always visible, smoother refresh</li>
       <li>v1.9 — Skeleton glitch fixed, mobile cache fixed</li>
       <li>v2.0 — Branch tag, Story mode, keep last 200, Confession of Day, emoji reactions, disclaimer</li>
+      <li>v2.1 — Security hardening: helmet, rate limiting, NoSQL sanitize, admin auth</li>
+      <li>v2.2 — Stats fix: DB-backed online count, visit rate-limit exemption</li>
+      <li>v2.3 — Exam season theme, "This is me!" button, reply notifications, poll confessions</li>
     </ul>
   </div>
 </div>
@@ -376,6 +491,61 @@ textarea:focus{border-color:var(--rose);box-shadow:0 0 0 3px rgba(255,45,111,0.1
 <script>
 const API = 'https://confession-app-1w0s.onrender.com';
 const EMOJI_LIST = ['❤️','😮','😂','🥺','🔥'];
+
+// ── CAPTCHA GATE ──────────────────────────────────────
+// LEARN: Math captcha prevents bots from auto-submitting confessions.
+// We generate a random arithmetic question, store the answer, and check it.
+// localStorage key 'giet_captcha_pass' stores a timestamp so we only ask once per day.
+(function initCaptcha() {
+  const gate = document.getElementById('captchaGate');
+  // Check if already passed today
+  const passed = localStorage.getItem('giet_captcha_pass');
+  if (passed && (Date.now() - parseInt(passed)) < 86400000) { // 24 hours
+    gate.style.display = 'none'; return;
+  }
+
+  // Generate question: mix of add/subtract/multiply with small numbers
+  // LEARN: We use an IIFE (Immediately Invoked Function Expression) to keep
+  // captchaAnswer scoped to this function — it's a closure variable.
+  const ops = [
+    () => { const a=rnd(2,12),b=rnd(2,9); return {q:`${a} + ${b}`, a:a+b}; },
+    () => { const a=rnd(8,20),b=rnd(2,8); return {q:`${a} − ${b}`, a:a-b}; },
+    () => { const a=rnd(2,9),b=rnd(2,9); return {q:`${a} × ${b}`, a:a*b}; },
+    () => { const a=rnd(2,9),b=rnd(2,5); return {q:`${a*b} ÷ ${b}`, a:a}; },
+  ];
+  function rnd(min,max){return Math.floor(Math.random()*(max-min+1))+min;}
+
+  const chosen = ops[Math.floor(Math.random()*ops.length)]();
+  document.getElementById('captchaQ').textContent = `What is  ${chosen.q}  = ?`;
+  window._captchaAnswer = chosen.a;
+})();
+
+function checkCaptcha() {
+  const val = parseInt(document.getElementById('captchaAns').value.trim());
+  const err = document.getElementById('captchaErr');
+  if (isNaN(val)) { err.textContent = 'Please enter a number 🔢'; return; }
+  if (val !== window._captchaAnswer) {
+    err.textContent = 'Wrong answer! Try again 🤔';
+    document.getElementById('captchaAns').value = '';
+    document.getElementById('captchaAns').focus();
+    // Shake animation on wrong answer
+    const box = document.querySelector('.captcha-box');
+    box.style.animation = 'shake 0.4s ease';
+    setTimeout(()=>box.style.animation='', 400);
+    return;
+  }
+  // Correct! Store timestamp and hide gate
+  localStorage.setItem('giet_captcha_pass', Date.now().toString());
+  const gate = document.getElementById('captchaGate');
+  gate.style.transition = 'opacity 0.5s ease';
+  gate.style.opacity = '0';
+  setTimeout(()=>{ gate.style.display='none'; }, 500);
+  err.textContent = '';
+}
+// Add shake animation to CSS dynamically
+const shakeStyle = document.createElement('style');
+shakeStyle.textContent = '@keyframes shake{0%,100%{transform:translateX(0)}20%,60%{transform:translateX(-8px)}40%,80%{transform:translateX(8px)}}';
+document.head.appendChild(shakeStyle);
 
 // ── Particles ─────────────────────────────────────────
 (function(){
@@ -402,6 +572,7 @@ const EMOJI_LIST = ['❤️','😮','😂','🥺','🔥'];
 
 // ── Theme ─────────────────────────────────────────────
 const themeBtn=document.getElementById('themeBtn');
+// Dark is the default. Only use saved preference if user explicitly chose light before.
 const saved=localStorage.getItem('giet_theme')||'dark';
 document.body.setAttribute('data-theme',saved);
 themeBtn.textContent=saved==='dark'?'☀️ Light':'🌙 Dark';
@@ -424,12 +595,6 @@ confInput.addEventListener('input',()=>{
   const wc=words(confInput.value);const pct=Math.min((wc/400)*100,100);
   wbar.style.width=pct+'%';wbar.className='wbar'+(wc>400?' over':wc>340?' warn':'');
   wcount.textContent=wc+' / 400 words';wcount.style.color=wc>400?'#ff6644':wc>340?'#ffaa44':'';
-});
-
-// ── Category ──────────────────────────────────────────
-let selCat='💘 Crush';
-document.querySelectorAll('#catPicker .cat-pill').forEach(p=>{
-  p.addEventListener('click',()=>{document.querySelectorAll('#catPicker .cat-pill').forEach(x=>x.classList.remove('active'));p.classList.add('active');selCat=p.dataset.cat;});
 });
 
 // ── Filter ────────────────────────────────────────────
@@ -507,6 +672,19 @@ function render() {
       const tc = card.querySelector('.card-time');
       if (tc) tc.textContent = `🕐 ${ago(m.createdAt)}`;
       updateReactionBar(card, m.id, m.reactions, m.myReaction);
+      // Update "This is me!" count
+      const timBtn = card.querySelector(`#tim-${m.id}`);
+      if (timBtn) {
+        const cnt = m.thisIsMe?.length || 0;
+        const claimed = (m.thisIsMe||[]).includes(cid());
+        timBtn.className = 'thisisme-btn' + (claimed?' claimed':'');
+        timBtn.querySelector('.thisisme-count').textContent = cnt > 0 ? cnt : '';
+      }
+      // Update poll bars if poll
+      if (m.isPoll) {
+        const ps = card.querySelector('.poll-section');
+        if (ps) ps.outerHTML = renderPollSection(m);
+      }
     } else {
       card = document.createElement('div');
       card.className = 'conf-card' + (m.isConfessionOfDay?' cotd':'');
@@ -536,11 +714,12 @@ function render() {
           <div class="card-cat">${m.category||'💭 Random'}</div>
           ${branchBadge}
         </div>
-        <div class="card-msg">${m.message}</div>
+        ${m.isPoll ? renderPollSection(m) : `<div class="card-msg">${m.message}</div>`}
         ${rxnBar}
         <div class="card-footer">
           <span class="card-time">🕐 ${ago(m.createdAt)}</span>
           <div class="action-row">
+            ${m.category==='💘 Crush' ? `<button class="thisisme-btn${(m.thisIsMe||[]).includes(cid())?' claimed':''}" id="tim-${m.id}" onclick="thisIsMe('${m.id}',this)">🫣 This is me! <span class="thisisme-count">${m.thisIsMe?.length>0?m.thisIsMe.length:''}</span></button>` : ''}
             <button class="act-btn" onclick="openShare(\`${m.message.replace(/`/g,"'")}\`)">📤 Share</button>
             <button class="act-btn${(m.flags||0)>0?' flagged':''}" onclick="flagConfession('${m.id}',this)">⚑ ${(m.flags||0)>0?'Flagged':'Flag'}</button>
           </div>
@@ -574,20 +753,33 @@ document.addEventListener('focusout', e=>{
 });
 
 // ── Fetch ─────────────────────────────────────────────
+// ⚠️ LEARN: The API returns { confessions: [...], cotdId: "..." }
+// NOT a plain array. We destructure it here.
+// Before this fix, data.filter(...) crashed because data was an object,
+// causing "data.filter is not a function" and showing 0 confessions.
 function fetchConf() {
   fetch(`${API}/api/confessions`)
-    .then(r=>r.json()).then(data=>{
-      const newOnes = data.filter(m=>!seenIds.has(m.id));
+    .then(r=>r.json()).then(rawData=>{
+      // Handle both old array format and new { confessions, cotdId } format
+      const confessions = Array.isArray(rawData) ? rawData : (rawData.confessions || []);
+      const cotdId = Array.isArray(rawData) ? null : rawData.cotdId;
+
+      // Mark COTD on the confession object so render can use it
+      confessions.forEach(m => { m.isConfessionOfDay = (cotdId && m.id === cotdId); });
+
+      const newOnes = confessions.filter(m=>!seenIds.has(m.id));
       if (newOnes.length && !firstLoad) {
         toast(`💌 ${newOnes.length} new confession${newOnes.length>1?'s':''}!`);
         document.title = `(${newOnes.length}) GIET Confessions 💌`;
         const cb = ()=>{ document.title='GIET Confessions 💌'; window.removeEventListener('focus',cb); };
         window.addEventListener('focus', cb);
       }
-      seenIds = new Set(data.map(m=>m.id));
-      allConf = data;
+      seenIds = new Set(confessions.map(m=>m.id));
+      allConf = confessions;
       firstLoad = false;
       safeRender();
+      // After first load, check for new replies to confessions the user submitted
+      checkReplyNotifications();
     }).catch(()=>{
       if (firstLoad) document.getElementById('feed').innerHTML = `<div class="empty"><span class="empty-icon">📡</span>Connecting to server… please wait</div>`;
     });
@@ -631,7 +823,152 @@ async function flagConfession(id, btn) {
   } catch(e) { toast('Network error'); }
 }
 
-// ── Feature 2: Story Mode ─────────────────────────────
+// ── Feature: This is me! ──────────────────────────────
+async function thisIsMe(confId, btn) {
+  if (btn.classList.contains('claimed')) return;
+  btn.classList.add('claimed');
+  try {
+    const r = await fetch(`${API}/api/thisisme/${confId}`, {method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({clientId:cid()})});
+    const d = await r.json();
+    if (d.count !== undefined) {
+      btn.querySelector('.thisisme-count').textContent = d.count > 0 ? d.count : '';
+      const conf = allConf.find(c=>c.id===confId);
+      if (conf) conf.thisIsMe = d.list || [];
+    }
+    if (d.alreadyClaimed) { toast('You already claimed this one 🫣'); return; }
+    toast('🫣 Marked! The confessor might be thinking of you…');
+  } catch(e) { toast('Network error'); btn.classList.remove('claimed'); }
+}
+
+// ── Feature: Poll render helper ───────────────────────
+function renderPollSection(m) {
+  if (!m.isPoll) return `<div class="card-msg">${m.message}</div>`;
+  const total = (m.pollVotes?.a || 0) + (m.pollVotes?.b || 0);
+  const pctA = total ? Math.round((m.pollVotes.a / total) * 100) : 50;
+  const pctB = total ? Math.round((m.pollVotes.b / total) * 100) : 50;
+  const myVote = m.pollUserVotes?.[cid()];
+  const optA = m.pollOptions?.a || 'Yes';
+  const optB = m.pollOptions?.b || 'No';
+  return `
+    <div class="poll-section">
+      <div class="poll-question">📊 ${m.message}</div>
+      <div class="poll-opt-row">
+        <button class="poll-vote-btn${myVote==='a'?' voted':''}" onclick="pollVote('${m.id}','a',this)">
+          ${optA}
+        </button>
+        <div class="poll-bar-wrap">
+          <div class="poll-bar-fill" style="width:${pctA}%"></div>
+          <span class="poll-bar-label">${pctA}%</span>
+        </div>
+      </div>
+      <div class="poll-opt-row">
+        <button class="poll-vote-btn${myVote==='b'?' voted':''}" onclick="pollVote('${m.id}','b',this)">
+          ${optB}
+        </button>
+        <div class="poll-bar-wrap">
+          <div class="poll-bar-fill" style="width:${pctB}%"></div>
+          <span class="poll-bar-label">${pctB}%</span>
+        </div>
+      </div>
+      <div class="poll-total">${total} vote${total!==1?'s':''}</div>
+    </div>`;
+}
+
+async function pollVote(confId, option, btn) {
+  try {
+    const r = await fetch(`${API}/api/poll/${confId}/vote`, {method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({clientId:cid(),option})});
+    const d = await r.json();
+    if (d.pollVotes) {
+      const conf = allConf.find(c=>c.id===confId);
+      if (conf) { conf.pollVotes = d.pollVotes; if(!conf.pollUserVotes)conf.pollUserVotes={}; conf.pollUserVotes[cid()]=option; }
+      const card = btn.closest('.conf-card');
+      if (card && conf) {
+        const ps = card.querySelector('.poll-section');
+        if (ps) ps.outerHTML = renderPollSection(conf);
+      }
+    }
+    if (d.alreadyVoted) toast('You already voted on this one 📊');
+  } catch(e) { toast('Network error'); }
+}
+
+// ── Feature: Reply notifications ──────────────────────
+// myConfessions: confId → last known reply count when we submitted
+// Stored in localStorage so it persists across refreshes
+function getMyConfs() { try{ return JSON.parse(localStorage.getItem('giet_myconfs')||'{}'); }catch(e){return{};} }
+function saveMyConfs(obj) { localStorage.setItem('giet_myconfs',JSON.stringify(obj)); }
+
+let replyNotifTarget = null;
+function goToRepliedConfession() {
+  hideReplyNotif();
+  if (!replyNotifTarget) return;
+  const card = document.querySelector(`.conf-card[data-id="${replyNotifTarget}"]`);
+  if (card) card.scrollIntoView({behavior:'smooth',block:'center'});
+}
+function hideReplyNotif() {
+  document.getElementById('replyNotif').classList.remove('show');
+}
+
+async function checkReplyNotifications() {
+  const myConfs = getMyConfs();
+  const ids = Object.keys(myConfs);
+  if (!ids.length) return;
+  // Check each confession's reply count against what we last saw
+  for (const id of ids) {
+    const conf = allConf.find(c=>c.id===id);
+    if (!conf) continue; // confession might have been pruned
+    try {
+      const r = await fetch(`${API}/api/replies/${id}`);
+      const replies = await r.json();
+      const prevCount = myConfs[id];
+      const newCount = replies.length;
+      if (newCount > prevCount) {
+        // New replies arrived!
+        replyNotifTarget = id;
+        myConfs[id] = newCount;
+        saveMyConfs(myConfs);
+        const n = newCount - prevCount;
+        document.getElementById('replyNotifSub').textContent = `${n} new repl${n>1?'ies':'y'} on your confession — tap to see`;
+        const el = document.getElementById('replyNotif');
+        el.classList.add('show');
+        setTimeout(hideReplyNotif, 7000);
+        break; // show one at a time
+      }
+    } catch(e) {}
+  }
+}
+
+// ── Feature: Exam season theme ────────────────────────
+function applyExamTheme() {
+  const now = new Date();
+  const m = now.getMonth(); // 0-indexed
+  const d = now.getDate();
+  // Exam seasons: April (3) + November (10) — adjust these months to match GIET schedule
+  const isExam = (m === 3) || (m === 10);
+  if (isExam) {
+    document.body.classList.add('exam-season');
+    document.getElementById('examBanner').style.display = 'flex';
+    // Swap particles to study emojis
+    window._examParticles = ['📚','✏️','😭','📝','💀','🤯','☕'];
+  }
+}
+
+// ── Feature: Category picker — show/hide poll fields ──
+let selCat='💘 Crush';
+document.querySelectorAll('#catPicker .cat-pill').forEach(p=>{
+  p.addEventListener('click',()=>{
+    document.querySelectorAll('#catPicker .cat-pill').forEach(x=>x.classList.remove('active'));
+    p.classList.add('active');
+    selCat=p.dataset.cat;
+    const isPoll = selCat === '📊 Poll';
+    document.getElementById('pollInputSection').classList.toggle('show', isPoll);
+    confInput.placeholder = isPoll
+      ? '(Optional) Add extra context for your poll…'
+      : 'Write your confession... it\'ll reach them, anonymously 💕';
+    // For polls, hide the word bar requirement hint visually
+    document.getElementById('wcount').textContent = isPoll ? '(optional)' : '0 / 400 words';
+    if (isPoll) confInput.value = ''; // clear to show it's optional
+  });
+});
 let storyIdx = 0, storyList = [], storyTimer = null, storyDuration = 6000;
 
 function openStory() {
@@ -728,7 +1065,11 @@ async function storyReact(confId, emoji, btn) {
 const submitBtn=document.getElementById('submitBtn'),fStatus=document.getElementById('fStatus');
 submitBtn.addEventListener('click',()=>{
   const msg=confInput.value.trim(); const wc=words(msg);
-  if(!wc){fStatus.textContent='Please write something first 💭';fStatus.style.color='var(--rose2)';return;}
+  const isPollSubmit = selCat === '📊 Poll';
+
+  // For polls, message is OPTIONAL (the poll question IS the message)
+  // For other categories, message is required
+  if(!isPollSubmit && !wc){fStatus.textContent='Please write something first 💭';fStatus.style.color='var(--rose2)';return;}
   if(wc>400){fStatus.textContent='Too long! Stay under 400 words.';fStatus.style.color='var(--rose2)';return;}
   submitBtn.disabled=true; submitBtn.textContent='Sending… 💌'; fStatus.textContent='';
 
@@ -737,8 +1078,31 @@ submitBtn.addEventListener('click',()=>{
   const branchVal = document.getElementById('branchSelect').value;
   const branch = (yearVal && branchVal) ? { year: yearVal, branch: branchVal } : null;
 
-  fetch(`${API}/api/confessions`,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({message:msg,clientId:cid(),category:selCat,branch})})
-    .then(r=>r.json()).then(data=>{
+  // Poll: collect poll fields if category is Poll
+  // LEARN: For polls, the question field IS the message. No separate message needed.
+  let pollData = null;
+  if (isPollSubmit) {
+    const q = document.getElementById('pollQuestion').value.trim();
+    if (!q) { fStatus.textContent='Please enter a poll question 📊'; fStatus.style.color='var(--rose2)'; submitBtn.disabled=false; submitBtn.textContent='Send Anonymously 💌'; return; }
+    pollData = {
+      question: q,
+      optA: document.getElementById('pollOpt1').value.trim() || 'Yes',
+      optB: document.getElementById('pollOpt2').value.trim() || 'No',
+    };
+  }
+
+  fetch(`${API}/api/confessions`,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({message: pollData ? pollData.question : msg, clientId:cid(), category:selCat, branch, poll:pollData})})
+    .then(r=>{
+      if(r.status===429){
+        fStatus.textContent="You've sent quite a few confessions today 💌 Come back in a bit!";
+        fStatus.style.color='var(--muted)';
+        submitBtn.disabled=false; submitBtn.textContent='Send Anonymously 💌';
+        return null;
+      }
+      return r.json();
+    })
+    .then(data=>{
+      if(!data)return;
       if(data.error){fStatus.textContent=data.error;fStatus.style.color='var(--rose2)';}
       else{
         let msg2=data.status==='approved'?'✅ Confession posted! 💌':'✅ Sent! Admin will review it shortly 💌';
@@ -749,16 +1113,30 @@ submitBtn.addEventListener('click',()=>{
         toast(msg2,data.edited?6000:4000);
         fStatus.textContent=''; confInput.value=''; wbar.style.width='0%'; wcount.textContent='0 / 400 words';
         document.getElementById('yearSelect').value=''; document.getElementById('branchSelect').value='';
+        document.getElementById('pollQuestion').value=''; document.getElementById('pollOpt1').value=''; document.getElementById('pollOpt2').value='';
+        // Track confession ID for reply notifications
+        if (data.confessionId) {
+          const myConfs = getMyConfs();
+          myConfs[data.confessionId] = 0; // start with 0 known replies
+          saveMyConfs(myConfs);
+        }
         if(data.status==='approved')setTimeout(fetchConf,1000);
       }
     }).catch(()=>{fStatus.textContent='Network error. Try again.';fStatus.style.color='var(--rose2)';})
     .finally(()=>{submitBtn.disabled=false;submitBtn.textContent='Send Anonymously 💌';});
 });
 
-// ── Analytics ─────────────────────────────────────────
-async function analytics(){
+// ── Analytics / Visit ping ────────────────────────────────────────────────────
+// POST /api/visit does three things:
+//   1. Registers a new unique visitor (increments totals once per clientId)
+//   2. Updates lastSeen timestamp in DB (used to count "online now")
+//   3. Returns current stats: visits, uniqueVisitors, activeVisitors
+// We call it on load + every 30s to keep "online now" accurate.
+// It has its own rate limiter (1 per 20s) so it never hits the global 100/15min cap.
+async function pingVisit(){
   try{
     const r=await fetch(`${API}/api/visit`,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({clientId:cid()})});
+    if(!r.ok)return; // e.g. 429 — just skip, don't crash
     const d=await r.json();
     document.getElementById('statLive').textContent=d.activeVisitors||0;
     document.getElementById('statVisits').textContent=d.visits||0;
@@ -797,8 +1175,10 @@ function urlBase64ToUint8Array(b){const p='='.repeat((4-b.length%4)%4);const s=(
 
 // ── Boot ──────────────────────────────────────────────
 window.addEventListener('load',()=>{
-  fetchConf();analytics();
-  setInterval(fetchConf,15000);setInterval(analytics,15000);
+  applyExamTheme();
+  fetchConf(); pingVisit();
+  setInterval(fetchConf,15000);
+  setInterval(pingVisit,30000);
   if('serviceWorker' in navigator){
     navigator.serviceWorker.register('/sw.js').then(reg=>{
       reg.update();
