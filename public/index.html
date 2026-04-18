@@ -318,21 +318,21 @@ body.exam-season .story-rxn{background:rgba(120,60,255,0.15);}
 }
 
 /* ── Report Modal ── */
-.report-modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,0.75);backdrop-filter:blur(6px);z-index:9500;display:flex;align-items:center;justify-content:center;opacity:0;pointer-events:none;transition:opacity .25s;}
-.report-modal-overlay.open{opacity:1;pointer-events:all;}
-.report-modal{background:#1a0010;border:1px solid rgba(255,100,150,0.3);border-radius:24px;padding:28px;max-width:360px;width:92%;transform:scale(0.92);transition:transform .25s cubic-bezier(.34,1.56,.64,1);}
-.report-modal-overlay.open .report-modal{transform:scale(1);}
-.report-modal h3{font-family:'Playfair Display',serif;font-size:1.15rem;margin-bottom:6px;color:var(--text);}
-.report-modal p{font-size:0.8rem;color:var(--muted);margin-bottom:18px;line-height:1.5;}
+.report-overlay{position:fixed;inset:0;background:rgba(0,0,0,0.75);backdrop-filter:blur(8px);z-index:9500;display:flex;align-items:flex-end;justify-content:center;opacity:0;pointer-events:none;transition:opacity .25s;}
+.report-overlay.open{opacity:1;pointer-events:all;}
+.report-box{background:#1a0010;border:1px solid rgba(255,100,150,0.3);border-radius:24px 24px 0 0;padding:28px 24px 40px;width:100%;max-width:520px;transform:translateY(100%);transition:transform .3s cubic-bezier(.34,1.2,.64,1);}
+.report-overlay.open .report-box{transform:translateY(0);}
+.report-box h3{font-family:'Playfair Display',serif;font-size:1.1rem;margin-bottom:6px;color:var(--text);}
+.report-box p{font-size:0.78rem;color:var(--muted);margin-bottom:16px;line-height:1.5;}
 .report-reasons{display:flex;flex-direction:column;gap:8px;margin-bottom:18px;}
-.report-reason{display:flex;align-items:center;gap:12px;background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.1);border-radius:12px;padding:12px 14px;cursor:pointer;transition:all .18s;font-size:0.88rem;color:var(--text);}
-.report-reason:hover,.report-reason.selected{background:rgba(255,45,111,0.12);border-color:rgba(255,45,111,0.4);}
-.report-reason input{accent-color:var(--rose);width:16px;height:16px;flex-shrink:0;}
-.report-reason span{font-size:1rem;}
-.report-submit{width:100%;padding:13px;background:linear-gradient(135deg,#ef4444,#b91c1c);color:#fff;border:none;border-radius:12px;font-size:0.95rem;font-weight:700;cursor:pointer;font-family:'DM Sans',sans-serif;transition:all .2s;margin-bottom:8px;}
-.report-submit:disabled{opacity:0.5;cursor:not-allowed;}
-.report-cancel{width:100%;padding:10px;background:transparent;border:1px solid rgba(255,255,255,0.1);color:var(--muted);border-radius:12px;cursor:pointer;font-size:0.85rem;font-family:'DM Sans',sans-serif;}
-.act-btn.reported{background:rgba(239,68,68,0.15);border-color:rgba(239,68,68,0.4);color:#fca5a5;}
+.report-reason{display:flex;align-items:center;gap:12px;background:rgba(255,255,255,0.04);border:1.5px solid rgba(255,255,255,0.08);border-radius:14px;padding:13px 16px;cursor:pointer;transition:all .18s;font-size:0.88rem;color:var(--text);}
+.report-reason:hover{background:rgba(255,45,111,0.08);border-color:rgba(255,45,111,0.3);}
+.report-reason.selected{background:rgba(255,45,111,0.12);border-color:rgba(255,45,111,0.5);}
+.report-reason input{accent-color:var(--rose);width:18px;height:18px;flex-shrink:0;cursor:pointer;}
+.report-submit{width:100%;padding:14px;background:linear-gradient(135deg,#ef4444,#b91c1c);color:#fff;border:none;border-radius:14px;font-size:0.95rem;font-weight:700;cursor:pointer;font-family:'DM Sans',sans-serif;transition:all .2s;margin-bottom:10px;box-shadow:0 4px 20px rgba(239,68,68,0.3);}
+.report-submit:disabled{opacity:0.45;cursor:not-allowed;}
+.report-cancel{width:100%;padding:12px;background:transparent;border:1px solid rgba(255,255,255,0.1);color:var(--muted);border-radius:14px;cursor:pointer;font-size:0.88rem;font-family:'DM Sans',sans-serif;}
+.act-btn.reported{background:rgba(239,68,68,0.15);border-color:rgba(239,68,68,0.35);color:#fca5a5;}
 </style>
 </head>
 <body data-theme="dark">
@@ -541,11 +541,7 @@ const EMOJI_LIST = ['❤️','😮','😂','🥺','🔥'];
 // localStorage key 'giet_captcha_pass' stores a timestamp so we only ask once per day.
 (function initCaptcha() {
   const gate = document.getElementById('captchaGate');
-  // Check if already passed today
-  const passed = localStorage.getItem('giet_captcha_pass');
-  if (passed && (Date.now() - parseInt(passed)) < 86400000) { // 24 hours
-    gate.style.display = 'none'; return;
-  }
+  // Captcha shows on EVERY visit — no localStorage skip
 
   // Generate question: mix of add/subtract/multiply with small numbers
   // LEARN: We use an IIFE (Immediately Invoked Function Expression) to keep
@@ -577,8 +573,7 @@ function checkCaptcha() {
     setTimeout(()=>box.style.animation='', 400);
     return;
   }
-  // Correct! Store timestamp and hide gate
-  localStorage.setItem('giet_captcha_pass', Date.now().toString());
+  // Correct! Hide gate
   const gate = document.getElementById('captchaGate');
   gate.style.transition = 'opacity 0.5s ease';
   gate.style.opacity = '0';
@@ -782,7 +777,7 @@ function render() {
           <div class="action-row">
             ${m.category==='💘 Crush' ? `<button class="thisisme-btn${(m.thisIsMe||[]).includes(cid())?' claimed':''}" id="tim-${m.id}" onclick="thisIsMe('${m.id}',this)">🫣 This is me! <span class="thisisme-count">${m.thisIsMe?.length>0?m.thisIsMe.length:''}</span></button>` : ''}
             <button class="act-btn" onclick="openShare(\`${m.message.replace(/`/g,"'")}\`)">📤 Share</button>
-            <button class="act-btn${(m.reports||[]).some(r=>r.clientId===cid())?' reported':''}" onclick="openReport('${m.id}',this)" id="rb-${m.id}">⚑ ${(m.reports||[]).some(r=>r.clientId===cid())?'Reported':'Report'}</button>
+            <button class="act-btn${getReportedIds().includes(m.id)?' reported':''}" onclick="openReport('${m.id}',this)" id="rb-${m.id}">⚑ ${getReportedIds().includes(m.id)?'Reported':'Report'}</button>
           </div>
         </div>
         <div class="replies-section" id="rs-${m.id}">
@@ -867,75 +862,50 @@ async function sendReply(confId) {
 }
 
 // ── Community Report System ──────────────────────────
-// LEARN: We open a modal first to collect the reason, then POST to /api/report/:id
-// The server tracks who reported and auto-hides at 3 reports.
-// We store reported IDs in localStorage so the button stays "Reported" on reload.
+let _rId=null, _rBtn=null;
+function getReportedIds(){try{return JSON.parse(localStorage.getItem('giet_reported')||'[]');}catch(e){return[];}}
+function addReportedId(id){const a=getReportedIds();if(!a.includes(id)){a.push(id);localStorage.setItem('giet_reported',JSON.stringify(a));}}
 
-let _reportTargetId = null;
-let _reportTargetBtn = null;
-
-function getReportedIds() { try{return JSON.parse(localStorage.getItem('giet_reported')||'[]');}catch(e){return[];} }
-function addReportedId(id) { const a=getReportedIds(); if(!a.includes(id)){a.push(id);localStorage.setItem('giet_reported',JSON.stringify(a));} }
-
-function openReport(confId, btn) {
-  if (getReportedIds().includes(confId)) { toast('⚑ You already reported this'); return; }
-  _reportTargetId = confId;
-  _reportTargetBtn = btn;
-  // Reset radio selection
-  document.querySelectorAll('input[name="reportReason"]').forEach(r=>r.checked=false);
-  document.getElementById('reportSubmitBtn').disabled = true;
-  document.getElementById('reportModal').classList.add('open');
+function openReport(confId, btn){
+  if(getReportedIds().includes(confId)){toast('⚑ Already reported');return;}
+  _rId=confId; _rBtn=btn;
+  document.querySelectorAll('input[name="reportReason"]').forEach(r=>{r.checked=false;});
+  document.querySelectorAll('.report-reason').forEach(l=>l.classList.remove('selected'));
+  document.getElementById('reportSubmitBtn').disabled=true;
+  document.getElementById('reportOverlay').classList.add('open');
 }
-
-// Enable submit only when a reason is selected
-document.querySelectorAll('input[name="reportReason"]').forEach(radio => {
-  radio.addEventListener('change', () => {
-    document.getElementById('reportSubmitBtn').disabled = false;
-    // Highlight selected label
+document.querySelectorAll('input[name="reportReason"]').forEach(radio=>{
+  radio.addEventListener('change',()=>{
+    document.getElementById('reportSubmitBtn').disabled=false;
     document.querySelectorAll('.report-reason').forEach(l=>l.classList.remove('selected'));
     radio.closest('.report-reason').classList.add('selected');
   });
 });
+function closeReport(){document.getElementById('reportOverlay').classList.remove('open');_rId=null;_rBtn=null;}
+document.getElementById('reportOverlay').addEventListener('click',e=>{if(e.target===e.currentTarget)closeReport();});
 
-function closeReport() {
-  document.getElementById('reportModal').classList.remove('open');
-  _reportTargetId = null; _reportTargetBtn = null;
-}
-
-async function submitReport() {
-  const reason = document.querySelector('input[name="reportReason"]:checked')?.value;
-  if (!reason || !_reportTargetId) return;
-  const btn = document.getElementById('reportSubmitBtn');
-  btn.disabled = true; btn.textContent = 'Submitting…';
-  try {
-    const r = await fetch(`${API}/api/report/${_reportTargetId}`, {
-      method:'POST', headers:{'Content-Type':'application/json'},
-      body: JSON.stringify({ clientId: cid(), reason })
-    });
-    const d = await r.json();
+async function submitReport(){
+  const reason=document.querySelector('input[name="reportReason"]:checked')?.value;
+  if(!reason||!_rId)return;
+  const btn=document.getElementById('reportSubmitBtn');
+  btn.disabled=true; btn.textContent='Submitting…';
+  try{
+    const r=await fetch(`${API}/api/report/${_rId}`,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({clientId:cid(),reason})});
+    const d=await r.json();
     closeReport();
-    if (d.alreadyReported) { toast('⚑ You already reported this'); return; }
-    addReportedId(_reportTargetId);
-    if (_reportTargetBtn) {
-      _reportTargetBtn.classList.add('reported');
-      _reportTargetBtn.innerHTML = '⚑ Reported';
-    }
-    if (d.autoHidden) {
-      toast('✅ Reported! This confession has been hidden pending admin review 🛡');
-      // Remove card from feed immediately
-      const card = document.querySelector(`.conf-card[data-id="${_reportTargetId}"]`);
-      if (card) { card.style.transition='opacity .4s'; card.style.opacity='0'; setTimeout(()=>card.remove(),400); }
+    if(d.alreadyReported){toast('⚑ Already reported');return;}
+    addReportedId(_rId);
+    if(_rBtn){_rBtn.classList.add('reported');_rBtn.innerHTML='⚑ Reported';}
+    if(d.autoHidden){
+      toast('🛡 Reported! Confession hidden pending admin review.');
+      const card=document.querySelector(`.conf-card[data-id="${_rId}"]`);
+      if(card){card.style.transition='opacity .4s';card.style.opacity='0';setTimeout(()=>card.remove(),400);}
     } else {
-      const left = Math.max(0, 3 - (d.reportCount||1));
-      toast(`⚑ Reported! ${left} more report${left!==1?'s':''} needed to auto-hide`);
+      const left=Math.max(0,3-(d.reportCount||1));
+      toast(`⚑ Reported! ${left} more report${left!==1?'s':''} needed to auto-hide.`);
     }
-  } catch(e) { toast('Network error'); btn.disabled=false; btn.textContent='Submit Report'; }
+  }catch(e){toast('Network error');btn.disabled=false;btn.textContent='Submit Report';}
 }
-
-// Close report modal on overlay click
-document.getElementById('reportModal').addEventListener('click', e=>{
-  if(e.target===e.currentTarget) closeReport();
-});
 
 // ── Feature: This is me! ──────────────────────────────
 async function thisIsMe(confId, btn) {
@@ -1302,19 +1272,19 @@ window.addEventListener('load',()=>{
 });
 </script>
 
-<!-- Report Modal -->
-<div class="report-modal-overlay" id="reportModal">
-  <div class="report-modal">
+<!-- Report Bottom Sheet -->
+<div class="report-overlay" id="reportOverlay">
+  <div class="report-box">
     <h3>⚑ Report this confession</h3>
-    <p>Why should this be removed? Your report is anonymous. After 3 reports it's auto-hidden pending admin review.</p>
+    <p>Select a reason. Your report is anonymous. 3 reports from different users auto-hides it pending admin review.</p>
     <div class="report-reasons">
-      <label class="report-reason"><input type="radio" name="reportReason" value="identity"/> <span>🪪</span> Reveals someone's identity (name/roll/number)</label>
-      <label class="report-reason"><input type="radio" name="reportReason" value="harassment"/> <span>😤</span> Harassment or targeting someone</label>
-      <label class="report-reason"><input type="radio" name="reportReason" value="fake"/> <span>🤥</span> Fake / misleading content</label>
-      <label class="report-reason"><input type="radio" name="reportReason" value="spam"/> <span>🗑</span> Spam or repeated content</label>
-      <label class="report-reason"><input type="radio" name="reportReason" value="other"/> <span>💬</span> Other reason</label>
+      <label class="report-reason"><input type="radio" name="reportReason" value="identity"> 🪪 Reveals someone's identity (name / roll / phone)</label>
+      <label class="report-reason"><input type="radio" name="reportReason" value="harassment"> 😤 Harassment or targeting someone</label>
+      <label class="report-reason"><input type="radio" name="reportReason" value="fake"> 🤥 Fake or misleading content</label>
+      <label class="report-reason"><input type="radio" name="reportReason" value="spam"> 🗑 Spam or duplicate</label>
+      <label class="report-reason"><input type="radio" name="reportReason" value="other"> 💬 Other reason</label>
     </div>
-    <button class="report-submit" id="reportSubmitBtn" onclick="submitReport()" disabled>Submit Report</button>
+    <button class="report-submit" id="reportSubmitBtn" disabled onclick="submitReport()">Submit Report</button>
     <button class="report-cancel" onclick="closeReport()">Cancel</button>
   </div>
 </div>
