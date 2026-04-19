@@ -59,24 +59,22 @@ header{text-align:center;padding:52px 0 24px;position:relative;}
 @keyframes float{0%,100%{transform:translateY(0);}50%{transform:translateY(-8px);}}
 .site-title{font-family:'Playfair Display',serif;font-size:clamp(2rem,6vw,3.2rem);font-weight:700;letter-spacing:-0.02em;line-height:1.1;background:linear-gradient(135deg,#fff 0%,var(--rose2) 50%,var(--gold) 100%);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;margin-bottom:8px;}
 .site-sub{font-size:0.95rem;color:var(--muted);font-style:italic;font-family:'Playfair Display',serif;margin-bottom:18px;}
-.stats-bar{display:inline-flex;gap:0;background:var(--glass);border:1px solid var(--border);border-radius:20px;padding:0;backdrop-filter:blur(10px);overflow:hidden;}
-.stats-bar span{display:flex;flex-direction:column;align-items:center;gap:3px;padding:14px 32px;font-size:1.6rem;font-weight:700;color:var(--text);border-right:1px solid var(--border);}
-.stats-bar span:last-child{border-right:none;}
-.stats-bar span em{font-size:0.68rem;font-style:normal;color:var(--muted);font-weight:500;text-transform:uppercase;letter-spacing:.06em;}
+.stats-bar{display:inline-flex;gap:20px;background:var(--glass);border:1px solid var(--border);border-radius:40px;padding:8px 22px;font-size:0.78rem;color:var(--muted);backdrop-filter:blur(10px);}
+.stats-bar span{display:flex;align-items:center;gap:5px;}
 .stats-dot{width:6px;height:6px;border-radius:50%;background:var(--rose);animation:pulse 2s infinite;display:inline-block;}
 @keyframes pulse{0%,100%{opacity:1;transform:scale(1);}50%{opacity:0.5;transform:scale(1.4);}}
 
 /* Top bar */
-.top-bar{display:flex;flex-direction:column;gap:10px;margin-bottom:20px;}
-.ig-pill{display:flex;align-items:center;justify-content:center;gap:10px;background:linear-gradient(135deg,#f09433,#e6683c,#dc2743,#cc2366,#bc1888);color:#fff;padding:16px 20px;border-radius:16px;text-decoration:none;font-size:1rem;font-weight:700;box-shadow:0 4px 20px rgba(220,59,121,0.4);transition:transform .15s;width:100%;}
-.ig-pill:hover{transform:scale(1.01);}
-.top-right{display:contents;}
+.top-bar{display:flex;align-items:center;justify-content:space-between;margin-bottom:20px;gap:10px;flex-wrap:wrap;}
+.ig-pill{display:inline-flex;align-items:center;gap:7px;background:linear-gradient(135deg,#f09433,#e6683c,#dc2743,#cc2366,#bc1888);color:#fff;padding:8px 16px;border-radius:40px;text-decoration:none;font-size:0.82rem;font-weight:600;box-shadow:0 4px 20px rgba(220,59,121,0.4);transition:transform .2s;}
+.ig-pill:hover{transform:scale(1.05);}
+.top-right{display:flex;gap:8px;align-items:center;}
 .theme-pill{background:var(--glass);border:1px solid var(--border);color:var(--text);border-radius:40px;padding:8px 16px;cursor:pointer;font-size:0.82rem;font-weight:500;backdrop-filter:blur(10px);transition:all .2s;font-family:'DM Sans',sans-serif;}
 .theme-pill{display:none;}/* light mode removed */
-.admin-pill{display:flex;align-items:center;justify-content:center;gap:10px;background:rgba(255,255,255,0.06);border:1.5px solid rgba(255,100,150,0.2);color:rgba(255,200,220,0.85);border-radius:16px;padding:16px 20px;font-size:1rem;font-weight:700;text-decoration:none;backdrop-filter:blur(10px);transition:all .2s;font-family:'DM Sans',sans-serif;width:100%;}
+.admin-pill{display:inline-flex;align-items:center;gap:6px;background:rgba(255,255,255,0.07);border:1px solid rgba(255,100,150,0.25);color:rgba(255,200,220,0.8);border-radius:40px;padding:8px 14px;font-size:0.8rem;font-weight:600;text-decoration:none;backdrop-filter:blur(10px);transition:all .2s;font-family:'DM Sans',sans-serif;}
 .admin-pill:hover{background:rgba(255,45,111,0.15);border-color:rgba(255,45,111,0.4);color:#fff;}
 /* ── Feature 2: Story mode button ── */
-.story-pill{background:linear-gradient(135deg,var(--rose),var(--crimson));border:none;color:#fff;border-radius:16px;padding:16px 20px;cursor:pointer;font-size:1rem;font-weight:700;font-family:'DM Sans',sans-serif;transition:all .2s;box-shadow:0 4px 16px rgba(255,45,111,0.35);width:100%;display:flex;align-items:center;justify-content:center;gap:10px;}
+.story-pill{background:linear-gradient(135deg,var(--rose),var(--crimson));border:none;color:#fff;border-radius:40px;padding:8px 16px;cursor:pointer;font-size:0.82rem;font-weight:600;font-family:'DM Sans',sans-serif;transition:all .2s;box-shadow:0 4px 16px rgba(255,45,111,0.35);}
 .story-pill:hover{transform:scale(1.05);}
 
 /* Glass card */
@@ -144,7 +142,7 @@ textarea:focus{border-color:var(--rose);box-shadow:0 0 0 3px rgba(255,45,111,0.1
 
 /* ── Feature 5: Emoji reaction bar ── */
 .reaction-bar{display:flex;gap:6px;flex-wrap:wrap;margin-top:12px;padding-top:12px;border-top:1px solid rgba(255,100,150,0.1);}
-.rxn-btn{display:flex;align-items:center;gap:6px;background:rgba(255,255,255,0.06);border:1px solid rgba(255,255,255,0.12);border-radius:14px;padding:10px 14px;font-size:1.05rem;cursor:pointer;transition:all .18s;font-family:'DM Sans',sans-serif;color:var(--muted);min-width:52px;justify-content:center;}
+.rxn-btn{display:flex;align-items:center;gap:4px;background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.1);border-radius:20px;padding:4px 10px;font-size:0.82rem;cursor:pointer;transition:all .18s;font-family:'DM Sans',sans-serif;color:var(--muted);}
 .rxn-btn:hover{background:rgba(255,45,111,0.12);border-color:rgba(255,45,111,0.3);transform:scale(1.1);}
 .rxn-btn.active{background:rgba(255,45,111,0.2);border-color:var(--rose);color:var(--text);}
 .rxn-count{font-size:0.72rem;font-weight:700;}
@@ -192,12 +190,7 @@ body.exam-season .cat-pill.active{background:#6d28d9;border-color:#7c3aff;box-sh
 body.exam-season .ftag.active{background:#6d28d9;border-color:#7c3aff;}
 body.exam-season .reply-send{background:#6d28d9;}
 body.exam-season .story-pill{background:linear-gradient(135deg,#7c3aff,#5b00d4);}
-/* Exam season: override CSS variables directly on body (not :root — that's invalid nested) */
-body.exam-season{--rose:#7c3aff;--rose2:#a78bfa;--crimson:#5b00d4;--border:rgba(140,80,255,0.25);--card-shadow:0 8px 40px rgba(124,58,237,0.2);}
-body.exam-season .stats-dot{background:#a78bfa;box-shadow:0 0 8px #a78bfa;}
-body.exam-season .rxn-btn.active{background:rgba(124,58,237,0.25);border-color:#7c3aff;}
-body.exam-season .conf-card:hover{box-shadow:0 12px 40px rgba(124,58,237,0.25);}
-body.exam-season .thisisme-btn.claimed{color:#a78bfa;}
+body.exam-season :root{--rose:#7c3aff;--rose2:#a78bfa;--crimson:#5b00d4;--border:rgba(140,80,255,0.25);}
 
 /* ── THIS IS ME button ── */
 .thisisme-btn{display:inline-flex;align-items:center;gap:5px;background:rgba(255,183,71,0.08);border:1px solid rgba(255,183,71,0.25);color:rgba(255,210,100,0.85);border-radius:20px;padding:4px 12px;font-size:0.76rem;font-weight:600;cursor:pointer;transition:all .2s;font-family:'DM Sans',sans-serif;}
@@ -415,15 +408,18 @@ body.exam-season .story-rxn{background:rgba(120,60,255,0.15);}
     <h1 class="site-title">GIET Confessions</h1>
     <p class="site-sub">"Say what your heart won't let you speak aloud"</p>
     <div class="stats-bar">
-      <span><span class="stats-dot"></span> <span id="statLive">0</span><em>online now</em></span>
-      <span>💌 <span id="statUnique">0</span><em>visitors</em></span>
+      <span><span class="stats-dot"></span> <span id="statLive">0</span> online now</span>
+      <span>👁 <span id="statVisits">0</span> visits</span>
+      <span>💌 <span id="statUnique">0</span> visitors</span>
     </div>
   </header>
 
   <div class="top-bar">
     <a href="https://www.instagram.com/" target="_blank" class="ig-pill">📷 Instagram Page</a>
-    <a href="/admin.html" class="admin-pill">🔐 Admin Panel</a>
-    <button class="story-pill" onclick="openStory()">▶ Story Mode</button>
+    <div class="top-right">
+      <a href="/admin.html" class="admin-pill">🔐 Admin</a>
+      <button class="story-pill" onclick="openStory()">▶ Story Mode</button>
+    </div>
   </div>
 
   <!-- Exam Season Banner (shown when exam season is active) -->
@@ -886,7 +882,8 @@ document.querySelectorAll('input[name="reportReason"]').forEach(radio=>{
   });
 });
 function closeReport(){document.getElementById('reportOverlay').classList.remove('open');_rId=null;_rBtn=null;}
-document.getElementById('reportOverlay').addEventListener('click',e=>{if(e.target===e.currentTarget)closeReport();});
+// reportOverlay listener added at boot (element must exist first)
+
 
 async function submitReport(){
   const reason=document.querySelector('input[name="reportReason"]:checked')?.value;
@@ -1227,6 +1224,7 @@ async function pingVisit(){
     if(!r.ok)return; // e.g. 429 — just skip, don't crash
     const d=await r.json();
     document.getElementById('statLive').textContent=d.activeVisitors||0;
+    document.getElementById('statVisits').textContent=d.visits||0;
     document.getElementById('statUnique').textContent=d.uniqueVisitors||0;
   }catch(e){}
 }
@@ -1262,10 +1260,13 @@ function urlBase64ToUint8Array(b){const p='='.repeat((4-b.length%4)%4);const s=(
 
 // ── Boot ──────────────────────────────────────────────
 window.addEventListener('load',()=>{
+  // Wire up report overlay dismiss on background tap
+  const ro=document.getElementById('reportOverlay');
+  if(ro) ro.addEventListener('click',e=>{if(e.target===e.currentTarget)closeReport();});
   applyExamTheme();
   fetchConf(); pingVisit();
-  setInterval(fetchConf,60000); // 60s — prevents constant blinking
-  setInterval(pingVisit,60000);
+  setInterval(fetchConf,15000);
+  setInterval(pingVisit,30000);
   if('serviceWorker' in navigator){
     navigator.serviceWorker.register('/sw.js').then(reg=>{
       reg.update();
