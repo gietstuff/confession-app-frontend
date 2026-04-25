@@ -816,6 +816,8 @@ function render() {
     fragment.appendChild(card);
   });
   feed.appendChild(fragment);
+  // Read-receipt: observe newly rendered cards
+  if(typeof _viewObs!=='undefined'){document.querySelectorAll('.conf-card[data-id]').forEach(c=>{if(!_viewed.has(c.dataset.id))_viewObs.observe(c);});}
 }
 
 // ── Safe render ───────────────────────────────────────
@@ -1046,16 +1048,39 @@ async function checkReplyNotifications() {
 }
 
 // ── Feature: Exam season theme ────────────────────────
+// ── Full Theme System ─────────────────────────────────
+// crush=red, hostel=blue, exam=orange-pink, general=green
+// Admin sets via /api/admin/prompt → applied to whole page
+
+const THEMES = {
+  crush:   { r:'239,68,68',   r2:'248,113,113', c:'185,28,28',   bodyBg:'#130000', bgStop:'rgba(239,68,68,0.38)',   bgStop2:'rgba(185,28,28,0.22)' },
+  hostel:  { r:'59,130,246',  r2:'96,165,250',  c:'29,78,216',   bodyBg:'#00041a', bgStop:'rgba(59,130,246,0.38)',  bgStop2:'rgba(29,78,216,0.22)' },
+  exam:    { r:'249,115,22',  r2:'251,146,60',  c:'234,88,12',   bodyBg:'#0d0300', bgStop:'rgba(249,115,22,0.38)',  bgStop2:'rgba(236,72,153,0.28)' },
+  general: { r:'34,197,94',   r2:'74,222,128',  c:'22,163,74',   bodyBg:'#000d03', bgStop:'rgba(34,197,94,0.38)',   bgStop2:'rgba(22,163,74,0.22)' }
+};
+
+function applyTheme(key) {
+  const t = THEMES[key]; if(!t) return;
+  const s = document.documentElement.style;
+  s.setProperty('--rose',    `rgb(${t.r})`);
+  s.setProperty('--rose2',   `rgb(${t.r2})`);
+  s.setProperty('--crimson', `rgb(${t.c})`);
+  s.setProperty('--border',  `rgba(${t.r},0.28)`);
+  s.setProperty('--card-shadow', `0 8px 40px rgba(${t.r},0.2)`);
+  document.body.style.background = t.bodyBg;
+  const bg = document.querySelector('.bg');
+  if(bg) bg.style.background = `radial-gradient(ellipse 80% 60% at 20% 10%,${t.bgStop} 0%,transparent 60%),radial-gradient(ellipse 60% 80% at 80% 90%,${t.bgStop2} 0%,transparent 55%),radial-gradient(ellipse 50% 50% at 50% 50%,${t.bodyBg} 0%,${t.bodyBg} 100%)`;
+  document.querySelectorAll('.stats-dot').forEach(d=>{ d.style.background=`rgb(${t.r2})`; d.style.boxShadow=`0 0 8px rgb(${t.r2})`; });
+}
+
 function applyExamTheme() {
-  const now = new Date();
-  const m = now.getMonth(); // 0-indexed
-  const d = now.getDate();
-  // Exam seasons: April (3) + November (10) — adjust these months to match GIET schedule
+  if(window._adminTheme) return; // admin theme takes priority
+  const m = new Date().getMonth();
   const isExam = (m === 3) || (m === 10);
   if (isExam) {
+    applyTheme('exam');
     document.body.classList.add('exam-season');
     document.getElementById('examBanner').style.display = 'flex';
-    // Swap particles to study emojis
     window._examParticles = ['📚','✏️','😭','📝','💀','🤯','☕'];
   }
 }
@@ -1313,14 +1338,7 @@ const _viewObs=new IntersectionObserver(entries=>{
     // el may not exist yet if views<=4; that's fine
   });
 },{threshold:0.6});
-// Attach observer after render
-const _origRender=render;
-function render(){
-  _origRender();
-  document.querySelectorAll('.conf-card[data-id]').forEach(card=>{
-    if(!_viewed.has(card.dataset.id))_viewObs.observe(card);
-  });
-}
+// Observer attached inside render() above
 
 // ── Weekly Prompt ──────────────────────────────────────
 async function loadPrompt(){
@@ -1329,10 +1347,11 @@ async function loadPrompt(){
     const d=await r.json();
     if(!d.prompt)return;
     const banner=document.getElementById('promptBanner');
-    const themeLabels={'crush':'💘 This Week: Crush Confessions','hostel':'🏠 This Week: Hostel Life','exam':'📚 Exam Season Theme','random':'💭 Weekly Theme'};
-    document.getElementById('promptThemeLabel').textContent=themeLabels[d.promptTheme]||'💬 This Week\'s Theme';
+    const themeLabels={'crush':'💘 Crush Week','hostel':'🏠 Hostel Life Week','exam':'📚 Exam Season','general':'💬 Weekly Theme'};
+    document.getElementById('promptThemeLabel').textContent=themeLabels[d.promptTheme]||'💬 Weekly Theme';
     document.getElementById('promptText').textContent=d.prompt;
     banner.classList.add('show');
+    if(d.promptTheme && THEMES[d.promptTheme]){window._adminTheme=d.promptTheme;applyTheme(d.promptTheme);}
   }catch(e){}
 }
 
