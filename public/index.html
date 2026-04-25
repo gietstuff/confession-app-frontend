@@ -317,6 +317,42 @@ body.exam-season .story-rxn{background:rgba(120,60,255,0.15);}
   .toast{width:90%;text-align:center;white-space:normal;}
 }
 
+
+/* ── Sort dropdown ── */
+.sort-wrap{position:relative;display:inline-flex;align-items:center;}
+.sort-dropdown{
+  background:rgba(255,255,255,0.07);border:1px solid var(--border);
+  color:var(--text);border-radius:30px;padding:7px 14px 7px 12px;
+  font-size:0.8rem;font-weight:600;cursor:pointer;
+  font-family:'DM Sans',sans-serif;appearance:none;
+  backdrop-filter:blur(10px);display:flex;align-items:center;gap:6px;
+  transition:all .18s;
+}
+.sort-dropdown:hover{background:rgba(255,45,111,0.12);border-color:rgba(255,45,111,0.3);}
+.sort-menu{
+  display:none;position:absolute;top:calc(100% + 6px);left:0;
+  background:rgba(20,0,12,0.97);border:1px solid var(--border);
+  border-radius:16px;padding:6px;min-width:130px;z-index:200;
+  backdrop-filter:blur(20px);box-shadow:0 10px 40px rgba(0,0,0,0.5);
+}
+.sort-menu.open{display:block;}
+.sort-opt{
+  display:flex;align-items:center;gap:8px;
+  padding:9px 14px;border-radius:10px;cursor:pointer;
+  font-size:0.82rem;color:var(--muted);transition:all .15s;
+  font-family:'DM Sans',sans-serif;
+}
+.sort-opt:hover,.sort-opt.active{background:rgba(255,45,111,0.14);color:var(--text);}
+/* New page pill */
+.newpage-pill{
+  display:inline-flex;align-items:center;gap:6px;
+  background:linear-gradient(135deg,#7c3aed,#4f46e5);color:#fff;
+  border-radius:40px;padding:8px 16px;font-size:0.82rem;font-weight:600;
+  text-decoration:none;transition:transform .2s;
+  box-shadow:0 4px 16px rgba(124,58,237,0.35);
+  font-family:'DM Sans',sans-serif;cursor:pointer;border:none;
+}
+.newpage-pill:hover{transform:scale(1.05);}
 /* ── Report Modal ── */
 .report-overlay{position:fixed;inset:0;background:rgba(0,0,0,0.75);backdrop-filter:blur(8px);z-index:9500;display:flex;align-items:flex-end;justify-content:center;opacity:0;pointer-events:none;transition:opacity .25s;}
 .report-overlay.open{opacity:1;pointer-events:all;}
@@ -430,6 +466,7 @@ body.exam-season .story-rxn{background:rgba(120,60,255,0.15);}
   <div class="top-bar">
     <a href="https://www.instagram.com/" target="_blank" class="ig-pill">📷 Instagram Page</a>
     <div class="top-right">
+      <a href="/confessions-v3.html" class="newpage-pill">✨ New Page</a>
       <a href="/admin.html" class="admin-pill">🔐 Admin</a>
       <button class="story-pill" onclick="openStory()">▶ Story Mode</button>
     </div>
@@ -508,7 +545,18 @@ body.exam-season .story-rxn{background:rgba(120,60,255,0.15);}
   </div>
 
   <div class="section-head">
-    <span class="section-label">Recent confessions</span>
+    <div style="display:flex;align-items:center;gap:12px;flex-wrap:wrap;">
+      <span class="section-label">Recent confessions</span>
+      <!-- Sort dropdown -->
+      <div class="sort-wrap">
+        <button class="sort-dropdown" onclick="toggleSortMenu()" id="sortDropBtn">⬆️ Sort: New ▾</button>
+        <div class="sort-menu" id="sortMenu">
+          <div class="sort-opt active" onclick="setConfSort('new',this)">🆕 New</div>
+          <div class="sort-opt" onclick="setConfSort('top',this)">🏆 Top</div>
+          <div class="sort-opt" onclick="setConfSort('best',this)">⭐ Best</div>
+        </div>
+      </div>
+    </div>
     <div class="filter-row">
       <div class="ftag active" data-f="all">All</div>
       <div class="ftag" data-f="💘 Crush">💘</div>
@@ -649,6 +697,25 @@ confInput.addEventListener('input',()=>{
   wcount.textContent=wc+' / 400 words';wcount.style.color=wc>400?'#ff6644':wc>340?'#ffaa44':'';
 });
 
+
+// ── Sort confessions ──────────────────────────────────
+let confSortMode = 'new';
+function toggleSortMenu() {
+  document.getElementById('sortMenu').classList.toggle('open');
+}
+document.addEventListener('click', e => {
+  if (!e.target.closest('.sort-wrap')) document.getElementById('sortMenu')?.classList.remove('open');
+});
+function setConfSort(mode, el) {
+  confSortMode = mode;
+  document.querySelectorAll('.sort-opt').forEach(o => o.classList.remove('active'));
+  el.classList.add('active');
+  const labels = {new:'New', top:'Top', best:'Best'};
+  document.getElementById('sortDropBtn').textContent = '⬆️ Sort: ' + labels[mode] + ' ▾';
+  document.getElementById('sortMenu').classList.remove('open');
+  safeRender();
+}
+
 // ── Filter ────────────────────────────────────────────
 let activeF='all';
 let searchQ = '';
@@ -722,6 +789,13 @@ function updateReactionBar(card, confId, reactions, myReaction) {
 function render() {
   const feed = document.getElementById('feed');
   let list = activeF==='all' ? allConf : allConf.filter(c=>c.category===activeF);
+  // Apply sort
+  if(confSortMode==='top') list=[...list].sort((a,b)=>(b.likes||0)-(a.likes||0));
+  else if(confSortMode==='best') list=[...list].sort((a,b)=>{
+    const ra=Object.values(a.reactions||{}).reduce((s,v)=>s+v,0);
+    const rb=Object.values(b.reactions||{}).reduce((s,v)=>s+v,0);
+    return rb-ra;
+  });
   // Apply search filter — checks message text and poll question
   if (searchQ) {
     list = list.filter(c => {

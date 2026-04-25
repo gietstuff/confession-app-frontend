@@ -1,0 +1,851 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1.0,viewport-fit=cover"/>
+<title>GIET Confessions — v3</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;0,900;1,400;1,700&family=DM+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet"/>
+<style>
+*{margin:0;padding:0;box-sizing:border-box;}
+
+/* ── Core palette — deep crimson/dark red, exact current site feel ── */
+:root{
+  --rose:#ff2d6f;--rose2:#ff6b9d;--crimson:#c0144c;--gold:#ffb347;
+  --text:#fff0f5;--muted:rgba(255,200,220,0.65);
+  --glass:rgba(255,255,255,0.06);--border:rgba(255,100,150,0.2);
+  --bg:#0d0008;
+}
+
+html{scroll-snap-type:y mandatory;overflow-y:scroll;overflow-x:hidden;height:100%;}
+body{background:var(--bg);color:var(--text);font-family:'DM Sans',sans-serif;height:100%;}
+
+/* Fixed ambient background */
+.ambient{position:fixed;inset:0;z-index:0;pointer-events:none;
+  background:
+    radial-gradient(ellipse 70% 55% at 15% 8%,rgba(192,20,76,0.38) 0%,transparent 58%),
+    radial-gradient(ellipse 55% 70% at 82% 92%,rgba(255,45,111,0.22) 0%,transparent 52%),
+    radial-gradient(ellipse 100% 100% at 50% 50%,rgba(30,0,15,1) 0%,#0d0008 100%);
+}
+
+/* ── Particle canvas ── */
+#particles{position:fixed;inset:0;z-index:0;pointer-events:none;opacity:0.5;}
+
+/* ── Scroll snap sections ── */
+section{
+  position:relative;z-index:1;
+  min-height:100svh;width:100%;
+  scroll-snap-align:start;scroll-snap-stop:always;
+  display:flex;flex-direction:column;align-items:center;justify-content:center;
+  padding:40px 24px;
+}
+
+/* ── Page 1: Landing ── */
+#page-landing{
+  text-align:center;
+  background:transparent;
+}
+
+.live-bubble{
+  position:fixed;top:20px;right:20px;z-index:100;
+  background:rgba(255,255,255,0.07);
+  backdrop-filter:blur(14px);
+  border:1px solid rgba(255,100,150,0.3);
+  border-radius:20px;padding:10px 16px;
+  display:flex;flex-direction:column;align-items:center;gap:4px;
+  box-shadow:0 4px 24px rgba(255,45,111,0.15);
+}
+.live-dot{
+  display:flex;align-items:center;gap:6px;font-size:0.7rem;font-weight:700;
+  text-transform:uppercase;letter-spacing:.1em;color:#4ade80;
+}
+.live-dot::before{
+  content:'';width:7px;height:7px;border-radius:50%;background:#4ade80;
+  animation:livePulse 1.2s ease-in-out infinite;
+  box-shadow:0 0 8px #4ade80;
+}
+@keyframes livePulse{0%,100%{opacity:1;transform:scale(1);}50%{opacity:.4;transform:scale(1.4);}}
+.live-count{font-size:1.4rem;font-weight:800;color:var(--text);line-height:1;}
+.live-label{font-size:0.62rem;color:var(--muted);letter-spacing:.06em;text-transform:uppercase;}
+
+.landing-logo{font-size:3rem;margin-bottom:24px;display:block;
+  filter:drop-shadow(0 0 30px rgba(255,45,111,0.6));animation:logoFloat 4s ease-in-out infinite;}
+@keyframes logoFloat{0%,100%{transform:translateY(0);}50%{transform:translateY(-10px);}}
+
+.landing-title{
+  font-family:'Playfair Display',serif;
+  font-size:clamp(2.8rem,9vw,6rem);
+  font-weight:900;line-height:1.0;
+  letter-spacing:-0.02em;
+  background:linear-gradient(135deg,#fff 0%,var(--rose2) 40%,var(--gold) 85%);
+  -webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;
+  margin-bottom:16px;
+}
+.landing-sub{
+  font-family:'Playfair Display',serif;
+  font-style:italic;font-size:clamp(1rem,2.5vw,1.3rem);
+  color:var(--muted);margin-bottom:36px;
+}
+.landing-nav{display:flex;gap:12px;justify-content:center;flex-wrap:wrap;margin-bottom:32px;}
+.nav-btn{
+  display:inline-flex;align-items:center;gap:7px;
+  padding:11px 20px;border-radius:40px;
+  font-size:0.85rem;font-weight:600;text-decoration:none;cursor:pointer;
+  border:none;font-family:'DM Sans',sans-serif;
+  transition:transform .2s,box-shadow .2s;
+}
+.nav-btn:hover{transform:scale(1.06);}
+.nav-btn.ig{background:linear-gradient(135deg,#f09433,#e6683c,#dc2743,#cc2366,#bc1888);color:#fff;box-shadow:0 4px 20px rgba(220,59,121,0.4);}
+.nav-btn.admin{background:rgba(255,255,255,0.08);border:1px solid rgba(255,100,150,0.28);color:var(--text);backdrop-filter:blur(10px);}
+.nav-btn.newpage{background:linear-gradient(135deg,#7c3aed,#4f46e5);color:#fff;box-shadow:0 4px 20px rgba(124,58,237,0.4);}
+.nav-btn.confess{background:linear-gradient(135deg,var(--rose),var(--crimson));color:#fff;box-shadow:0 4px 20px rgba(255,45,111,0.4);}
+
+.disclaimer-v3{
+  background:rgba(255,200,0,0.06);border:1px solid rgba(255,200,0,0.18);
+  border-radius:14px;padding:14px 18px;max-width:620px;width:100%;
+  display:flex;gap:12px;align-items:flex-start;text-align:left;
+}
+.disclaimer-v3 .icon{font-size:1.1rem;flex-shrink:0;margin-top:1px;}
+.disclaimer-v3 p{font-size:0.74rem;color:rgba(255,220,120,0.8);line-height:1.6;}
+.disclaimer-v3 strong{color:rgba(255,220,120,1);}
+
+.scroll-hint{
+  position:absolute;bottom:28px;left:50%;transform:translateX(-50%);
+  display:flex;flex-direction:column;align-items:center;gap:6px;
+  color:var(--muted);font-size:0.7rem;letter-spacing:.1em;text-transform:uppercase;
+  animation:hintBounce 2s ease-in-out infinite;
+}
+@keyframes hintBounce{0%,100%{transform:translateX(-50%) translateY(0);}50%{transform:translateX(-50%) translateY(6px);}}
+.scroll-hint svg{opacity:.5;}
+
+/* ── Page 2: Confess ── */
+#page-confess{background:transparent;padding:0;}
+.confess-fullpage{
+  width:100%;min-height:100svh;
+  display:flex;flex-direction:column;align-items:center;justify-content:center;
+  padding:40px 24px;position:relative;
+}
+.confess-fullpage::before{
+  content:'';position:absolute;inset:0;
+  background:radial-gradient(ellipse 80% 60% at 50% 40%,rgba(255,45,111,0.12) 0%,transparent 70%);
+  pointer-events:none;
+}
+.confess-eyebrow{font-size:0.75rem;letter-spacing:.15em;text-transform:uppercase;color:var(--rose2);font-weight:600;margin-bottom:10px;}
+.confess-title{font-family:'Playfair Display',serif;font-size:clamp(1.8rem,5vw,3rem);font-weight:900;margin-bottom:6px;text-align:center;}
+.confess-sub{color:var(--muted);font-size:0.88rem;margin-bottom:32px;text-align:center;}
+.confess-form{width:100%;max-width:600px;}
+.cat-row{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:16px;}
+.cat-pill{
+  display:flex;align-items:center;gap:5px;
+  background:var(--glass);border:1px solid var(--border);
+  color:var(--muted);border-radius:30px;padding:7px 14px;
+  font-size:0.8rem;font-weight:600;cursor:pointer;
+  transition:all .18s;font-family:'DM Sans',sans-serif;
+}
+.cat-pill.active,.cat-pill:hover{background:rgba(255,45,111,0.18);border-color:var(--rose);color:var(--text);}
+.batch-row{display:flex;gap:8px;margin-bottom:14px;}
+.batch-select{
+  background:rgba(0,0,0,0.35);border:1px solid var(--border);color:var(--text);
+  border-radius:12px;padding:8px 12px;font-size:0.82rem;font-family:'DM Sans',sans-serif;
+  appearance:none;cursor:pointer;flex:1;
+}
+.batch-select option{background:#1a0010;}
+.poll-section{display:none;margin-bottom:14px;}
+.poll-section.show{display:block;}
+.poll-input{
+  width:100%;background:rgba(0,0,0,0.35);border:1.5px solid var(--border);
+  border-radius:14px;padding:12px 16px;color:var(--text);font-size:0.9rem;
+  font-family:'DM Sans',sans-serif;margin-bottom:8px;outline:none;
+}
+.poll-input::placeholder{color:rgba(255,200,220,0.35);}
+.confess-textarea{
+  width:100%;min-height:140px;
+  background:rgba(0,0,0,0.3);border:1.5px solid var(--border);
+  border-radius:18px;padding:18px;color:var(--text);font-size:0.95rem;
+  font-family:'DM Sans',sans-serif;resize:vertical;outline:none;
+  transition:border-color .2s,box-shadow .2s;line-height:1.65;
+  margin-bottom:8px;
+}
+.confess-textarea::placeholder{color:rgba(255,200,220,0.38);}
+.confess-textarea:focus{border-color:var(--rose);box-shadow:0 0 0 3px rgba(255,45,111,0.12);}
+.word-bar{display:flex;justify-content:space-between;font-size:0.72rem;color:var(--muted);margin-bottom:16px;}
+.wbar-track{height:2px;background:rgba(255,100,150,0.1);border-radius:2px;margin-bottom:8px;}
+.wbar-fill{height:100%;background:var(--rose);border-radius:2px;width:0%;transition:width .2s;}
+.submit-v3{
+  width:100%;padding:15px;
+  background:linear-gradient(135deg,var(--rose),var(--crimson));
+  border:none;color:#fff;border-radius:16px;
+  font-size:1rem;font-weight:700;cursor:pointer;
+  font-family:'DM Sans',sans-serif;
+  box-shadow:0 6px 28px rgba(255,45,111,0.4);
+  transition:all .2s;letter-spacing:.02em;
+}
+.submit-v3:hover{transform:translateY(-2px);box-shadow:0 10px 36px rgba(255,45,111,0.5);}
+.submit-v3:disabled{opacity:.5;cursor:not-allowed;transform:none;}
+.fstatus{font-size:0.8rem;color:var(--rose2);margin-top:8px;min-height:20px;text-align:center;}
+
+/* ── Confession pages ── */
+.conf-page{background:transparent;padding:24px;}
+.conf-page-inner{
+  width:100%;max-width:700px;
+  display:flex;flex-direction:column;
+  min-height:100svh;justify-content:center;
+  gap:0;
+}
+/* Page number */
+.page-num{
+  font-size:0.65rem;letter-spacing:.14em;text-transform:uppercase;
+  color:var(--muted);margin-bottom:10px;display:flex;align-items:center;gap:8px;
+}
+.page-num::after{content:'';flex:1;height:1px;background:var(--border);}
+
+/* Category tag on confession */
+.conf-cat-tag{
+  display:inline-flex;align-items:center;gap:5px;
+  background:rgba(255,45,111,0.1);border:1px solid rgba(255,45,111,0.25);
+  color:var(--rose2);border-radius:20px;padding:4px 12px;
+  font-size:0.72rem;font-weight:600;margin-bottom:18px;
+}
+
+/* Branch tag */
+.branch-tag{
+  display:inline-flex;align-items:center;gap:5px;
+  background:rgba(124,58,237,0.12);border:1px solid rgba(124,58,237,0.3);
+  color:#a78bfa;border-radius:20px;padding:4px 12px;
+  font-size:0.72rem;font-weight:600;margin-bottom:18px;margin-left:6px;
+}
+
+/* Main confession text — BIG typographic treatment */
+.conf-body{
+  font-family:'Playfair Display',serif;
+  font-size:clamp(1.4rem,4vw,2.2rem);
+  line-height:1.55;font-weight:400;font-style:italic;
+  color:#fff0f5;margin-bottom:28px;
+  flex:1;
+}
+/* COTD crown */
+.cotd-flag{
+  font-size:0.72rem;letter-spacing:.12em;text-transform:uppercase;
+  color:var(--gold);font-weight:700;margin-bottom:12px;font-style:normal;
+  display:flex;align-items:center;gap:6px;
+}
+
+/* Top-right actions */
+.conf-top-actions{
+  display:flex;justify-content:space-between;align-items:flex-start;
+  margin-bottom:14px;
+}
+.conf-actions-right{display:flex;gap:8px;}
+.ca-btn{
+  display:flex;align-items:center;gap:4px;
+  background:rgba(255,255,255,0.06);border:1px solid rgba(255,255,255,0.1);
+  color:var(--muted);border-radius:24px;padding:5px 12px;
+  font-size:0.76rem;font-weight:600;cursor:pointer;
+  transition:all .18s;font-family:'DM Sans',sans-serif;
+}
+.ca-btn:hover{background:rgba(255,45,111,0.14);border-color:rgba(255,45,111,0.35);color:var(--text);}
+.ca-btn.reported{background:rgba(239,68,68,0.12);border-color:rgba(239,68,68,0.3);color:#fca5a5;}
+.ca-btn.removed{background:rgba(239,68,68,0.08);color:rgba(252,165,165,0.5);cursor:default;}
+
+/* Emoji reactions */
+.conf-reactions{display:flex;gap:10px;flex-wrap:wrap;margin-bottom:20px;}
+.rxn-v3{
+  display:flex;align-items:center;gap:6px;
+  background:rgba(255,255,255,0.06);border:1.5px solid rgba(255,255,255,0.1);
+  border-radius:14px;padding:10px 16px;
+  font-size:1.2rem;cursor:pointer;
+  transition:all .18s;font-family:'DM Sans',sans-serif;color:var(--muted);
+  min-width:58px;justify-content:center;
+}
+.rxn-v3:hover{background:rgba(255,45,111,0.14);border-color:rgba(255,45,111,0.4);transform:scale(1.08);}
+.rxn-v3.active{background:rgba(255,45,111,0.22);border-color:var(--rose);color:var(--text);box-shadow:0 0 12px rgba(255,45,111,0.25);}
+.rxn-count{font-size:0.82rem;font-weight:700;}
+
+/* Conf meta line */
+.conf-meta{
+  display:flex;align-items:center;gap:12px;flex-wrap:wrap;
+  font-size:0.72rem;color:var(--muted);margin-bottom:14px;
+}
+.conf-meta .dot{opacity:.4;}
+
+/* Read receipt */
+.read-receipt-v3{font-size:0.68rem;color:rgba(255,200,220,0.45);}
+
+/* Poll bars */
+.poll-card{background:rgba(255,255,255,0.04);border:1px solid var(--border);border-radius:16px;padding:16px;margin-bottom:20px;}
+.poll-q{font-family:'Playfair Display',serif;font-size:1.1rem;font-style:italic;margin-bottom:14px;}
+.poll-opt{margin-bottom:10px;cursor:pointer;}
+.poll-opt-label{display:flex;justify-content:space-between;font-size:0.82rem;margin-bottom:5px;color:var(--text);}
+.poll-bar{height:8px;background:rgba(255,255,255,0.08);border-radius:6px;overflow:hidden;}
+.poll-bar-fill{height:100%;background:linear-gradient(90deg,var(--rose),var(--crimson));border-radius:6px;transition:width .5s ease;}
+
+/* Reply section */
+.replies-v3{margin-top:16px;border-top:1px solid var(--border);padding-top:16px;}
+.replies-label{font-size:0.7rem;letter-spacing:.1em;text-transform:uppercase;color:var(--muted);margin-bottom:10px;font-weight:600;}
+.reply-item-v3{
+  background:rgba(255,45,111,0.05);border:1px solid rgba(255,45,111,0.12);
+  border-radius:12px;padding:10px 14px;margin-bottom:8px;
+  font-size:0.83rem;color:var(--reply-text,rgba(255,240,245,0.82));line-height:1.55;
+}
+.reply-meta-v3{font-size:0.67rem;color:var(--muted);margin-top:4px;}
+.reply-form-v3{display:flex;gap:8px;margin-top:10px;}
+.reply-input-v3{
+  flex:1;background:rgba(0,0,0,0.3);border:1px solid var(--border);
+  border-radius:12px;padding:9px 13px;color:var(--text);
+  font-size:0.85rem;font-family:'DM Sans',sans-serif;outline:none;
+}
+.reply-input-v3::placeholder{color:rgba(255,200,220,0.3);}
+.reply-send-v3{
+  background:var(--rose);border:none;color:#fff;
+  border-radius:12px;padding:9px 16px;font-size:0.82rem;
+  font-weight:600;cursor:pointer;font-family:'DM Sans',sans-serif;white-space:nowrap;
+}
+
+/* Sort bar */
+.sort-bar{
+  display:flex;align-items:center;gap:6px;
+  position:fixed;top:18px;left:50%;transform:translateX(-50%);
+  z-index:100;
+  background:rgba(255,255,255,0.07);backdrop-filter:blur(14px);
+  border:1px solid rgba(255,100,150,0.2);border-radius:40px;padding:6px 8px;
+}
+.sort-btn{
+  background:transparent;border:none;color:var(--muted);
+  border-radius:30px;padding:6px 14px;font-size:0.78rem;font-weight:600;
+  cursor:pointer;font-family:'DM Sans',sans-serif;transition:all .18s;
+}
+.sort-btn.active{background:rgba(255,45,111,0.2);color:var(--text);border:1px solid rgba(255,45,111,0.3);}
+.sort-btn:hover:not(.active){color:var(--text);}
+
+/* ── Changelog page ── */
+.changelog-page{background:transparent;}
+.changelog-inner{max-width:620px;width:100%;text-align:center;}
+.changelog-title{font-family:'Playfair Display',serif;font-size:2.5rem;font-weight:900;margin-bottom:8px;}
+.changelog-version{display:inline-block;background:linear-gradient(135deg,var(--rose),var(--gold));
+  -webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;
+  font-size:3.5rem;font-weight:900;font-family:'Playfair Display',serif;margin-bottom:24px;}
+.changelog-list{text-align:left;list-style:none;}
+.changelog-list li{
+  padding:12px 0;border-bottom:1px solid rgba(255,100,150,0.1);
+  font-size:0.88rem;color:var(--muted);display:flex;gap:10px;align-items:flex-start;
+}
+.changelog-list li::before{content:'✦';color:var(--rose);flex-shrink:0;margin-top:1px;}
+.changelog-list li strong{color:var(--text);}
+
+/* ── Loading skeleton ── */
+.skeleton-page{background:transparent;}
+.skel{background:linear-gradient(90deg,rgba(255,100,150,0.06) 25%,rgba(255,100,150,0.12) 50%,rgba(255,100,150,0.06) 75%);
+  background-size:200% 100%;border-radius:8px;animation:shimmer 1.5s infinite;}
+@keyframes shimmer{0%{background-position:200% 0;}100%{background-position:-200% 0;}}
+
+/* ── Toast ── */
+#toast-v3{position:fixed;bottom:32px;left:50%;transform:translateX(-50%) translateY(20px);
+  background:rgba(30,0,15,0.95);border:1px solid var(--rose);border-radius:30px;
+  padding:10px 22px;font-size:0.85rem;color:var(--text);z-index:9999;
+  opacity:0;transition:all .3s;white-space:nowrap;pointer-events:none;
+  box-shadow:0 8px 30px rgba(255,45,111,0.25);}
+#toast-v3.show{opacity:1;transform:translateX(-50%) translateY(0);}
+
+/* Page navigation dots */
+.page-dots{
+  position:fixed;right:16px;top:50%;transform:translateY(-50%);
+  z-index:100;display:flex;flex-direction:column;gap:8px;
+}
+.page-dot{
+  width:6px;height:6px;border-radius:50%;
+  background:rgba(255,100,150,0.3);cursor:pointer;
+  transition:all .2s;
+}
+.page-dot.active{background:var(--rose);height:20px;border-radius:4px;}
+
+/* Mobile tweaks */
+@media(max-width:640px){
+  .conf-body{font-size:clamp(1.2rem,5vw,1.7rem);}
+  .sort-bar{top:12px;}
+  .live-bubble{top:12px;right:12px;padding:8px 12px;}
+}
+</style>
+</head>
+<body>
+
+<div class="ambient"></div>
+<canvas id="particles"></canvas>
+
+<!-- Live visitor bubble -->
+<div class="live-bubble">
+  <div class="live-dot">Live</div>
+  <div class="live-count" id="liveCount">—</div>
+  <div class="live-label">visitors</div>
+</div>
+
+<!-- Sort bar (hidden on page 1 & 2) -->
+<div class="sort-bar" id="sortBar" style="display:none">
+  <button class="sort-btn active" data-sort="new" onclick="setSort('new',this)">New</button>
+  <button class="sort-btn" data-sort="top" onclick="setSort('top',this)">Top</button>
+  <button class="sort-btn" data-sort="best" onclick="setSort('best',this)">Best</button>
+</div>
+
+<!-- Page navigation dots -->
+<div class="page-dots" id="pageDots"></div>
+
+<!-- ═══════════ PAGE 1: LANDING ═══════════ -->
+<section id="page-landing">
+  <span class="landing-logo">💌</span>
+  <h1 class="landing-title">GIET Confessions</h1>
+  <p class="landing-sub">"Say what your heart won't let you speak aloud"</p>
+  <nav class="landing-nav">
+    <a href="https://www.instagram.com/" target="_blank" class="nav-btn ig">📷 Instagram Page</a>
+    <a href="/admin.html" class="nav-btn admin">🔐 Admin</a>
+    <a href="/new-page.html" class="nav-btn newpage">✨ NEW PAGE</a>
+    <button class="nav-btn confess" onclick="scrollToConfess()">✍️ Confess Now</button>
+  </nav>
+  <div class="disclaimer-v3">
+    <span class="icon">⚠️</span>
+    <p><strong>Entertainment purposes only.</strong> This site is meant for fun and anonymous expression among GIET students. It does not intend to harm, defame, or breach anyone's privacy. If any content causes harm, the site will be taken down immediately. All confessions are reviewed by admin before publishing.</p>
+  </div>
+  <div class="scroll-hint">
+    scroll
+    <svg width="16" height="24" viewBox="0 0 16 24" fill="none">
+      <rect x="6" y="2" width="4" height="8" rx="2" fill="rgba(255,100,150,0.6)"/>
+      <rect x="1" y="1" width="14" height="22" rx="7" stroke="rgba(255,100,150,0.4)" stroke-width="1.5"/>
+      <path d="M5 16l3 3 3-3" stroke="rgba(255,100,150,0.5)" stroke-width="1.5" stroke-linecap="round"/>
+    </svg>
+  </div>
+</section>
+
+<!-- ═══════════ PAGE 2: CONFESS ═══════════ -->
+<section id="page-confess">
+  <div class="confess-fullpage">
+    <div class="confess-eyebrow">Anonymous · Safe · GIET only</div>
+    <h2 class="confess-title">✍️ Send a Confession</h2>
+    <p class="confess-sub">It'll reach them. Anonymously.</p>
+    <div class="confess-form">
+      <!-- Category -->
+      <div class="cat-row" id="v3CatPicker">
+        <button class="cat-pill active" data-cat="💘 Crush">💘 Crush</button>
+        <button class="cat-pill" data-cat="🌹 Shayari">🌹 Shayari</button>
+        <button class="cat-pill" data-cat="💭 Random">💭 Random</button>
+        <button class="cat-pill" data-cat="📊 Poll">📊 Poll</button>
+      </div>
+      <!-- Batch -->
+      <div class="batch-row">
+        <select class="batch-select" id="v3Year"><option value="">Year...</option><option>1st Year</option><option>2nd Year</option><option>3rd Year</option><option>4th Year</option></select>
+        <select class="batch-select" id="v3Branch"><option value="">Branch...</option><option>CSE</option><option>AIML</option><option>ECE</option><option>AGRI</option><option>Others</option></select>
+      </div>
+      <!-- Poll fields -->
+      <div class="poll-section" id="v3PollSection">
+        <input class="poll-input" id="v3PollQ" placeholder="Poll question…"/>
+        <input class="poll-input" id="v3PollA" placeholder="Option A (default: Yes)"/>
+        <input class="poll-input" id="v3PollB" placeholder="Option B (default: No)"/>
+      </div>
+      <!-- Message -->
+      <textarea class="confess-textarea" id="v3Msg" placeholder="Write your confession... it'll reach them, anonymously 💕" oninput="v3WordCount(this)"></textarea>
+      <div class="wbar-track"><div class="wbar-fill" id="v3Wbar"></div></div>
+      <div class="word-bar"><span id="v3Wcount">0 / 400 words</span></div>
+      <button class="submit-v3" id="v3Submit" onclick="v3Submit()">Send Anonymously 💌</button>
+      <div class="fstatus" id="v3Status"></div>
+    </div>
+  </div>
+</section>
+
+<!-- ═══════════ CONFESSION PAGES (injected by JS) ═══════════ -->
+<div id="confessionPages"></div>
+
+<!-- ═══════════ CHANGELOG PAGE ═══════════ -->
+<section id="page-changelog" class="changelog-page">
+  <div class="changelog-inner">
+    <p class="changelog-title">Changelog</p>
+    <div class="changelog-version">v3.0</div>
+    <ul class="changelog-list">
+      <li><strong>v3.0</strong> — Full-page scroll experience, typographic confession layout, sort by New/Top/Best, read receipts, REMOVE! community flagging</li>
+      <li><strong>v2.5</strong> — Admin theme system (crush/hostel/exam/general), analytics charts, scheduled publishing, weekly prompt banner</li>
+      <li><strong>v2.4</strong> — Smart filter v4 (roll numbers, leet-speak, section IDs), community report system, reply delete in admin</li>
+      <li><strong>v2.3</strong> — Exam season theme, "This is me!" button, reply notifications, poll confessions</li>
+      <li><strong>v2.2</strong> — DB-backed online count, admin auth fixes, captcha gate</li>
+      <li><strong>v2.1</strong> — Security: helmet, rate limiting, NoSQL sanitize</li>
+      <li><strong>v2.0</strong> — Year/Branch badge, Story Mode, keep-last-200, emoji reactions, COTD</li>
+      <li><strong>v1.0</strong> — Initial launch: anonymous confessions, admin moderation, MongoDB</li>
+    </ul>
+  </div>
+</section>
+
+<div id="toast-v3"></div>
+
+<script>
+const API = 'https://confession-app-1w0s.onrender.com';
+const EMOJIS = ['❤️','😮','😂','🥺','🔥'];
+let allConf = [], sortMode = 'new', clientId = null;
+
+// ── Client ID ──
+function cid() {
+  if (clientId) return clientId;
+  let id = localStorage.getItem('giet_cid');
+  if (!id) { id = crypto.randomUUID(); localStorage.setItem('giet_cid', id); }
+  clientId = id; return id;
+}
+
+// ── Toast ──
+function toast(msg, dur=3000) {
+  const t = document.getElementById('toast-v3');
+  t.textContent = msg; t.classList.add('show');
+  setTimeout(() => t.classList.remove('show'), dur);
+}
+
+// ── Time ago ──
+function ago(ts) {
+  const d = (Date.now() - ts) / 1000;
+  if (d < 60) return 'just now';
+  if (d < 3600) return Math.floor(d/60) + 'm ago';
+  if (d < 86400) return Math.floor(d/3600) + 'h ago';
+  return Math.floor(d/86400) + 'd ago';
+}
+
+// ── Particles ──
+(function(){
+  const c = document.getElementById('particles'), ctx = c.getContext('2d');
+  let W, H, pts = [];
+  function resize() { W = c.width = innerWidth; H = c.height = innerHeight; }
+  resize(); addEventListener('resize', resize);
+  for (let i = 0; i < 60; i++) pts.push({
+    x: Math.random()*1e4, y: Math.random()*1e4,
+    vx: (Math.random()-.5)*.3, vy: (Math.random()-.5)*.3,
+    r: Math.random()*1.5+.5, o: Math.random()*.5+.1
+  });
+  function draw() {
+    ctx.clearRect(0,0,W,H);
+    pts.forEach(p => {
+      p.x=(p.x+p.vx+W)%W; p.y=(p.y+p.vy+H)%H;
+      ctx.beginPath(); ctx.arc(p.x,p.y,p.r,0,Math.PI*2);
+      ctx.fillStyle=`rgba(255,100,150,${p.o})`; ctx.fill();
+    });
+    requestAnimationFrame(draw);
+  }
+  draw();
+})();
+
+// ── Category picker ──
+let selCat = '💘 Crush';
+document.querySelectorAll('#v3CatPicker .cat-pill').forEach(p => {
+  p.addEventListener('click', () => {
+    document.querySelectorAll('#v3CatPicker .cat-pill').forEach(x => x.classList.remove('active'));
+    p.classList.add('active'); selCat = p.dataset.cat;
+    document.getElementById('v3PollSection').classList.toggle('show', selCat === '📊 Poll');
+  });
+});
+
+// ── Word count ──
+function v3WordCount(el) {
+  const wc = el.value.trim().split(/\s+/).filter(Boolean).length;
+  document.getElementById('v3Wcount').textContent = wc + ' / 400 words';
+  document.getElementById('v3Wbar').style.width = Math.min(wc/400*100,100) + '%';
+}
+
+// ── Submit confession ──
+async function v3Submit() {
+  const msg = document.getElementById('v3Msg').value.trim();
+  const isPoll = selCat === '📊 Poll';
+  if (!isPoll && !msg) { document.getElementById('v3Status').textContent = 'Please write something 💭'; return; }
+  if (!isPoll && msg.split(/\s+/).filter(Boolean).length > 400) { document.getElementById('v3Status').textContent = 'Too long! Max 400 words.'; return; }
+  const btn = document.getElementById('v3Submit');
+  btn.disabled = true; btn.textContent = 'Sending… 💌';
+  const year = document.getElementById('v3Year').value;
+  const branch = document.getElementById('v3Branch').value;
+  const body = {
+    message: isPoll ? document.getElementById('v3PollQ').value.trim() : msg,
+    clientId: cid(), category: selCat,
+    branch: (year && branch) ? {year, branch} : null,
+    poll: isPoll ? {
+      question: document.getElementById('v3PollQ').value.trim(),
+      optA: document.getElementById('v3PollA').value.trim() || 'Yes',
+      optB: document.getElementById('v3PollB').value.trim() || 'No',
+    } : null
+  };
+  try {
+    const r = await fetch(`${API}/api/confessions`, {method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(body)});
+    const d = await r.json();
+    if (d.error) { document.getElementById('v3Status').textContent = d.error; btn.disabled=false; btn.textContent='Send Anonymously 💌'; return; }
+    document.getElementById('v3Status').textContent = d.status==='approved' ? '✅ Published!' : '⏳ Submitted for review!';
+    document.getElementById('v3Msg').value = '';
+    if (d.confessionId) { const ids=JSON.parse(localStorage.getItem('giet_my_confs')||'[]'); ids.push(d.confessionId); localStorage.setItem('giet_my_confs',JSON.stringify(ids)); }
+    toast('💌 Confession sent!');
+    setTimeout(() => { btn.disabled=false; btn.textContent='Send Anonymously 💌'; document.getElementById('v3Status').textContent=''; }, 3000);
+  } catch(e) { document.getElementById('v3Status').textContent='Network error'; btn.disabled=false; btn.textContent='Send Anonymously 💌'; }
+}
+
+// ── Sort ──
+function setSort(mode, el) {
+  sortMode = mode;
+  document.querySelectorAll('.sort-btn').forEach(b => b.classList.remove('active'));
+  el.classList.add('active');
+  renderConfessions();
+}
+
+function getSorted() {
+  const arr = [...allConf];
+  if (sortMode === 'top') return arr.sort((a,b) => (b.likes||0)-(a.likes||0));
+  if (sortMode === 'best') {
+    return arr.sort((a,b) => {
+      const ra = Object.values(a.reactions||{}).reduce((s,v)=>s+v,0);
+      const rb = Object.values(b.reactions||{}).reduce((s,v)=>s+v,0);
+      return rb - ra;
+    });
+  }
+  return arr.sort((a,b) => b.createdAt - a.createdAt);
+}
+
+// ── Local storage helpers ──
+function getRemovedIds(){try{return JSON.parse(localStorage.getItem('giet_removed')||'[]');}catch(e){return[];}}
+function getReportedIds(){try{return JSON.parse(localStorage.getItem('giet_reported')||'[]');}catch(e){return[];}}
+
+// ── Reaction ──
+async function v3React(confId, emoji) {
+  try {
+    const r = await fetch(`${API}/api/react/${confId}`, {method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({clientId:cid(),emoji})});
+    const d = await r.json();
+    // Update all reaction buttons for this confession
+    const card = document.getElementById('rxns-'+confId);
+    if (card && d.reactions) {
+      EMOJIS.forEach(e => {
+        const btn = card.querySelector(`[data-emoji="${e}"]`);
+        if (btn) {
+          btn.querySelector('.rxn-count').textContent = d.reactions[e]||0;
+          btn.classList.toggle('active', d.myReaction === e);
+        }
+      });
+    }
+  } catch(e) {}
+}
+
+// ── Remove ──
+async function v3Remove(confId, btn) {
+  if (getRemovedIds().includes(confId)) return;
+  const ids=getRemovedIds(); ids.push(confId); localStorage.setItem('giet_removed',JSON.stringify(ids));
+  btn.classList.add('removed'); btn.textContent='Removed';
+  try {
+    const r = await fetch(`${API}/api/remove/${confId}`,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({clientId:cid()})});
+    const d = await r.json();
+    if(d.flagged) toast('⚠️ Flagged for admin review');
+    else { const left=Math.max(0,4-(d.removeCount||1)); toast(`🗑 ${left} more removes needed to flag`); }
+  } catch(e) {}
+}
+
+// ── Report ──
+async function v3Report(confId, btn) {
+  if (getReportedIds().includes(confId)) { toast('Already reported'); return; }
+  const reason = prompt('Reason?\n1. identity\n2. harassment\n3. fake\n4. spam\n5. other\n\nType number:');
+  const map = {'1':'identity','2':'harassment','3':'fake','4':'spam','5':'other'};
+  const r2 = map[reason?.trim()] || 'other';
+  try {
+    const r = await fetch(`${API}/api/report/${confId}`,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({clientId:cid(),reason:r2})});
+    const d = await r.json();
+    const ids=getReportedIds(); ids.push(confId); localStorage.setItem('giet_reported',JSON.stringify(ids));
+    btn.classList.add('reported'); btn.textContent='⚑ Reported';
+    if(d.autoHidden) toast('🛡 Confession hidden pending review');
+    else toast('⚑ Reported!');
+  } catch(e) { toast('Network error'); }
+}
+
+// ── Reply ──
+async function v3SendReply(confId, inputEl, containerEl) {
+  const msg = inputEl.value.trim();
+  if (!msg) return;
+  try {
+    const r = await fetch(`${API}/api/replies/${confId}`,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({message:msg,clientId:cid()})});
+    const d = await r.json();
+    if (d.error) { toast(d.error); return; }
+    inputEl.value = '';
+    const div = document.createElement('div'); div.className='reply-item-v3';
+    div.innerHTML = `${msg}<div class="reply-meta-v3">just now</div>`;
+    containerEl.insertBefore(div, containerEl.querySelector('.reply-form-v3'));
+    toast('💬 Reply sent!');
+  } catch(e) { toast('Network error'); }
+}
+
+// ── Build a confession section ──
+function buildConfSection(conf, index, total) {
+  const removed = getRemovedIds().includes(conf.id);
+  const reported = getReportedIds().includes(conf.id);
+  const sec = document.createElement('section');
+  sec.className = 'conf-page';
+  sec.id = 'conf-' + conf.id;
+  sec.dataset.confId = conf.id;
+
+  const rxnHTML = EMOJIS.map(e =>
+    `<button class="rxn-v3${(conf.myReaction===e)?' active':''}" data-emoji="${e}" onclick="v3React('${conf.id}','${e}')">
+      ${e}<span class="rxn-count">${conf.reactions?.[e]||0}</span>
+    </button>`
+  ).join('');
+
+  const branchTag = conf.branchTag?.year || conf.branchTag?.branch
+    ? `<span class="branch-tag">🎓 ${[conf.branchTag.year,conf.branchTag.branch].filter(Boolean).join(' · ')}</span>` : '';
+
+  const cotd = conf.isConfessionOfDay ? `<div class="cotd-flag">👑 Confession of the Day</div>` : '';
+
+  let bodyHTML = '';
+  if (conf.isPoll) {
+    const total = (conf.pollVotes?.a||0) + (conf.pollVotes?.b||0);
+    const pctA = total ? Math.round((conf.pollVotes?.a||0)/total*100) : 0;
+    const pctB = total ? 100-pctA : 0;
+    bodyHTML = `<div class="poll-card">
+      <div class="poll-q">${conf.message}</div>
+      <div class="poll-opt" onclick="v3PollVote('${conf.id}','a',this)">
+        <div class="poll-opt-label"><span>${conf.pollOptions?.a||'Yes'}</span><span>${conf.pollVotes?.a||0} (${pctA}%)</span></div>
+        <div class="poll-bar"><div class="poll-bar-fill" style="width:${pctA}%"></div></div>
+      </div>
+      <div class="poll-opt" onclick="v3PollVote('${conf.id}','b',this)">
+        <div class="poll-opt-label"><span>${conf.pollOptions?.b||'No'}</span><span>${conf.pollVotes?.b||0} (${pctB}%)</span></div>
+        <div class="poll-bar"><div class="poll-bar-fill" style="width:${pctB}%"></div></div>
+      </div>
+    </div>`;
+  } else {
+    bodyHTML = `<div class="conf-body">"${conf.message}"</div>`;
+  }
+
+  sec.innerHTML = `
+    <div class="conf-page-inner">
+      <div class="page-num">${index} of ${total} <span>💌</span></div>
+      <div class="conf-top-actions">
+        <div>
+          <span class="conf-cat-tag">${conf.category||'💭 Random'}</span>${branchTag}
+        </div>
+        <div class="conf-actions-right">
+          <button class="ca-btn${removed?' removed':''}" onclick="v3Remove('${conf.id}',this)">${removed?'Removed':'🗑 REMOVE!'}</button>
+          <button class="ca-btn${reported?' reported':''}" onclick="v3Report('${conf.id}',this)">${reported?'⚑ Reported':'⚑ Flag'}</button>
+          <button class="ca-btn" onclick="v3Share('${conf.id}','${conf.message?.slice(0,40).replace(/'/g,'\\'')}')">📤 Share</button>
+        </div>
+      </div>
+      ${cotd}
+      ${bodyHTML}
+      <div class="conf-meta">
+        <span>🕐 ${ago(conf.createdAt)}</span>
+        <span class="dot">·</span>
+        <span class="read-receipt-v3">${(conf.views||0)>4?`👁 ${conf.views} read`:''}</span>
+        ${(conf.thisIsMe||[]).length?`<span class="dot">·</span><span>🫣 ${conf.thisIsMe.length} claimed</span>`:''}
+      </div>
+      <div class="conf-reactions" id="rxns-${conf.id}">${rxnHTML}</div>
+      <div class="replies-v3" id="replies-${conf.id}">
+        <div class="replies-label">💬 Replies</div>
+        <div id="reply-list-${conf.id}"></div>
+        <div class="reply-form-v3">
+          <input class="reply-input-v3" id="ri-${conf.id}" placeholder="Write an anonymous reply…"/>
+          <button class="reply-send-v3" onclick="v3SendReply('${conf.id}',document.getElementById('ri-${conf.id}'),document.getElementById('reply-list-${conf.id}'))">Send</button>
+        </div>
+      </div>
+    </div>`;
+  return sec;
+}
+
+// ── Poll vote ──
+async function v3PollVote(confId, opt, el) {
+  try {
+    const r = await fetch(`${API}/api/poll/${confId}/vote`,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({clientId:cid(),option:opt})});
+    const d = await r.json();
+    if (d.alreadyVoted) { toast('Already voted'); return; }
+    toast('✅ Vote cast!');
+  } catch(e) { toast('Network error'); }
+}
+
+// ── Share ──
+function v3Share(id, snippet) {
+  const url = `${location.origin}/confessions-v3.html#conf-${id}`;
+  const text = `"${snippet}…"\n\nRead at GIET Confessions 💌\n${url}`;
+  if (navigator.share) { navigator.share({title:'GIET Confessions',text,url}).catch(()=>{}); }
+  else { navigator.clipboard?.writeText(url); toast('🔗 Link copied!'); }
+}
+
+// ── Render confessions into sections ──
+function renderConfessions() {
+  const container = document.getElementById('confessionPages');
+  container.innerHTML = '';
+  const sorted = getSorted();
+  sorted.forEach((conf, i) => {
+    container.appendChild(buildConfSection(conf, i+1, sorted.length));
+  });
+  buildDots();
+  loadReplies(sorted.map(c=>c.id));
+}
+
+// ── Load replies for all confessions ──
+async function loadReplies(ids) {
+  try {
+    const r = await fetch(`${API}/api/replies/counts`,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({ids})});
+    // Just ping; individual reply loading happens lazily
+  } catch(e) {}
+  // Load replies for each confession
+  ids.forEach(async id => {
+    try {
+      const r = await fetch(`${API}/api/replies/${id}`);
+      const replies = await r.json();
+      const container = document.getElementById('reply-list-'+id);
+      if (!container || !replies.length) return;
+      container.innerHTML = replies.map(rep =>
+        `<div class="reply-item-v3">${rep.message}<div class="reply-meta-v3">${ago(rep.createdAt)}</div></div>`
+      ).join('');
+    } catch(e) {}
+  });
+}
+
+// ── Page nav dots ──
+function buildDots() {
+  const all = document.querySelectorAll('section');
+  const dotsEl = document.getElementById('pageDots');
+  dotsEl.innerHTML = '';
+  all.forEach((sec, i) => {
+    const d = document.createElement('div');
+    d.className = 'page-dot';
+    d.onclick = () => sec.scrollIntoView({behavior:'smooth'});
+    dotsEl.appendChild(d);
+  });
+  updateActiveDot();
+}
+
+function updateActiveDot() {
+  const sections = document.querySelectorAll('section');
+  const dots = document.querySelectorAll('.page-dot');
+  const scrollY = window.scrollY;
+  let activeIdx = 0;
+  sections.forEach((s, i) => {
+    if (scrollY >= s.offsetTop - window.innerHeight/2) activeIdx = i;
+  });
+  dots.forEach((d, i) => d.classList.toggle('active', i === activeIdx));
+  // Show sort bar only on confession pages
+  const isConfPage = activeIdx >= 2 && activeIdx < sections.length - 1;
+  document.getElementById('sortBar').style.display = isConfPage ? 'flex' : 'none';
+}
+
+window.addEventListener('scroll', updateActiveDot);
+
+function scrollToConfess() {
+  document.getElementById('page-confess').scrollIntoView({behavior:'smooth'});
+}
+
+// ── Fetch confessions ──
+async function fetchConf() {
+  try {
+    const r = await fetch(`${API}/api/confessions`);
+    const data = await r.json();
+    allConf = Array.isArray(data) ? data : (data.confessions || []);
+    renderConfessions();
+  } catch(e) {
+    document.getElementById('confessionPages').innerHTML =
+      '<section><div style="text-align:center;padding:40px;color:rgba(255,200,220,0.5)">📡 Connecting to server…</div></section>';
+  }
+}
+
+// ── Ping visit (live count) ──
+async function pingVisit() {
+  try {
+    const r = await fetch(`${API}/api/visit`,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({clientId:cid()})});
+    const d = await r.json();
+    document.getElementById('liveCount').textContent = d.activeVisitors || 0;
+  } catch(e) {}
+}
+
+window.addEventListener('load', () => {
+  fetchConf();
+  pingVisit();
+  setInterval(pingVisit, 60000);
+  buildDots();
+});
+</script>
+</body>
+</html>
