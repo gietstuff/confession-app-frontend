@@ -123,6 +123,24 @@ body.exam-season .logout-btn{color:#a78bfa;border-color:rgba(140,80,255,0.3);}
 .exam-banner-admin p{font-size:0.78rem;color:rgba(200,170,255,0.88);line-height:1.5;}
 
 .hidden{display:none;}
+/* ── Analytics charts ── */
+.chart-wrap{margin-top:16px;}
+.chart-bar-row{display:flex;align-items:center;gap:8px;margin-bottom:7px;font-size:0.78rem;}
+.chart-bar-label{width:80px;color:var(--muted);flex-shrink:0;text-align:right;}
+.chart-bar-track{flex:1;background:rgba(255,255,255,0.06);border-radius:6px;height:18px;overflow:hidden;}
+.chart-bar-fill{height:100%;background:linear-gradient(90deg,var(--rose),var(--crimson));border-radius:6px;transition:width .6s ease;}
+.chart-bar-val{width:32px;color:var(--muted);font-size:0.72rem;flex-shrink:0;}
+/* ── Schedule input ── */
+.schedule-row{display:flex;gap:8px;align-items:center;margin-top:8px;flex-wrap:wrap;}
+.schedule-row input[type=datetime-local]{background:rgba(0,0,0,0.3);border:1px solid var(--border);color:var(--text);border-radius:10px;padding:6px 10px;font-size:0.8rem;font-family:'DM Sans',sans-serif;flex:1;}
+/* ── Prompt setter ── */
+.prompt-setter{background:rgba(255,183,71,0.06);border:1px solid rgba(255,183,71,0.2);border-radius:14px;padding:16px;margin-top:12px;}
+.prompt-setter label{font-size:0.78rem;color:var(--muted);display:block;margin-bottom:6px;}
+.prompt-setter input,.prompt-setter select{width:100%;background:rgba(0,0,0,0.3);border:1px solid var(--border);color:var(--text);border-radius:10px;padding:8px 12px;font-size:0.85rem;font-family:'DM Sans',sans-serif;margin-bottom:8px;}
+.prompt-setter select option{background:#1a0010;}
+/* ── Re-review section ── */
+.item.review-item{border-color:rgba(245,158,11,0.4);background:rgba(245,158,11,0.04);}
+
 </style>
 </head>
 <body>
@@ -157,8 +175,20 @@ body.exam-season .logout-btn{color:#a78bfa;border-color:rgba(140,80,255,0.3);}
   <div class="stats-row">
     <div class="stat-box"><div class="stat-num" id="sVisits">—</div><div class="stat-lbl">Total Visits</div></div>
     <div class="stat-box"><div class="stat-num" id="sUnique">—</div><div class="stat-lbl">Unique Visitors</div></div>
-    <div class="stat-box"><div class="stat-num" id="sLive">—</div><div class="stat-lbl">Online Now</div></div>
+    <div class="stat-box"><div class="stat-num" id="sLive" style="color:var(--rose)">—</div><div class="stat-lbl">Online Now</div></div>
     <div class="stat-box"><div class="stat-num" id="sPending">—</div><div class="stat-lbl">Pending</div></div>
+    <div class="stat-box"><div class="stat-num" id="sTotal">—</div><div class="stat-lbl">Total Confessions</div></div>
+  </div>
+  <!-- Analytics Charts -->
+  <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:16px;">
+    <div style="background:rgba(255,255,255,0.04);border:1px solid var(--border);border-radius:14px;padding:14px;">
+      <div style="font-size:0.72rem;color:var(--muted);margin-bottom:8px;font-weight:600;text-transform:uppercase;letter-spacing:.05em;">By Category</div>
+      <div id="catChart"></div>
+    </div>
+    <div style="background:rgba(255,255,255,0.04);border:1px solid var(--border);border-radius:14px;padding:14px;">
+      <div style="font-size:0.72rem;color:var(--muted);margin-bottom:8px;font-weight:600;text-transform:uppercase;letter-spacing:.05em;">Top Reactions</div>
+      <div id="rxnChart"></div>
+    </div>
   </div>
 
   <div class="control-panel">
@@ -198,6 +228,33 @@ body.exam-season .logout-btn{color:#a78bfa;border-color:rgba(140,80,255,0.3);}
       <h2>🚨 Reported <span class="badge" style="background:#ef4444" id="reportedBadge">0</span></h2>
     </div>
     <div id="reportedList"><div class="empty-msg">No reported confessions 🎉</div></div>
+  </div>
+
+  <!-- Weekly Prompt / Themed Day -->
+  <div class="section">
+    <div class="section-head"><h2>💬 Weekly Theme / Prompt</h2></div>
+    <div class="prompt-setter">
+      <label>Theme type</label>
+      <select id="promptTheme">
+        <option value="">-- No theme (clear) --</option>
+        <option value="crush">💘 Crush Confessions Week</option>
+        <option value="hostel">🏠 Hostel Life Week</option>
+        <option value="exam">📚 Exam Season</option>
+        <option value="random">💭 General Theme</option>
+      </select>
+      <label>Prompt message (shown to all users as banner)</label>
+      <input type="text" id="promptText" placeholder="e.g. This week: confess something about your hostel life 🏠" maxlength="200"/>
+      <button class="ia-btn approve" onclick="savePrompt()">💾 Save Theme</button>
+      <button class="ia-btn delete" style="margin-left:8px;" onclick="clearPrompt()">✕ Clear</button>
+    </div>
+  </div>
+
+  <!-- Re-review section (confessions with 4+ REMOVE clicks) -->
+  <div class="section" id="reviewSection" style="display:none">
+    <div class="section-head">
+      <h2>⚠️ Re-Review Requested <span class="badge" style="background:#f59e0b" id="reviewBadge">0</span></h2>
+    </div>
+    <div id="reviewList"><div class="empty-msg">No re-review requests</div></div>
   </div>
   <div id="modStatus"></div>
 </div>
@@ -426,7 +483,10 @@ async function loadPending(){
         <button class="ia-btn approve" onclick="moderate('${item.id}','approve')">✅ Approve</button>
         <button class="ia-btn reject" onclick="moderate('${item.id}','reject')">❌ Reject</button>
         <button class="ia-btn delete" onclick="deleteConf('${item.id}')">🗑 Delete</button>
-      </div>`;
+        <button class="ia-btn" style="background:rgba(96,165,250,0.12);color:#93c5fd;border:1px solid rgba(96,165,250,0.3);" onclick="toggleReplies('${item.id}',this)">💬 Replies</button>
+        ${item.flaggedForReview?'<span style="font-size:0.72rem;padding:3px 10px;border-radius:8px;background:rgba(245,158,11,0.2);color:#fbbf24;border:1px solid rgba(245,158,11,0.3);">⚠️ Re-review</span>':''}
+      </div>
+      <div id="ra-${item.id}" style="display:none;margin-top:10px;"></div>`;
     container.appendChild(div);
   });
 }
@@ -457,7 +517,10 @@ async function loadApproved(){
       <div class="item-msg">${item.isPoll?`📊 ${item.message}\n${item.pollOptions?.a||'Yes'}: ${item.pollVotes?.a||0} votes | ${item.pollOptions?.b||'No'}: ${item.pollVotes?.b||0} votes`:item.message}</div>
       <div class="item-actions">
         <button class="ia-btn delete" onclick="deleteConf('${item.id}')">🗑 Delete</button>
-      </div>`;
+        <button class="ia-btn" style="background:rgba(96,165,250,0.12);color:#93c5fd;border:1px solid rgba(96,165,250,0.3);" onclick="toggleReplies('${item.id}',this)">💬 Replies</button>
+        ${item.flaggedForReview?'<span style="font-size:0.72rem;padding:3px 10px;border-radius:8px;background:rgba(245,158,11,0.2);color:#fbbf24;border:1px solid rgba(245,158,11,0.3);">⚠️ Re-review</span>':''}
+      </div>
+      <div id="ra-${item.id}" style="display:none;margin-top:10px;"></div>`;
     container.appendChild(div);
   });
 }
@@ -537,6 +600,152 @@ async function restoreConf(id){
     setStatus('✅ Restored — reports cleared');loadAll();
   }catch(e){setStatus('Network error','var(--rose)');}
 }
+
+// ── Reply management ──────────────────────────────────
+async function toggleReplies(confId,btn){
+  const box=document.getElementById('ra-'+confId);
+  if(!box)return;
+  if(box.style.display!=='none'){box.style.display='none';btn.textContent='💬 Replies';return;}
+  box.style.display='block';btn.textContent='💬 Hide';
+  box.innerHTML='<div style="color:var(--muted);font-size:0.8rem;padding:4px">Loading…</div>';
+  try{
+    const r=await fetch(`${API}/api/replies/${confId}`);
+    const replies=await r.json();
+    if(!replies.length){box.innerHTML='<div style="color:var(--muted);font-size:0.8rem;font-style:italic;padding:4px">No replies yet</div>';return;}
+    box.innerHTML=replies.map(rep=>`
+      <div id="ri-${rep.id}" style="display:flex;justify-content:space-between;align-items:flex-start;gap:8px;padding:8px 10px;margin-bottom:5px;background:rgba(255,255,255,0.03);border:1px solid rgba(255,255,255,0.07);border-radius:10px;">
+        <div style="font-size:0.82rem;color:rgba(255,240,245,0.8);flex:1;line-height:1.5;">${rep.message}
+          <div style="font-size:0.68rem;color:var(--muted);margin-top:2px;">${ago(rep.createdAt)}</div>
+        </div>
+        <button class="ia-btn delete" style="flex-shrink:0;padding:5px 10px;font-size:0.72rem;" onclick="deleteReply('${rep.id}')">🗑</button>
+      </div>`).join('');
+  }catch(e){box.innerHTML='<div style="color:var(--rose);font-size:0.8rem;">Error loading</div>';}
+}
+
+async function deleteReply(replyId){
+  if(!confirm('Delete this reply?'))return;
+  try{
+    const r=await fetch(`${API}/api/admin/reply/delete`,{method:'POST',headers:adminH(),body:JSON.stringify({replyId})});
+    const d=await r.json();
+    if(d.error){setStatus(d.error,'var(--rose)');return;}
+    const el=document.getElementById('ri-'+replyId);
+    if(el)el.remove();
+    setStatus('🗑 Reply deleted');
+  }catch(e){setStatus('Network error','var(--rose)');}
+}
+
+// ── Scheduled publish ─────────────────────────────────
+async function scheduleConf(confId){
+  const dt=document.getElementById('sched-'+confId)?.value;
+  if(!dt){setStatus('Pick a date/time first','var(--rose)');return;}
+  try{
+    const r=await fetch(`${API}/api/admin/schedule`,{method:'POST',headers:adminH(),body:JSON.stringify({confessionId:confId,scheduledAt:new Date(dt).toISOString()})});
+    const d=await r.json();
+    if(d.error){setStatus(d.error,'var(--rose)');return;}
+    setStatus('🕐 Scheduled for '+new Date(dt).toLocaleString());
+    loadAll();
+  }catch(e){setStatus('Network error','var(--rose)');}
+}
+
+// ── Weekly prompt ─────────────────────────────────────
+async function savePrompt(){
+  const prompt=document.getElementById('promptText')?.value?.trim();
+  const promptTheme=document.getElementById('promptTheme')?.value;
+  if(!prompt){setStatus('Enter a prompt message','var(--rose)');return;}
+  try{
+    const r=await fetch(`${API}/api/admin/prompt`,{method:'POST',headers:adminH(),body:JSON.stringify({prompt,promptTheme})});
+    const d=await r.json();
+    if(d.error){setStatus(d.error,'var(--rose)');return;}
+    setStatus('✅ Theme saved — will show to all users');
+  }catch(e){setStatus('Network error','var(--rose)');}
+}
+async function clearPrompt(){
+  try{
+    await fetch(`${API}/api/admin/prompt`,{method:'POST',headers:adminH(),body:JSON.stringify({prompt:'',promptTheme:''})});
+    document.getElementById('promptText').value='';
+    document.getElementById('promptTheme').value='';
+    setStatus('✅ Theme cleared');
+  }catch(e){setStatus('Network error','var(--rose)');}
+}
+async function loadCurrentPrompt(){
+  try{
+    const r=await fetch(`${API}/api/prompt`);
+    const d=await r.json();
+    if(d.prompt&&document.getElementById('promptText')){
+      document.getElementById('promptText').value=d.prompt;
+      document.getElementById('promptTheme').value=d.promptTheme||'';
+    }
+  }catch(e){}
+}
+
+// ── Re-review section ─────────────────────────────────
+async function loadReview(){
+  try{
+    const r=await fetch(`${API}/api/flagged-review`,{headers:adminH()});
+    if(!r.ok)return;
+    const arr=await r.json();
+    const sec=document.getElementById('reviewSection');
+    const badge=document.getElementById('reviewBadge');
+    if(badge)badge.textContent=arr.length;
+    if(sec)sec.style.display=arr.length?'block':'none';
+    const container=document.getElementById('reviewList');
+    if(!container)return;
+    if(!arr.length){container.innerHTML='<div class="empty-msg">No re-review requests</div>';return;}
+    container.innerHTML='';
+    arr.forEach(item=>{
+      const div=document.createElement('div');
+      div.className='item review-item';
+      div.innerHTML=`<div class="item-meta"><span class="item-cat">${item.category||'💭 Random'}</span>
+        <span class="flag-count">🗑 ${(item.removedBy||[]).length} removes</span></div>
+        <div class="item-msg">${item.message}</div>
+        <div class="item-actions">
+          <button class="ia-btn approve" onclick="clearReview('${item.id}')">✅ Keep</button>
+          <button class="ia-btn delete" onclick="deleteConf('${item.id}')">🗑 Delete</button>
+        </div>`;
+      container.appendChild(div);
+    });
+  }catch(e){}
+}
+async function clearReview(id){
+  try{
+    await fetch(`${API}/api/admin/clear-review`,{method:'POST',headers:adminH(),body:JSON.stringify({confessionId:id})});
+    setStatus('✅ Kept — remove flags cleared');loadAll();
+  }catch(e){setStatus('Network error','var(--rose)');}
+}
+
+// ── Analytics charts ──────────────────────────────────
+function renderBarChart(containerId, data, maxVal){
+  const el=document.getElementById(containerId);
+  if(!el)return;
+  el.innerHTML=data.map(({label,val})=>`
+    <div class="chart-bar-row">
+      <div class="chart-bar-label">${label}</div>
+      <div class="chart-bar-track"><div class="chart-bar-fill" style="width:${maxVal?Math.round(val/maxVal*100):0}%"></div></div>
+      <div class="chart-bar-val">${val}</div>
+    </div>`).join('');
+}
+
+async function loadCharts(){
+  try{
+    const r=await fetch(`${API}/api/confessions`);
+    const rawData=await r.json();
+    const arr=Array.isArray(rawData)?rawData:(rawData.confessions||[]);
+    document.getElementById('sTotal').textContent=arr.length;
+
+    // Category breakdown
+    const cats={};
+    arr.forEach(c=>{const k=c.category||'💭 Random';cats[k]=(cats[k]||0)+1;});
+    const catData=Object.entries(cats).sort((a,b)=>b[1]-a[1]).map(([k,v])=>({label:k.split(' ').slice(-1)[0],val:v}));
+    renderBarChart('catChart',catData,Math.max(...catData.map(d=>d.val),1));
+
+    // Reaction breakdown
+    const rxns={'❤️':0,'😮':0,'😂':0,'🥺':0,'🔥':0};
+    arr.forEach(c=>Object.entries(c.reactions||{}).forEach(([e,v])=>{if(rxns[e]!==undefined)rxns[e]+=v;}));
+    const rxnData=Object.entries(rxns).sort((a,b)=>b[1]-a[1]).map(([k,v])=>({label:k,val:v}));
+    renderBarChart('rxnChart',rxnData,Math.max(...rxnData.map(d=>d.val),1));
+  }catch(e){}
+}
+
 async function loadAll(){
   try{await loadPending();}catch(e){}
   try{await loadApproved();}catch(e){}

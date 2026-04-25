@@ -333,6 +333,19 @@ body.exam-season .story-rxn{background:rgba(120,60,255,0.15);}
 .report-submit:disabled{opacity:0.45;cursor:not-allowed;}
 .report-cancel{width:100%;padding:12px;background:transparent;border:1px solid rgba(255,255,255,0.1);color:var(--muted);border-radius:14px;cursor:pointer;font-size:0.88rem;font-family:'DM Sans',sans-serif;}
 .act-btn.reported{background:rgba(239,68,68,0.15);border-color:rgba(239,68,68,0.35);color:#fca5a5;}
+
+/* ── Weekly Prompt Banner ── */
+.prompt-banner{display:none;align-items:flex-start;gap:12px;background:rgba(255,183,71,0.08);border:1px solid rgba(255,183,71,0.25);border-radius:16px;padding:14px 18px;margin-bottom:16px;animation:examPulse 3s ease-in-out infinite;}
+.prompt-banner.show{display:flex;}
+.prompt-icon{font-size:1.4rem;flex-shrink:0;}
+.prompt-text strong{display:block;font-size:0.85rem;font-weight:700;color:var(--gold);margin-bottom:3px;}
+.prompt-text span{font-size:0.82rem;color:var(--muted);line-height:1.5;}
+/* ── REMOVE button ── */
+.remove-btn{display:flex;align-items:center;gap:4px;background:rgba(255,255,255,0.06);border:1px solid rgba(255,255,255,0.12);color:var(--muted);border-radius:30px;padding:5px 12px;font-size:0.78rem;font-weight:600;cursor:pointer;transition:all .18s;font-family:'DM Sans',sans-serif;}
+.remove-btn:hover{background:rgba(239,68,68,0.15);border-color:rgba(239,68,68,0.4);color:#fca5a5;}
+.remove-btn.removed{background:rgba(239,68,68,0.1);border-color:rgba(239,68,68,0.3);color:rgba(252,165,165,0.6);cursor:default;}
+/* ── Read receipt ── */
+.read-receipt{font-size:0.7rem;color:var(--muted);margin-top:6px;opacity:0.7;}
 </style>
 </head>
 <body data-theme="dark">
@@ -429,6 +442,15 @@ body.exam-season .story-rxn{background:rgba(120,60,255,0.15);}
   </div>
 
   <!-- Feature 6: Disclaimer -->
+
+  <!-- Weekly Prompt Banner (shown when admin sets a theme) -->
+  <div class="prompt-banner" id="promptBanner">
+    <span class="prompt-icon">💬</span>
+    <div class="prompt-text">
+      <strong id="promptThemeLabel">This Week's Theme</strong>
+      <span id="promptText"></span>
+    </div>
+  </div>
   <div class="disclaimer">
     <span class="disclaimer-icon">⚠️</span>
     <p><strong>Entertainment purposes only.</strong> This site is meant for fun and anonymous expression among GIET students. It does not intend to harm, defame, or breach anyone's privacy. If any content causes harm, the site will be taken down immediately. All confessions are reviewed by admin before publishing.</p>
@@ -773,11 +795,12 @@ function render() {
         ${m.isPoll ? renderPollSection(m) : `<div class="card-msg">${m.message}</div>`}
         ${rxnBar}
         <div class="card-footer">
-          <span class="card-time">🕐 ${ago(m.createdAt)}</span>
+          <span class="card-time">🕐 ${ago(m.createdAt)}</span>${(m.views||0)>4?`<span class="read-receipt">👁 ${m.views} read</span>`:''}
           <div class="action-row">
             ${m.category==='💘 Crush' ? `<button class="thisisme-btn${(m.thisIsMe||[]).includes(cid())?' claimed':''}" id="tim-${m.id}" onclick="thisIsMe('${m.id}',this)">🫣 This is me! <span class="thisisme-count">${m.thisIsMe?.length>0?m.thisIsMe.length:''}</span></button>` : ''}
             <button class="act-btn" onclick="openShare(\`${m.message.replace(/`/g,"'")}\`)">📤 Share</button>
             <button class="act-btn${getReportedIds().includes(m.id)?' reported':''}" onclick="openReport('${m.id}',this)" id="rb-${m.id}">⚑ ${getReportedIds().includes(m.id)?'Reported':'Report'}</button>
+            <button class="remove-btn${getRemovedIds().includes(m.id)?' removed':''}" onclick="removeConfession('${m.id}',this)">🗑 ${getRemovedIds().includes(m.id)?'Removed':'REMOVE!'}</button>
           </div>
         </div>
         <div class="replies-section" id="rs-${m.id}">
@@ -1259,14 +1282,68 @@ async function sendSubToServer(sub){
 function urlBase64ToUint8Array(b){const p='='.repeat((4-b.length%4)%4);const s=(b+p).replace(/-/g,'+').replace(/_/g,'/');const r=window.atob(s);return Uint8Array.from([...r].map(c=>c.charCodeAt(0)));}
 
 // ── Boot ──────────────────────────────────────────────
+
+// ── REMOVE button ─────────────────────────────────────
+function getRemovedIds(){try{return JSON.parse(localStorage.getItem('giet_removed')||'[]');}catch(e){return[];}}
+function addRemovedId(id){const a=getRemovedIds();if(!a.includes(id)){a.push(id);localStorage.setItem('giet_removed',JSON.stringify(a));}}
+async function removeConfession(confId,btn){
+  if(getRemovedIds().includes(confId))return;
+  btn.classList.add('removed');btn.textContent='Removed';
+  addRemovedId(confId);
+  try{
+    const r=await fetch(`${API}/api/remove/${confId}`,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({clientId:cid()})});
+    const d=await r.json();
+    if(d.flagged)toast('⚠️ Thanks! This confession has been flagged for admin review.');
+    else{const left=Math.max(0,4-(d.removeCount||1));toast(`🗑 Noted. ${left} more needed to flag for review.`);}
+  }catch(e){toast('Network error');}
+}
+
+// ── Read receipt (IntersectionObserver) ───────────────
+// Fires once per card when it scrolls 60% into view
+const _viewed=new Set();
+const _viewObs=new IntersectionObserver(entries=>{
+  entries.forEach(e=>{
+    if(!e.isIntersecting||e.intersectionRatio<0.6)return;
+    const id=e.target.dataset.id;
+    if(!id||_viewed.has(id))return;
+    _viewed.add(id);
+    fetch(`${API}/api/view/${id}`,{method:'POST'}).catch(()=>{});
+    // Update UI instantly
+    const el=e.target.querySelector('.read-receipt');
+    // el may not exist yet if views<=4; that's fine
+  });
+},{threshold:0.6});
+// Attach observer after render
+const _origRender=render;
+function render(){
+  _origRender();
+  document.querySelectorAll('.conf-card[data-id]').forEach(card=>{
+    if(!_viewed.has(card.dataset.id))_viewObs.observe(card);
+  });
+}
+
+// ── Weekly Prompt ──────────────────────────────────────
+async function loadPrompt(){
+  try{
+    const r=await fetch(`${API}/api/prompt`);
+    const d=await r.json();
+    if(!d.prompt)return;
+    const banner=document.getElementById('promptBanner');
+    const themeLabels={'crush':'💘 This Week: Crush Confessions','hostel':'🏠 This Week: Hostel Life','exam':'📚 Exam Season Theme','random':'💭 Weekly Theme'};
+    document.getElementById('promptThemeLabel').textContent=themeLabels[d.promptTheme]||'💬 This Week's Theme';
+    document.getElementById('promptText').textContent=d.prompt;
+    banner.classList.add('show');
+  }catch(e){}
+}
+
 window.addEventListener('load',()=>{
   // Wire up report overlay dismiss on background tap
   const ro=document.getElementById('reportOverlay');
   if(ro) ro.addEventListener('click',e=>{if(e.target===e.currentTarget)closeReport();});
   applyExamTheme();
-  fetchConf(); pingVisit();
-  setInterval(fetchConf,15000);
-  setInterval(pingVisit,30000);
+  fetchConf(); loadPrompt(); // load once on page open
+  pingVisit();
+  setInterval(pingVisit,60000);
   if('serviceWorker' in navigator){
     navigator.serviceWorker.register('/sw.js').then(reg=>{
       reg.update();
