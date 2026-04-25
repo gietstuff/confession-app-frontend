@@ -1330,7 +1330,7 @@ async function loadPrompt(){
     if(!d.prompt)return;
     const banner=document.getElementById('promptBanner');
     const themeLabels={'crush':'💘 This Week: Crush Confessions','hostel':'🏠 This Week: Hostel Life','exam':'📚 Exam Season Theme','random':'💭 Weekly Theme'};
-    document.getElementById('promptThemeLabel').textContent=themeLabels[d.promptTheme]||'💬 This Week's Theme';
+    document.getElementById('promptThemeLabel').textContent=themeLabels[d.promptTheme]||'💬 This Week\'s Theme';
     document.getElementById('promptText').textContent=d.prompt;
     banner.classList.add('show');
   }catch(e){}
