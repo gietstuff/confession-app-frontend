@@ -336,6 +336,15 @@ html,body{width:100%;height:100%;overflow:hidden;font-family:'DM Sans',sans-seri
 .rep-item{background:rgba(0,0,0,0.1);border-radius:10px;padding:8px 12px;margin-bottom:6px;font-size:0.79rem;line-height:1.5;}
 .on-dark .rep-item{background:rgba(255,255,255,0.08);}
 .rep-time{font-size:0.62rem;opacity:.45;margin-top:3px;}
+.rep-list.open{max-height:220px;overflow-y:auto;padding-right:4px;}
+.rep-head{display:inline-flex;align-items:center;gap:7px;background:rgba(0,0,0,0.12);border:1.5px solid rgba(0,0,0,0.16);border-radius:16px;padding:6px 12px;font-size:0.72rem;font-weight:800;letter-spacing:.04em;margin-bottom:8px;}
+.on-dark .rep-head{background:rgba(255,255,255,0.1);border-color:rgba(255,255,255,0.18);}
+.rep-rxn{display:flex;gap:6px;flex-wrap:wrap;margin-top:6px;}
+.rrb{display:inline-flex;align-items:center;gap:4px;background:rgba(0,0,0,0.1);border:1px solid rgba(0,0,0,0.16);border-radius:10px;padding:4px 8px;font-size:0.83rem;cursor:pointer;}
+.on-dark .rrb{background:rgba(255,255,255,0.1);border-color:rgba(255,255,255,0.18);}
+.rrb.on{background:rgba(0,0,0,0.2);}
+.on-dark .rrb.on{background:rgba(255,255,255,0.24);}
+.share-bottom{position:absolute;left:50%;bottom:18px;transform:translateX(-50%);}
 .rep-form{display:flex;gap:7px;margin-top:4px;}
 .rinp{
   flex:1;background:rgba(0,0,0,0.15);border:1.5px solid rgba(0,0,0,0.18);
@@ -599,11 +608,11 @@ window.addEventListener('keydown',e=>{
   if(['ArrowDown','ArrowRight','PageDown'].includes(e.key)){e.preventDefault();goDir(1);}
   if(['ArrowUp','ArrowLeft','PageUp'].includes(e.key)){e.preventDefault();goDir(-1);}
 });
-let ty=0;
-window.addEventListener('touchstart',e=>{ty=e.touches[0].clientY;},{passive:true});
+let tx=0;
+window.addEventListener('touchstart',e=>{tx=e.touches[0].clientX;},{passive:true});
 window.addEventListener('touchend',e=>{
-  const dy=ty-e.changedTouches[0].clientY;
-  if(Math.abs(dy)>48)goDir(dy>0?1:-1);
+  const dx=tx-e.changedTouches[0].clientX;
+  if(Math.abs(dx)>48)goDir(dx>0?1:-1);
 },{passive:true});
 
 /* ── Category picker ── */
@@ -733,9 +742,28 @@ function toggleRep(confId){
     list.dataset.loaded='1';list.innerHTML='<div class="rep-item" style="opacity:.4;font-style:italic">Loading…</div>';
     fetch(API+'/api/replies/'+confId).then(r=>r.json()).then(reps=>{
       if(!reps.length){list.innerHTML='<div class="rep-item" style="opacity:.4;font-style:italic">No replies yet</div>';return;}
-      list.innerHTML=reps.map(rp=>`<div class="rep-item">${rp.message}<div class="rep-time">${ago(rp.createdAt)}</div></div>`).join('');
+      list.innerHTML=reps.map(rp=>`<div class="rep-item">${rp.message}<div class="rep-time">${ago(rp.createdAt)}</div><div class="rep-rxn">${EMOJIS.map(e=>`<button class="rrb${rp.reactedBy?.[cid()]===e?' on':''}" onclick="doReplyReact('${rp.id}','${e}',this)">${e} <span>${rp.reactions?.[e]||''}</span></button>`).join('')}</div></div>`).join('');
     }).catch(()=>{list.innerHTML='<div class="rep-item" style="opacity:.4">Error loading</div>';});
   }
+}
+function loadRepliesOpen(confId){
+  const list=document.getElementById('rl-'+confId);
+  if(!list || list.dataset.loaded) return;
+  list.dataset.loaded='1';
+  list.innerHTML='<div class="rep-item" style="opacity:.4;font-style:italic">Loading…</div>';
+  fetch(API+'/api/replies/'+confId).then(r=>r.json()).then(reps=>{
+    if(!reps.length){list.innerHTML='<div class="rep-item" style="opacity:.4;font-style:italic">No replies yet</div>';return;}
+    list.innerHTML=reps.map(rp=>`<div class="rep-item">${rp.message}<div class="rep-time">${ago(rp.createdAt)}</div><div class="rep-rxn">${EMOJIS.map(e=>`<button class="rrb${rp.reactedBy?.[cid()]===e?' on':''}" onclick="doReplyReact('${rp.id}','${e}',this)">${e} <span>${rp.reactions?.[e]||''}</span></button>`).join('')}</div></div>`).join('');
+  }).catch(()=>{list.innerHTML='<div class="rep-item" style="opacity:.4">Error loading</div>';});
+}
+async function doReplyReact(replyId,emoji,btn){
+  try{
+    const r=await fetch(API+'/api/reply/react/'+replyId,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({clientId:cid(),emoji})});
+    const d=await r.json();
+    if(!d.reactions)return;
+    const box=btn.closest('.rep-rxn');
+    box.innerHTML=EMOJIS.map(e=>`<button class="rrb${d.myReaction===e?' on':''}" onclick="doReplyReact('${replyId}','${e}',this)">${e} <span>${d.reactions?.[e]||''}</span></button>`).join('');
+  }catch(e){}
 }
 async function sendRep(confId){
   const inp=document.getElementById('ri-'+confId);
@@ -803,8 +831,8 @@ function buildConfPage(conf,i,total){
     <div class="top-acts">
       <button class="act${removed?' done':''}" onclick="doRemove('${conf.id}',this)">${removed?'Removed':'🗑 Remove'}</button>
       <button class="act${reported?' done':''}" onclick="doReport('${conf.id}',this)">${reported?'Reported':'⚑ Flag'}</button>
-      <button class="act" onclick="doShare()">📤 Share</button>
     </div>
+    <button class="act share-bottom" onclick="doShare()">📤 Share</button>
     <div class="pgnum-line">${String(i+1).padStart(2,'0')} of ${String(total).padStart(2,'0')}</div>
     <div style="margin-bottom:14px">${ctag}${btag}</div>
     ${cotd}
@@ -816,8 +844,8 @@ function buildConfPage(conf,i,total){
     </div>
     <div class="rxn-row" id="rxns-${conf.id}">${rxHtml}</div>
     <div>
-      <button class="rep-tog" data-rt="${conf.id}" onclick="toggleRep('${conf.id}')">💬 Replies</button>
-      <div class="rep-list" id="rl-${conf.id}"></div>
+      <div class="rep-head">💬 Replies</div>
+      <div class="rep-list open" id="rl-${conf.id}"></div>
       <div class="rep-form">
         <input class="rinp" id="ri-${conf.id}" placeholder="Write an anonymous reply…"/>
         <button class="rsend" onclick="sendRep('${conf.id}')">Send</button>
@@ -832,6 +860,7 @@ function renderConf(){
   slot.innerHTML='';
   const sorted=[...confData].sort((a,b)=>b.createdAt-a.createdAt);
   sorted.forEach((c,i)=>slot.appendChild(buildConfPage(c,i,sorted.length)));
+  sorted.forEach(c=>setTimeout(()=>loadRepliesOpen(c.id),0));
   buildPageList();
 }
 

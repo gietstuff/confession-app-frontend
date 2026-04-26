@@ -142,7 +142,7 @@ textarea:focus{border-color:var(--rose);box-shadow:0 0 0 3px rgba(255,45,111,0.1
 
 /* ── Feature 5: Emoji reaction bar ── */
 .reaction-bar{display:flex;gap:6px;flex-wrap:wrap;margin-top:12px;padding-top:12px;border-top:1px solid rgba(255,100,150,0.1);}
-.rxn-btn{display:flex;align-items:center;gap:4px;background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.1);border-radius:20px;padding:4px 10px;font-size:0.82rem;cursor:pointer;transition:all .18s;font-family:'DM Sans',sans-serif;color:var(--muted);}
+.rxn-btn{display:flex;align-items:center;gap:6px;background:rgba(255,255,255,0.06);border:1px solid rgba(255,255,255,0.14);border-radius:12px;padding:7px 12px;font-size:0.95rem;cursor:pointer;transition:all .18s;font-family:'DM Sans',sans-serif;color:var(--muted);}
 .rxn-btn:hover{background:rgba(255,45,111,0.12);border-color:rgba(255,45,111,0.3);transform:scale(1.1);}
 .rxn-btn.active{background:rgba(255,45,111,0.2);border-color:var(--rose);color:var(--text);}
 .rxn-count{font-size:0.72rem;font-weight:700;}
@@ -381,7 +381,15 @@ body.exam-season .story-rxn{background:rgba(120,60,255,0.15);}
 .remove-btn:hover{background:rgba(239,68,68,0.15);border-color:rgba(239,68,68,0.4);color:#fca5a5;}
 .remove-btn.removed{background:rgba(239,68,68,0.1);border-color:rgba(239,68,68,0.3);color:rgba(252,165,165,0.6);cursor:default;}
 /* ── Read receipt ── */
-.read-receipt{font-size:0.7rem;color:var(--muted);margin-top:6px;opacity:0.7;}
+.read-receipt{font-size:0.78rem;color:var(--muted);margin-top:6px;opacity:0.8;}
+.poll-opt-list{display:flex;flex-direction:column;gap:8px;}
+.poll-opt-dyn{width:100%;background:rgba(0,0,0,0.25);border:1px solid var(--border);border-radius:10px;padding:9px 12px;color:var(--text);font-size:0.85rem;font-family:'DM Sans',sans-serif;outline:none;}
+.poll-add-btn{align-self:flex-start;background:rgba(255,255,255,0.08);border:1px solid var(--border);color:var(--muted);border-radius:10px;padding:7px 12px;cursor:pointer;font-size:0.8rem;font-family:'DM Sans',sans-serif;}
+.poll-add-btn:hover{color:var(--text);border-color:var(--rose);}
+.sort-scroll{position:fixed;right:8px;top:110px;bottom:110px;width:6px;border-radius:8px;background:rgba(255,255,255,0.08);z-index:50;}
+.sort-scroll-thumb{position:absolute;left:0;right:0;top:0;height:20%;border-radius:8px;background:linear-gradient(180deg,var(--rose2),var(--rose));}
+.report-other{display:none;width:100%;min-height:72px;background:rgba(0,0,0,0.35);border:1px solid rgba(255,255,255,0.12);border-radius:12px;padding:10px 12px;color:var(--text);font-size:0.84rem;font-family:'DM Sans',sans-serif;outline:none;resize:vertical;}
+.report-other.show{display:block;}
 </style>
 </head>
 <body data-theme="dark">
@@ -409,6 +417,7 @@ body.exam-season .story-rxn{background:rgba(120,60,255,0.15);}
   </div>
 </div>
 <div class="toast" id="toast"></div>
+<div class="sort-scroll"><div class="sort-scroll-thumb" id="scrollThumb"></div></div>
 <div class="reply-notif" id="replyNotif" onclick="goToRepliedConfession()">
   <div class="reply-notif-icon">💬</div>
   <div>
@@ -509,10 +518,11 @@ body.exam-season .story-rxn{background:rgba(120,60,255,0.15);}
     <!-- Poll input fields (only visible when Poll is selected) -->
     <div class="poll-input-section" id="pollInputSection">
       <input class="poll-q" id="pollQuestion" maxlength="200" placeholder="Ask your question… e.g. Is canteen food getting worse? 🍛"/>
-      <div class="poll-opts-row">
-        <input class="poll-opt" id="pollOpt1" maxlength="60" placeholder="Option A (default: Yes)"/>
-        <input class="poll-opt" id="pollOpt2" maxlength="60" placeholder="Option B (default: No)"/>
+      <div class="poll-opt-list" id="pollOptionsList">
+        <input class="poll-opt-dyn" maxlength="60" placeholder="Option 1"/>
+        <input class="poll-opt-dyn" maxlength="60" placeholder="Option 2"/>
       </div>
+      <button type="button" class="poll-add-btn" onclick="addPollOptionInput()">+ Add another option</button>
     </div>
 
     <!-- Feature 1: Branch tag picker -->
@@ -549,10 +559,11 @@ body.exam-season .story-rxn{background:rgba(120,60,255,0.15);}
       <span class="section-label">Recent confessions</span>
       <!-- Sort dropdown -->
       <div class="sort-wrap">
-        <button class="sort-dropdown" onclick="toggleSortMenu()" id="sortDropBtn">⬆️ Sort: New ▾</button>
+        <button class="sort-dropdown" onclick="toggleSortMenu()" id="sortDropBtn">⬆️ Sort: Top ▾</button>
         <div class="sort-menu" id="sortMenu">
-          <div class="sort-opt active" onclick="setConfSort('new',this)">🆕 New</div>
-          <div class="sort-opt" onclick="setConfSort('top',this)">🏆 Top</div>
+          <div class="sort-opt active" onclick="setConfSort('top',this)">🏆 Top</div>
+          <div class="sort-opt" onclick="setConfSort('hot',this)">🔥 Hot</div>
+          <div class="sort-opt" onclick="setConfSort('new',this)">🆕 New</div>
           <div class="sort-opt" onclick="setConfSort('best',this)">⭐ Best</div>
         </div>
       </div>
@@ -601,6 +612,7 @@ body.exam-season .story-rxn{background:rgba(120,60,255,0.15);}
   </div>
 </div>
 
+<script src="https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js"></script>
 <script>
 const API = 'https://confession-app-1w0s.onrender.com';
 const EMOJI_LIST = ['❤️','😮','😂','🥺','🔥'];
@@ -699,7 +711,7 @@ confInput.addEventListener('input',()=>{
 
 
 // ── Sort confessions ──────────────────────────────────
-let confSortMode = 'new';
+let confSortMode = 'top';
 function toggleSortMenu() {
   document.getElementById('sortMenu').classList.toggle('open');
 }
@@ -710,7 +722,7 @@ function setConfSort(mode, el) {
   confSortMode = mode;
   document.querySelectorAll('.sort-opt').forEach(o => o.classList.remove('active'));
   el.classList.add('active');
-  const labels = {new:'New', top:'Top', best:'Best'};
+  const labels = {new:'New', top:'Top', best:'Best', hot:'Hot'};
   document.getElementById('sortDropBtn').textContent = '⬆️ Sort: ' + labels[mode] + ' ▾';
   document.getElementById('sortMenu').classList.remove('open');
   safeRender();
@@ -749,7 +761,26 @@ function openShare(msg){
   document.getElementById('shareModal').classList.add('open');
 }
 function closeShare(){document.getElementById('shareModal').classList.remove('open');}
-function shareIG(){navigator.clipboard.writeText(`💌 "${shareText}"\n\n— Anonymous confession from GIET Confessions\n👉 page-confession.vercel.app`);toast('📋 Copied! Paste it in your Instagram story caption');closeShare();}
+async function shareIG(){
+  const holder=document.createElement('div');
+  holder.style.cssText='position:fixed;left:-9999px;top:0;width:540px;padding:36px;border-radius:28px;background:linear-gradient(160deg,#6d28d9,#db2777,#f97316);color:#fff;font-family:DM Sans,sans-serif;';
+  holder.innerHTML=`<div style="font-size:14px;opacity:.88;letter-spacing:.08em;text-transform:uppercase;margin-bottom:16px;">GIET Anonymous Confession</div><div style="font-family:Playfair Display,serif;font-size:34px;line-height:1.35;font-style:italic;">${shareText.replace(/</g,'&lt;')}</div><div style="margin-top:26px;font-size:13px;opacity:.85;">Reply on: page-confession.vercel.app</div>`;
+  document.body.appendChild(holder);
+  try{
+    const canvas=await html2canvas(holder,{backgroundColor:null,scale:2});
+    const blob = await new Promise(resolve => canvas.toBlob(resolve,'image/png'));
+    if(!blob){toast('Could not generate image');holder.remove();return;}
+    const file=new File([blob],'giet-confession-story.png',{type:'image/png'});
+    if(navigator.canShare && navigator.canShare({files:[file]})){
+      await navigator.share({files:[file],title:'GIET Confession Story'});
+    }else{
+      const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download='giet-confession-story.png';a.click();
+      toast('Story image downloaded. Upload it to Instagram story.');
+    }
+    closeShare();
+  }catch(e){toast('Could not generate image');}
+  holder.remove();
+}
 function shareCopy(){navigator.clipboard.writeText('https://page-confession.vercel.app');toast('🔗 Link copied!');closeShare();}
 document.getElementById('shareModal').addEventListener('click',e=>{if(e.target===e.currentTarget)closeShare();});
 
@@ -790,12 +821,24 @@ function render() {
   const feed = document.getElementById('feed');
   let list = activeF==='all' ? allConf : allConf.filter(c=>c.category===activeF);
   // Apply sort
-  if(confSortMode==='top') list=[...list].sort((a,b)=>(b.likes||0)-(a.likes||0));
-  else if(confSortMode==='best') list=[...list].sort((a,b)=>{
-    const ra=Object.values(a.reactions||{}).reduce((s,v)=>s+v,0);
-    const rb=Object.values(b.reactions||{}).reduce((s,v)=>s+v,0);
-    return rb-ra;
-  });
+  const getNet = c => (c.likes||0) - (c.dislikes||0);
+  const getReplyCount = c => Number(c.replyCount || 0);
+  const getPollTotal = c => c.isPoll ? Object.values(c.pollVotes||{}).reduce((s,v)=>s+(v||0),0) : 0;
+  const getBestScore = c => {
+    const up = Math.max(0, c.likes || 0);
+    const n = Math.max(1, (c.likes || 0) + (c.dislikes || 0));
+    const z = 1.281551565545;
+    const phat = up / n;
+    return (phat + (z*z)/(2*n) - z*Math.sqrt((phat*(1-phat)+(z*z)/(4*n))/n)) / (1+(z*z)/n);
+  };
+  const getHotScore = c => {
+    const ageHours = Math.max(1, (Date.now() - (c.createdAt || Date.now())) / 3600000);
+    return (getNet(c) + (getReplyCount(c) * 0.8) + (getPollTotal(c) * 0.7)) / Math.pow(ageHours, 1.2);
+  };
+  if(confSortMode==='top') list=[...list].sort((a,b)=>(getNet(b)+getReplyCount(b)*0.8+getPollTotal(b)*0.7)-(getNet(a)+getReplyCount(a)*0.8+getPollTotal(a)*0.7));
+  else if(confSortMode==='best') list=[...list].sort((a,b)=>getBestScore(b)-getBestScore(a));
+  else if(confSortMode==='hot') list=[...list].sort((a,b)=>getHotScore(b)-getHotScore(a));
+  else if(confSortMode==='new') list=[...list].sort((a,b)=>(b.createdAt||0)-(a.createdAt||0));
   // Apply search filter — checks message text and poll question
   if (searchQ) {
     list = list.filter(c => {
@@ -942,8 +985,17 @@ async function loadReplies(confId) {
     const r = await fetch(`${API}/api/replies/${confId}`);
     const replies = await r.json();
     if (!replies.length) { list.innerHTML='<div class="no-replies">No replies yet — be the first 💬</div>'; return; }
-    list.innerHTML = replies.map(r=>`<div class="reply-item">${r.message}<div class="reply-time">${ago(r.createdAt)}</div></div>`).join('');
+    list.innerHTML = replies.map(r=>`<div class="reply-item">${r.message}<div class="reply-time">${ago(r.createdAt)}</div><div class="reaction-bar">${EMOJI_LIST.map(e=>`<button class="rxn-btn${(r.reactedBy?.[cid()]===e)?' active':''}" onclick="reactReply('${r.id}','${e}',this)">${e} <span class="rxn-count">${r.reactions?.[e]||''}</span></button>`).join('')}</div></div>`).join('');
   } catch(e) { list.innerHTML='<div class="no-replies">Could not load replies</div>'; }
+}
+async function reactReply(replyId, emoji, btn) {
+  try{
+    const r=await fetch(`${API}/api/reply/react/${replyId}`,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({clientId:cid(),emoji})});
+    const d=await r.json();
+    if(!d.reactions)return;
+    const wrap=btn.closest('.reaction-bar');
+    wrap.innerHTML=EMOJI_LIST.map(e=>`<button class="rxn-btn${(d.myReaction===e)?' active':''}" onclick="reactReply('${replyId}','${e}',this)">${e} <span class="rxn-count">${d.reactions?.[e]||''}</span></button>`).join('');
+  }catch(e){toast('Network error');}
 }
 async function sendReply(confId) {
   const inp = document.getElementById('ri-'+confId);
@@ -978,6 +1030,7 @@ document.querySelectorAll('input[name="reportReason"]').forEach(radio=>{
     document.getElementById('reportSubmitBtn').disabled=false;
     document.querySelectorAll('.report-reason').forEach(l=>l.classList.remove('selected'));
     radio.closest('.report-reason').classList.add('selected');
+    document.getElementById('reportOtherText')?.classList.toggle('show', radio.value==='other');
   });
 });
 function closeReport(){document.getElementById('reportOverlay').classList.remove('open');_rId=null;_rBtn=null;}
@@ -987,18 +1040,21 @@ function closeReport(){document.getElementById('reportOverlay').classList.remove
 async function submitReport(){
   const reason=document.querySelector('input[name="reportReason"]:checked')?.value;
   if(!reason||!_rId)return;
+  const capturedId=_rId;
+  const otherMessage = reason==='other' ? (document.getElementById('reportOtherText')?.value || '').trim() : '';
+  if(reason==='other' && !otherMessage){toast('Please enter a short reason');return;}
   const btn=document.getElementById('reportSubmitBtn');
   btn.disabled=true; btn.textContent='Submitting…';
   try{
-    const r=await fetch(`${API}/api/report/${_rId}`,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({clientId:cid(),reason})});
+    const r=await fetch(`${API}/api/report/${capturedId}`,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({clientId:cid(),reason,otherMessage})});
     const d=await r.json();
     closeReport();
     if(d.alreadyReported){toast('⚑ Already reported');return;}
-    addReportedId(_rId);
+    addReportedId(capturedId);
     if(_rBtn){_rBtn.classList.add('reported');_rBtn.innerHTML='⚑ Reported';}
     if(d.autoHidden){
       toast('🛡 Reported! Confession hidden pending admin review.');
-      const card=document.querySelector(`.conf-card[data-id="${_rId}"]`);
+      const card=document.querySelector(`.conf-card[data-id="${capturedId}"]`);
       if(card){card.style.transition='opacity .4s';card.style.opacity='0';setTimeout(()=>card.remove(),400);}
     } else {
       const left=Math.max(0,3-(d.reportCount||1));
@@ -1027,33 +1083,25 @@ async function thisIsMe(confId, btn) {
 // ── Feature: Poll render helper ───────────────────────
 function renderPollSection(m) {
   if (!m.isPoll) return `<div class="card-msg">${m.message}</div>`;
-  const total = (m.pollVotes?.a || 0) + (m.pollVotes?.b || 0);
-  const pctA = total ? Math.round((m.pollVotes.a / total) * 100) : 50;
-  const pctB = total ? Math.round((m.pollVotes.b / total) * 100) : 50;
+  const opts = Object.entries(m.pollOptions || {});
+  const total = Object.values(m.pollVotes || {}).reduce((s,v)=>s+(v||0),0);
   const myVote = m.pollUserVotes?.[cid()];
-  const optA = m.pollOptions?.a || 'Yes';
-  const optB = m.pollOptions?.b || 'No';
   return `
     <div class="poll-section">
       <div class="poll-question">📊 ${m.message}</div>
-      <div class="poll-opt-row">
-        <button class="poll-vote-btn${myVote==='a'?' voted':''}" onclick="pollVote('${m.id}','a',this)">
-          ${optA}
-        </button>
-        <div class="poll-bar-wrap">
-          <div class="poll-bar-fill" style="width:${pctA}%"></div>
-          <span class="poll-bar-label">${pctA}%</span>
-        </div>
-      </div>
-      <div class="poll-opt-row">
-        <button class="poll-vote-btn${myVote==='b'?' voted':''}" onclick="pollVote('${m.id}','b',this)">
-          ${optB}
-        </button>
-        <div class="poll-bar-wrap">
-          <div class="poll-bar-fill" style="width:${pctB}%"></div>
-          <span class="poll-bar-label">${pctB}%</span>
-        </div>
-      </div>
+      ${opts.map(([key,label])=>{
+        const votes = m.pollVotes?.[key] || 0;
+        const pct = total ? Math.round((votes/total)*100) : 0;
+        return `<div class="poll-opt-row">
+          <button class="poll-vote-btn${myVote===key?' voted':''}" onclick="pollVote('${m.id}','${key}',this)">
+            ${label}
+          </button>
+          <div class="poll-bar-wrap">
+            <div class="poll-bar-fill" style="width:${pct}%"></div>
+            <span class="poll-bar-label">${pct}%</span>
+          </div>
+        </div>`;
+      }).join('')}
       <div class="poll-total">${total} vote${total!==1?'s':''}</div>
     </div>`;
 }
@@ -1064,14 +1112,14 @@ async function pollVote(confId, option, btn) {
     const d = await r.json();
     if (d.pollVotes) {
       const conf = allConf.find(c=>c.id===confId);
-      if (conf) { conf.pollVotes = d.pollVotes; if(!conf.pollUserVotes)conf.pollUserVotes={}; conf.pollUserVotes[cid()]=option; }
+      if (conf) { conf.pollVotes = d.pollVotes; if(!conf.pollUserVotes)conf.pollUserVotes={}; conf.pollUserVotes[cid()]=d.myVote || option; }
       const card = btn.closest('.conf-card');
       if (card && conf) {
         const ps = card.querySelector('.poll-section');
         if (ps) ps.outerHTML = renderPollSection(conf);
       }
     }
-    if (d.alreadyVoted) toast('You already voted on this one 📊');
+    if (d.changed) toast('📊 Vote updated');
   } catch(e) { toast('Network error'); }
 }
 
@@ -1291,10 +1339,11 @@ submitBtn.addEventListener('click',()=>{
   if (isPollSubmit) {
     const q = document.getElementById('pollQuestion').value.trim();
     if (!q) { fStatus.textContent='Please enter a poll question 📊'; fStatus.style.color='var(--rose2)'; submitBtn.disabled=false; submitBtn.textContent='Send Anonymously 💌'; return; }
+    const pollOptions = [...document.querySelectorAll('#pollOptionsList .poll-opt-dyn')].map(i=>i.value.trim()).filter(Boolean);
+    if (pollOptions.length < 2) { fStatus.textContent='Please add at least 2 options 📊'; fStatus.style.color='var(--rose2)'; submitBtn.disabled=false; submitBtn.textContent='Send Anonymously 💌'; return; }
     pollData = {
       question: q,
-      optA: document.getElementById('pollOpt1').value.trim() || 'Yes',
-      optB: document.getElementById('pollOpt2').value.trim() || 'No',
+      options: pollOptions,
     };
   }
 
@@ -1320,7 +1369,7 @@ submitBtn.addEventListener('click',()=>{
         toast(msg2,data.edited?6000:4000);
         fStatus.textContent=''; confInput.value=''; wbar.style.width='0%'; wcount.textContent='0 / 400 words';
         document.getElementById('yearSelect').value=''; document.getElementById('branchSelect').value='';
-        document.getElementById('pollQuestion').value=''; document.getElementById('pollOpt1').value=''; document.getElementById('pollOpt2').value='';
+        document.getElementById('pollQuestion').value=''; resetPollInputs();
         // Track confession ID for reply notifications
         if (data.confessionId) {
           const myConfs = getMyConfs();
@@ -1443,7 +1492,60 @@ window.addEventListener('load',()=>{
       if(!localStorage.getItem('pushDeclined'))setupPushNotifications();
     }).catch(()=>{});
   }
+  window.addEventListener('scroll', updateScrollThumb, { passive:true });
+  updateScrollThumb();
 });
+
+async function syncReplyCounts() {
+  if (!allConf.length) return;
+  try {
+    const r = await fetch(`${API}/api/replies/counts`, { method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify({ ids: allConf.map(c=>c.id) }) });
+    const map = await r.json();
+    allConf.forEach(c => { c.replyCount = map[c.id] || 0; });
+  } catch(e) {}
+}
+
+fetchConf = function() {
+  return fetch(`${API}/api/confessions`)
+    .then(r=>r.json()).then(async data=>{
+      const confessions = Array.isArray(data) ? data : (data.confessions || []);
+      const newOnes = confessions.filter(m=>!seenIds.has(m.id));
+      if (newOnes.length && !firstLoad) {
+        toast(`💌 ${newOnes.length} new confession${newOnes.length>1?'s':''}!`);
+      }
+      seenIds = new Set(confessions.map(m=>m.id));
+      allConf = confessions;
+      await syncReplyCounts();
+      firstLoad = false;
+      safeRender();
+      checkReplyNotifications();
+    }).catch(()=>{});
+};
+
+function addPollOptionInput() {
+  const list = document.getElementById('pollOptionsList');
+  if (!list || list.children.length >= 8) return;
+  const input = document.createElement('input');
+  input.className = 'poll-opt-dyn';
+  input.maxLength = 60;
+  input.placeholder = `Option ${list.children.length + 1}`;
+  list.appendChild(input);
+}
+function resetPollInputs() {
+  const list = document.getElementById('pollOptionsList');
+  if (!list) return;
+  list.innerHTML = '<input class="poll-opt-dyn" maxlength="60" placeholder="Option 1"/><input class="poll-opt-dyn" maxlength="60" placeholder="Option 2"/>';
+}
+function updateScrollThumb() {
+  const thumb = document.getElementById('scrollThumb');
+  if (!thumb) return;
+  const doc = document.documentElement;
+  const max = doc.scrollHeight - window.innerHeight;
+  const ratio = max > 0 ? window.scrollY / max : 0;
+  const hPct = Math.max(15, Math.min(45, (window.innerHeight / doc.scrollHeight) * 100));
+  thumb.style.height = `${hPct}%`;
+  thumb.style.top = `${ratio * (100 - hPct)}%`;
+}
 </script>
 
 <!-- Report Bottom Sheet -->
@@ -1458,6 +1560,7 @@ window.addEventListener('load',()=>{
       <label class="report-reason"><input type="radio" name="reportReason" value="spam"> 🗑 Spam or duplicate</label>
       <label class="report-reason"><input type="radio" name="reportReason" value="other"> 💬 Other reason</label>
     </div>
+    <textarea id="reportOtherText" class="report-other" maxlength="500" placeholder="Write your reason for admin review..."></textarea>
     <button class="report-submit" id="reportSubmitBtn" disabled onclick="submitReport()">Submit Report</button>
     <button class="report-cancel" onclick="closeReport()">Cancel</button>
   </div>
