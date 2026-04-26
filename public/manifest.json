@@ -2,34 +2,59 @@
   "name": "GIET Confessions 💌",
   "short_name": "Confessions",
   "description": "Anonymous confessions for GIET students — say what your heart won't let you speak aloud",
-  "start_url": "/",
+  "start_url": "/confessions-v3.html",
+  "id": "/confessions-v3.html",
   "display": "standalone",
+  "display_override": ["standalone", "minimal-ui"],
   "orientation": "portrait",
   "background_color": "#0d0008",
   "theme_color": "#ff2d6f",
   "categories": ["social", "lifestyle"],
+  "lang": "en",
+  "dir": "ltr",
+  "prefer_related_applications": false,
   "icons": [
+    { "src": "/icons/icon-72x72.png",   "sizes": "72x72",   "type": "image/png", "purpose": "any" },
+    { "src": "/icons/icon-96x96.png",   "sizes": "96x96",   "type": "image/png", "purpose": "any" },
+    { "src": "/icons/icon-128x128.png", "sizes": "128x128", "type": "image/png", "purpose": "any" },
+    { "src": "/icons/icon-144x144.png", "sizes": "144x144", "type": "image/png", "purpose": "any" },
+    { "src": "/icons/icon-152x152.png", "sizes": "152x152", "type": "image/png", "purpose": "any" },
+    { "src": "/icons/icon-192x192.png", "sizes": "192x192", "type": "image/png", "purpose": "any maskable" },
+    { "src": "/icons/icon-384x384.png", "sizes": "384x384", "type": "image/png", "purpose": "any" },
+    { "src": "/icons/icon-512x512.png", "sizes": "512x512", "type": "image/png", "purpose": "any maskable" }
+  ],
+  "screenshots": [
     {
-      "src": "https://em-content.zobj.net/source/twitter/376/love-letter_1f48c.png",
-      "sizes": "192x192",
-      "type": "image/png",
-      "purpose": "any maskable"
-    },
-    {
-      "src": "https://em-content.zobj.net/source/twitter/376/love-letter_1f48c.png",
+      "src": "/icons/icon-512x512.png",
       "sizes": "512x512",
       "type": "image/png",
-      "purpose": "any"
+      "form_factor": "narrow",
+      "label": "GIET Confessions home screen"
     }
   ],
-  "screenshots": [],
   "shortcuts": [
     {
       "name": "Send a Confession",
       "short_name": "Confess",
       "description": "Write and send an anonymous confession",
-      "url": "/#confess",
-      "icons": [{"src": "https://em-content.zobj.net/source/twitter/376/love-letter_1f48c.png", "sizes": "192x192"}]
+      "url": "/confessions-v3.html",
+      "icons": [{ "src": "/icons/icon-192x192.png", "sizes": "192x192" }]
+    },
+    {
+      "name": "Read Confessions",
+      "short_name": "Read",
+      "description": "Browse the latest confessions",
+      "url": "/confessions-v3.html",
+      "icons": [{ "src": "/icons/icon-192x192.png", "sizes": "192x192" }]
     }
-  ]
+  ],
+  "related_applications": [],
+  "share_target": {
+    "action": "/confessions-v3.html",
+    "method": "GET",
+    "params": {
+      "title": "title",
+      "text": "text"
+    }
+  }
 }
