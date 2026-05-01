@@ -538,6 +538,10 @@ body.exam-season .story-rxn{background:rgba(120,60,255,0.15);}
     <span class="disclaimer-icon">📲</span>
     <p class="disclaimer-text" style="color:rgba(160,210,255,0.85);"><strong style="color:rgba(180,220,255,1);">Get Notifications:</strong> On Chrome (Android) → tap ⋮ menu → <em>Add to Home Screen</em> → install → open → tap <em>Allow</em> when prompted. You'll be notified when someone replies to your confession! 🔔</p>
   </div>
+  <div class="disclaimer" style="background:rgba(168,85,247,0.08);border-color:rgba(168,85,247,0.24);margin-top:8px;">
+    <span class="disclaimer-icon">📸</span>
+    <p class="disclaimer-text" style="color:rgba(220,190,255,0.9);"><strong style="color:#e9d5ff;">Share as Screenshot:</strong> Tap <em>Share</em> on any confession → choose Instagram or WhatsApp. We generate a purple-red story card screenshot automatically so you can post it quickly.</p>
+  </div>
 
   <div class="disc">Anonymous · Safe · For GIET students only · Admin reviews every message</div>
 
@@ -597,11 +601,11 @@ body.exam-season .story-rxn{background:rgba(120,60,255,0.15);}
       <span class="section-label">Recent confessions</span>
       <!-- Sort dropdown -->
       <div class="sort-wrap">
-        <button class="sort-dropdown" onclick="toggleSortMenu()" id="sortDropBtn">⬆️ Sort: Top ▾</button>
+        <button class="sort-dropdown" onclick="toggleSortMenu()" id="sortDropBtn">⬆️ Sort: New ▾</button>
         <div class="sort-menu" id="sortMenu">
-          <div class="sort-opt active" onclick="setConfSort('top',this)">🏆 Top</div>
+          <div class="sort-opt" onclick="setConfSort('top',this)">🏆 Top</div>
           <div class="sort-opt" onclick="setConfSort('hot',this)">🔥 Hot</div>
-          <div class="sort-opt" onclick="setConfSort('new',this)">🆕 New</div>
+          <div class="sort-opt active" onclick="setConfSort('new',this)">🆕 New</div>
           <div class="sort-opt" onclick="setConfSort('best',this)">⭐ Best</div>
         </div>
       </div>
@@ -647,7 +651,7 @@ body.exam-season .story-rxn{background:rgba(120,60,255,0.15);}
       <li>v2.2 — Stats fix: DB-backed online count, visit rate-limit exemption</li>
       <li>v2.3 — Exam season theme, "This is me!" button, reply notifications, poll confessions</li>
       <li>v2.4 — Captcha gate, poll fix, admin link, dark-only, DB-backed online count, confession reactions in story mode</li>
-      <li>v2.5 — Multi-option polls (up to 8), changeable poll votes, Reddit-style sort (Wilson/Hot/Top/New), reply reactions, Instagram story card share, scroll progress bar, Funny category, notification guide, report fix</li>
+      <li>v2.5 — Multi-option polls (up to 8), changeable poll votes, Reddit-style sort (default New), reply reactions, purple-red screenshot share (Instagram + WhatsApp), scroll progress bar, Funny category, notification guide, report fix</li>
       <li>v3.0 — Full-page flip viewer (confessions-v3.html), Legwork-style per-page colors, page flip animation, offline PWA</li>
     </ul>
   </div>
@@ -795,16 +799,15 @@ function clearSearch() {
 
 // ── Share modal ───────────────────────────────────────
 let shareText='';
-let shareText='';
 function openShare(msg){
   shareText=msg;
-  const el=document.getElementById('sspMsg');if(el)el.textContent='"'+msg.slice(0,100)+(msg.length>100?'…':'')'"';
+  const el=document.getElementById('sspMsg');if(el)el.textContent='"'+msg.slice(0,100)+(msg.length>100?'…':'')+'"';
   const url='https://page-confession.vercel.app';
   document.getElementById('shareWA').href=`https://wa.me/?text=${encodeURIComponent('💌 Anonymous Confession from GIET:\n\n"'+msg+'"\n\nRead more: '+url)}`;
   document.getElementById('shareModal').classList.add('open');
 }
 function closeShare(){document.getElementById('shareModal').classList.remove('open');}
-async async function shareToIG(){
+async function shareToIG(){
   toast('📷 Generating image…');
   try{
     if(!window.html2canvas){
@@ -835,17 +838,6 @@ function shareIG(){shareToIG();}
 function shareToWA(){
   const text=encodeURIComponent('💌 Anonymous confession:\n"'+shareText.slice(0,150)+'"\n\nRead more: https://page-confession.vercel.app');
   window.open('https://wa.me/?text='+text,'_blank');closeShare();
-}
-    const file=new File([blob],'giet-confession-story.png',{type:'image/png'});
-    if(navigator.canShare && navigator.canShare({files:[file]})){
-      await navigator.share({files:[file],title:'GIET Confession Story'});
-    }else{
-      const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download='giet-confession-story.png';a.click();
-      toast('Story image downloaded. Upload it to Instagram story.');
-    }
-    closeShare();
-  }catch(e){toast('Could not generate image');}
-  holder.remove();
 }
 function shareCopy(){navigator.clipboard.writeText('https://page-confession.vercel.app');toast('🔗 Link copied!');closeShare();}
 document.getElementById('shareModal').addEventListener('click',e=>{if(e.target===e.currentTarget)closeShare();});
@@ -1088,7 +1080,8 @@ function openReport(confId, btn){
   _rId=confId; _rBtn=btn;
   document.querySelectorAll('input[name="reportReason"]').forEach(r=>{r.checked=false;});
   document.querySelectorAll('.report-reason').forEach(l=>l.classList.remove('selected'));
-  document.getElementById('reportSubmitBtn').disabled=true;
+  const sb=document.getElementById('reportSubmitBtn');
+  if(sb){sb.style.opacity='0.45';sb.style.cursor='not-allowed';sb.dataset.enabled='false';sb.textContent='Submit Report';}
   document.getElementById('reportOverlay').classList.add('open');
 }
 document.querySelectorAll('input[name="reportReason"]').forEach(radio=>{
@@ -1120,7 +1113,7 @@ async function submitReport(){
   const otherMessage = reason==='other' ? (document.getElementById('reportOtherText')?.value || '').trim() : '';
   if(reason==='other' && !otherMessage){toast('Please enter a short reason');return;}
   const btn=document.getElementById('reportSubmitBtn');
-  btn.disabled=true; btn.textContent='Submitting…';
+  if(btn){btn.style.opacity='0.7';btn.style.cursor='wait';btn.dataset.enabled='false';btn.textContent='Submitting…';}
   try{
     const r=await fetch(`${API}/api/report/${capturedId}`,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({clientId:cid(),reason,otherMessage})});
     const d=await r.json();
@@ -1136,7 +1129,10 @@ async function submitReport(){
       const left=Math.max(0,3-(d.reportCount||1));
       toast(`⚑ Reported! ${left} more report${left!==1?'s':''} needed to auto-hide.`);
     }
-  }catch(e){toast('Network error');btn.disabled=false;btn.textContent='Submit Report';}
+  }catch(e){
+    toast('Network error');
+    if(btn){btn.style.opacity='1';btn.style.cursor='pointer';btn.dataset.enabled='true';btn.textContent='Submit Report';}
+  }
 }
 
 // ── Feature: This is me! ──────────────────────────────

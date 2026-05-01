@@ -240,7 +240,7 @@ body.exam-season .logout-btn{color:#a78bfa;border-color:rgba(140,80,255,0.3);}
         <option value="crush">💘 Crush Confessions Week</option>
         <option value="hostel">🏠 Hostel Life Week</option>
         <option value="exam">📚 Exam Season</option>
-        <option value="random">💭 General Theme</option>
+        <option value="general">💭 General Theme</option>
       </select>
       <label>Prompt message (shown to all users as banner)</label>
       <input type="text" id="promptText" placeholder="e.g. This week: confess something about your hostel life 🏠" maxlength="200"/>
@@ -478,7 +478,7 @@ async function loadPending(){
       </div>
       ${editedNote}
       ${filterTagsHtml}
-      <div class="item-msg">${item.message}</div>
+      <div class="item-msg">${item.isPoll?`📊 ${item.message}\n${Object.entries(item.pollOptions||{}).map(([k,label])=>`${label}: ${(item.pollVotes||{})[k]||0} votes`).join(' | ')}`:item.message}</div>
       <div class="item-actions">
         <button class="ia-btn approve" onclick="moderate('${item.id}','approve')">✅ Approve</button>
         <button class="ia-btn reject" onclick="moderate('${item.id}','reject')">❌ Reject</button>
@@ -514,7 +514,7 @@ async function loadApproved(){
         <span class="item-time">🕐 ${ago(item.createdAt)} · ❤️ ${item.likes||0}${Object.values(item.reactions||{}).some(v=>v>0)?' · '+Object.entries(item.reactions||{}).filter(([,v])=>v>0).map(([e,v])=>e+v).join(''):''}${(item.thisIsMe||[]).length?' · 🫣 '+item.thisIsMe.length:''}</span>
         ${(item.flags||0)>0?`<span class="flag-count">⚑ ${item.flags} flag${item.flags>1?'s':''}</span>`:''}
       </div>
-      <div class="item-msg">${item.isPoll?`📊 ${item.message}\n${item.pollOptions?.a||'Yes'}: ${item.pollVotes?.a||0} votes | ${item.pollOptions?.b||'No'}: ${item.pollVotes?.b||0} votes`:item.message}</div>
+      <div class="item-msg">${item.isPoll?`📊 ${item.message}\n${Object.entries(item.pollOptions||{}).map(([k,label])=>`${label}: ${(item.pollVotes||{})[k]||0} votes`).join(' | ')}`:item.message}</div>
       <div class="item-actions">
         <button class="ia-btn delete" onclick="deleteConf('${item.id}')">🗑 Delete</button>
         <button class="ia-btn" style="background:rgba(96,165,250,0.12);color:#93c5fd;border:1px solid rgba(96,165,250,0.3);" onclick="toggleReplies('${item.id}',this)">💬 Replies</button>

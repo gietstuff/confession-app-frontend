@@ -652,8 +652,10 @@ document.getElementById('submitBtn').addEventListener('click',async function(){
     branch:(year&&branch)?{year,branch}:null,
     poll:isPoll?{
       question:document.getElementById('pollQ').value.trim(),
-      optA:document.getElementById('pollA').value.trim()||'Yes',
-      optB:document.getElementById('pollB').value.trim()||'No',
+      options:[
+        document.getElementById('pollA').value.trim()||'Yes',
+        document.getElementById('pollB').value.trim()||'No',
+      ],
     }:null
   };
   try{
@@ -699,8 +701,8 @@ async function doPoll(confId,opt,wrapEl){
     // Update poll bars in-place
     if(wrapEl&&d.pollVotes){
       const totalV=Object.values(d.pollVotes).reduce((s,v)=>s+(v||0),0);
-      wrapEl.querySelectorAll('.pollopt').forEach((el,i)=>{
-        const key=Object.keys(d.pollVotes)[i];if(!key)return;
+      wrapEl.querySelectorAll('.pollopt').forEach((el)=>{
+        const key=el.dataset.opt;if(!key)return;
         const v=d.pollVotes[key]||0;
         const pct=totalV?Math.round(v/totalV*100):0;
         const fill=el.querySelector('.pollfill');if(fill)fill.style.width=pct+'%';
@@ -835,7 +837,7 @@ function buildConfPage(conf,i,total){
       const v=votes[key]||0;
       const pct=totalVotes?Math.round(v/totalVotes*100):0;
       const isMyVote=myVote===key;
-      return `<div class="pollopt${isMyVote?' pollopt-voted':''}" onclick="doPoll('${conf.id}','${key}',this.closest('.pollwrap'))">
+      return `<div class="pollopt${isMyVote?' pollopt-voted':''}" data-opt="${key}" onclick="doPoll('${conf.id}','${key}',this.closest('.pollwrap'))">
         <div class="polllbl"><span>${label}</span><span>${v} (${pct}%)</span></div>
         <div class="pollbar"><div class="pollfill" style="width:${pct}%"></div></div>
         ${isMyVote?'<span style="font-size:0.6rem;color:rgba(255,255,255,0.5);margin-top:2px;display:block">✓ Your vote</span>':''}
