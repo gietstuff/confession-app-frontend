@@ -268,6 +268,16 @@ body.exam-season :root{--rose:#7c3aff;--rose2:#a78bfa;--crimson:#5b00d4;--border
 .story-nav button{pointer-events:all;background:rgba(255,255,255,0.12);border:none;color:#fff;width:44px;height:44px;border-radius:50%;font-size:1.2rem;cursor:pointer;backdrop-filter:blur(8px);transition:background .2s;}
 .story-nav button:hover{background:rgba(255,255,255,0.22);}
 .story-close{position:absolute;top:16px;right:16px;background:rgba(255,255,255,0.12);border:none;color:#fff;width:36px;height:36px;border-radius:50%;font-size:1.1rem;cursor:pointer;z-index:10;}
+
+/* ── Story Mode Independent Theme ── */
+/* Story mode uses its own color palette independent of page theme */
+.story-overlay.open .story-card{
+  background:linear-gradient(135deg,rgba(168,85,247,0.4),rgba(59,130,246,0.3));
+  border-color:rgba(168,85,247,0.4);
+}
+.story-overlay.open .story-cat{color:#c4b5fd;}
+.story-overlay.open .story-msg{color:#f3e8ff;}
+.story-overlay.open .story-rxn{background:rgba(168,85,247,0.25);border-color:rgba(168,85,247,0.4);}
 .story-counter{position:absolute;bottom:24px;left:50%;transform:translateX(-50%);font-size:0.75rem;color:rgba(255,255,255,0.5);}
 
 /* ── EXAM SEASON: Story Mode overrides ── */
@@ -543,6 +553,11 @@ body.exam-season .story-rxn{background:rgba(120,60,255,0.15);}
     <p class="disclaimer-text" style="color:rgba(220,190,255,0.9);"><strong style="color:#e9d5ff;">Share as Screenshot:</strong> Tap <em>Share</em> on any confession → choose Instagram or WhatsApp. We generate a purple-red story card screenshot automatically so you can post it quickly.</p>
   </div>
 
+  <div class="disclaimer" style="background:rgba(239,68,68,0.08);border-color:rgba(239,68,68,0.24);margin-top:8px;">
+    <span class="disclaimer-icon">🗑️</span>
+    <p class="disclaimer-text" style="color:rgba(255,180,160,0.9);"><strong style="color:#ffb3a3;">REMOVE! Button:</strong> If a confession is inappropriate or offensive, click <em>REMOVE!</em> to flag it. When 4 users remove the same confession, it gets hidden from the feed for admin review. Your privacy is protected — admins never see who clicked remove.</p>
+  </div>
+
   <div class="disc">Anonymous · Safe · For GIET students only · Admin reviews every message</div>
 
   <div class="glass-card submit-card">
@@ -583,6 +598,10 @@ body.exam-season .story-rxn{background:rgba(120,60,255,0.15);}
         <option>AIML</option>
         <option>ECE</option>
         <option>AGRI</option>
+        <option>BBA</option>
+        <option>MBA</option>
+        <option>BCA</option>
+        <option>MCA</option>
         <option>Others</option>
       </select>
     </div>
@@ -670,18 +689,16 @@ const EMOJI_LIST = ['❤️','😮','😂','🥺','🔥'];
   const gate = document.getElementById('captchaGate');
   // Captcha shows on EVERY visit — no localStorage skip
 
-  // Generate question: mix of add/subtract/multiply with small numbers
+  // Generate question: ONLY additions summing up to 10 or less
   // LEARN: We use an IIFE (Immediately Invoked Function Expression) to keep
   // captchaAnswer scoped to this function — it's a closure variable.
-  const ops = [
-    () => { const a=rnd(2,12),b=rnd(2,9); return {q:`${a} + ${b}`, a:a+b}; },
-    () => { const a=rnd(8,20),b=rnd(2,8); return {q:`${a} − ${b}`, a:a-b}; },
-    () => { const a=rnd(2,9),b=rnd(2,9); return {q:`${a} × ${b}`, a:a*b}; },
-    () => { const a=rnd(2,9),b=rnd(2,5); return {q:`${a*b} ÷ ${b}`, a:a}; },
-  ];
   function rnd(min,max){return Math.floor(Math.random()*(max-min+1))+min;}
-
-  const chosen = ops[Math.floor(Math.random()*ops.length)]();
+  
+  // Only addition operations with results up to 10
+  const a = rnd(1, 9);
+  const b = rnd(1, Math.min(10 - a, 9)); // Ensure a + b <= 10
+  const chosen = {q: `${a} + ${b}`, a: a + b};
+  
   document.getElementById('captchaQ').textContent = `What is  ${chosen.q}  = ?`;
   window._captchaAnswer = chosen.a;
 })();
@@ -1624,6 +1641,36 @@ function updateScrollThumb() {
   thumb.style.height = `${hPct}%`;
   thumb.style.top = `${ratio * (100 - hPct)}%`;
 }
+
+// Make scroll thumb clickable to scroll
+(function(){
+  const thumb = document.getElementById('scrollThumb');
+  const scroll = document.querySelector('.sort-scroll');
+  if(!thumb || !scroll) return;
+  scroll.addEventListener('click', (e)=>{
+    const rect = scroll.getBoundingClientRect();
+    const clickY = e.clientY - rect.top;
+    const clickPct = clickY / rect.height;
+    const doc = document.documentElement;
+    const max = doc.scrollHeight - window.innerHeight;
+    const targetScroll = clickPct * max;
+    window.scrollTo({ top: targetScroll, behavior: 'smooth' });
+  });
+  // Also make it draggable
+  let isDragging = false;
+  thumb.addEventListener('mousedown', ()=>{ isDragging = true; });
+  document.addEventListener('mouseup', ()=>{ isDragging = false; });
+  document.addEventListener('mousemove', (e)=>{
+    if(!isDragging) return;
+    const rect = scroll.getBoundingClientRect();
+    const clickY = Math.max(0, Math.min(rect.height, e.clientY - rect.top));
+    const clickPct = clickY / rect.height;
+    const doc = document.documentElement;
+    const max = doc.scrollHeight - window.innerHeight;
+    const targetScroll = clickPct * max;
+    window.scrollTo({ top: targetScroll });
+  });
+})();
 </script>
 
 <!-- Report Bottom Sheet -->
