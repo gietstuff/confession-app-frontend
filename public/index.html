@@ -368,6 +368,33 @@ body.exam-season .story-rxn{background:rgba(120,60,255,0.15);}
 .report-submit{width:100%;padding:14px;background:linear-gradient(135deg,#ef4444,#b91c1c);color:#fff;border:none;border-radius:14px;font-size:0.95rem;font-weight:700;cursor:pointer;font-family:'DM Sans',sans-serif;transition:all .2s;margin-bottom:10px;box-shadow:0 4px 20px rgba(239,68,68,0.3);}
 .report-submit:disabled{opacity:0.45;cursor:not-allowed;}
 .report-cancel{width:100%;padding:12px;background:transparent;border:1px solid rgba(255,255,255,0.1);color:var(--muted);border-radius:14px;cursor:pointer;font-size:0.88rem;font-family:'DM Sans',sans-serif;}
+
+/* ── Story share card ── */
+.share-story-preview{
+  width:100%;aspect-ratio:9/14;max-height:280px;
+  border-radius:18px;display:flex;flex-direction:column;
+  align-items:center;justify-content:center;padding:24px 20px;
+  position:relative;overflow:hidden;margin-bottom:14px;
+  background:linear-gradient(145deg,#1a0008 0%,#3d0020 40%,#1a0008 70%,#2d0018 100%);
+}
+.share-story-preview::before{
+  content:'';position:absolute;inset:0;
+  background:radial-gradient(ellipse 80% 55% at 50% 30%,rgba(192,20,76,0.45) 0%,transparent 65%),
+             radial-gradient(ellipse 60% 40% at 20% 80%,rgba(255,45,111,0.2) 0%,transparent 55%);
+}
+.ssp-logo{font-size:1.6rem;margin-bottom:6px;position:relative;z-index:1;filter:drop-shadow(0 0 12px rgba(255,45,111,0.6));}
+.ssp-brand{font-size:0.55rem;letter-spacing:.22em;text-transform:uppercase;color:rgba(255,180,210,0.45);margin-bottom:12px;position:relative;z-index:1;}
+.ssp-msg{
+  font-family:'Playfair Display',serif;font-style:italic;
+  font-size:clamp(0.82rem,2.8vw,1.05rem);line-height:1.65;
+  color:#fff0f5;text-align:center;position:relative;z-index:1;
+  text-shadow:0 2px 12px rgba(0,0,0,0.5);
+}
+.ssp-footer{position:absolute;bottom:10px;left:0;right:0;text-align:center;font-size:0.5rem;color:rgba(255,180,210,0.3);letter-spacing:.1em;text-transform:uppercase;z-index:1;}
+.share-ig-btn{width:100%;padding:12px;background:linear-gradient(135deg,#833ab4,#fd1d1d,#fcb045);border:none;color:#fff;border-radius:14px;font-size:0.88rem;font-weight:700;cursor:pointer;font-family:'DM Sans',sans-serif;margin-bottom:8px;box-shadow:0 4px 18px rgba(183,0,100,0.3);}
+.share-wa-btn{width:100%;padding:12px;background:linear-gradient(135deg,#25d366,#128c7e);border:none;color:#fff;border-radius:14px;font-size:0.88rem;font-weight:700;cursor:pointer;font-family:'DM Sans',sans-serif;margin-bottom:8px;}
+.share-copy-btn2{width:100%;padding:10px;background:rgba(255,255,255,0.06);border:1.5px solid rgba(255,255,255,0.12);color:var(--text);border-radius:14px;font-size:0.82rem;font-weight:600;cursor:pointer;font-family:'DM Sans',sans-serif;}
+.share-tip{font-size:0.65rem;color:var(--muted);text-align:center;margin-top:8px;line-height:1.5;}
 .act-btn.reported{background:rgba(239,68,68,0.15);border-color:rgba(239,68,68,0.35);color:#fca5a5;}
 
 /* ── Weekly Prompt Banner ── */
@@ -428,14 +455,20 @@ body.exam-season .story-rxn{background:rgba(120,60,255,0.15);}
 
 <!-- Share Modal -->
 <div class="modal-overlay" id="shareModal">
-  <div class="modal">
-    <h3>💌 Share this confession</h3>
-    <div class="share-btns">
-      <a class="share-btn whatsapp" id="shareWA" href="#" target="_blank"><span style="font-size:1.4rem">📱</span> Share on WhatsApp</a>
-      <button class="share-btn" onclick="shareIG()"><span style="font-size:1.4rem">📷</span> Copy for Instagram</button>
-      <button class="share-btn copy" onclick="shareCopy()"><span style="font-size:1.4rem">🔗</span> Copy link</button>
+  <div class="modal" style="max-width:340px;">
+    <h3 style="margin-bottom:12px;">📤 Share Confession</h3>
+    <!-- Story card preview with purple-red theme -->
+    <div class="share-story-preview" id="shareStoryPreview">
+      <span class="ssp-logo">💌</span>
+      <div class="ssp-brand">GIET Confessions</div>
+      <div class="ssp-msg" id="sspMsg">"loading…"</div>
+      <div class="ssp-footer">page-confession.vercel.app</div>
     </div>
-    <button class="modal-close" onclick="closeShare()">Cancel</button>
+    <button class="share-ig-btn" onclick="shareToIG()">📷 Share to Instagram Story</button>
+    <button class="share-wa-btn" id="shareWA" onclick="shareToWA()">📱 Share on WhatsApp</button>
+    <button class="share-copy-btn2" onclick="shareCopy()">🔗 Copy link</button>
+    <p class="share-tip">Instagram: image is copied to clipboard → paste in stories<br>WhatsApp: sends link + message</p>
+    <button class="modal-close" onclick="closeShare()" style="margin-top:10px;">Cancel</button>
   </div>
 </div>
 
@@ -501,6 +534,10 @@ body.exam-season .story-rxn{background:rgba(120,60,255,0.15);}
     <span class="disclaimer-icon">⚠️</span>
     <p><strong>Entertainment purposes only.</strong> This site is meant for fun and anonymous expression among GIET students. It does not intend to harm, defame, or breach anyone's privacy. If any content causes harm, the site will be taken down immediately. All confessions are reviewed by admin before publishing.</p>
   </div>
+  <div class="disclaimer" style="background:rgba(59,130,246,0.06);border-color:rgba(59,130,246,0.2);margin-top:8px;">
+    <span class="disclaimer-icon">📲</span>
+    <p class="disclaimer-text" style="color:rgba(160,210,255,0.85);"><strong style="color:rgba(180,220,255,1);">Get Notifications:</strong> On Chrome (Android) → tap ⋮ menu → <em>Add to Home Screen</em> → install → open → tap <em>Allow</em> when prompted. You'll be notified when someone replies to your confession! 🔔</p>
+  </div>
 
   <div class="disc">Anonymous · Safe · For GIET students only · Admin reviews every message</div>
 
@@ -512,6 +549,7 @@ body.exam-season .story-rxn{background:rgba(120,60,255,0.15);}
       <div class="cat-pill active" data-cat="💘 Crush">💘 Crush</div>
       <div class="cat-pill" data-cat="🌹 Shayari">🌹 Shayari</div>
       <div class="cat-pill" data-cat="💭 Random">💭 Random</div>
+      <div class="cat-pill" data-cat="😂 Funny">😂 Funny</div>
       <div class="cat-pill" data-cat="📊 Poll">📊 Poll</div>
     </div>
 
@@ -573,6 +611,7 @@ body.exam-season .story-rxn{background:rgba(120,60,255,0.15);}
       <div class="ftag" data-f="💘 Crush">💘</div>
       <div class="ftag" data-f="🌹 Shayari">🌹</div>
       <div class="ftag" data-f="💭 Random">💭</div>
+      <div class="ftag" data-f="😂 Funny">😂</div>
       <div class="ftag" data-f="📊 Poll">📊</div>
     </div>
   </div>
@@ -608,6 +647,8 @@ body.exam-season .story-rxn{background:rgba(120,60,255,0.15);}
       <li>v2.2 — Stats fix: DB-backed online count, visit rate-limit exemption</li>
       <li>v2.3 — Exam season theme, "This is me!" button, reply notifications, poll confessions</li>
       <li>v2.4 — Captcha gate, poll fix, admin link, dark-only, DB-backed online count, confession reactions in story mode</li>
+      <li>v2.5 — Multi-option polls (up to 8), changeable poll votes, Reddit-style sort (Wilson/Hot/Top/New), reply reactions, Instagram story card share, scroll progress bar, Funny category, notification guide, report fix</li>
+      <li>v3.0 — Full-page flip viewer (confessions-v3.html), Legwork-style per-page colors, page flip animation, offline PWA</li>
     </ul>
   </div>
 </div>
@@ -711,7 +752,7 @@ confInput.addEventListener('input',()=>{
 
 
 // ── Sort confessions ──────────────────────────────────
-let confSortMode = 'top';
+let confSortMode = 'new';
 function toggleSortMenu() {
   document.getElementById('sortMenu').classList.toggle('open');
 }
@@ -754,22 +795,47 @@ function clearSearch() {
 
 // ── Share modal ───────────────────────────────────────
 let shareText='';
+let shareText='';
 function openShare(msg){
   shareText=msg;
+  const el=document.getElementById('sspMsg');if(el)el.textContent='"'+msg.slice(0,100)+(msg.length>100?'…':'')'"';
   const url='https://page-confession.vercel.app';
   document.getElementById('shareWA').href=`https://wa.me/?text=${encodeURIComponent('💌 Anonymous Confession from GIET:\n\n"'+msg+'"\n\nRead more: '+url)}`;
   document.getElementById('shareModal').classList.add('open');
 }
 function closeShare(){document.getElementById('shareModal').classList.remove('open');}
-async function shareIG(){
-  const holder=document.createElement('div');
-  holder.style.cssText='position:fixed;left:-9999px;top:0;width:540px;padding:36px;border-radius:28px;background:linear-gradient(160deg,#6d28d9,#db2777,#f97316);color:#fff;font-family:DM Sans,sans-serif;';
-  holder.innerHTML=`<div style="font-size:14px;opacity:.88;letter-spacing:.08em;text-transform:uppercase;margin-bottom:16px;">GIET Anonymous Confession</div><div style="font-family:Playfair Display,serif;font-size:34px;line-height:1.35;font-style:italic;">${shareText.replace(/</g,'&lt;')}</div><div style="margin-top:26px;font-size:13px;opacity:.85;">Reply on: page-confession.vercel.app</div>`;
-  document.body.appendChild(holder);
+async async function shareToIG(){
+  toast('📷 Generating image…');
   try{
-    const canvas=await html2canvas(holder,{backgroundColor:null,scale:2});
-    const blob = await new Promise(resolve => canvas.toBlob(resolve,'image/png'));
-    if(!blob){toast('Could not generate image');holder.remove();return;}
+    if(!window.html2canvas){
+      await new Promise((res,rej)=>{
+        const s=document.createElement('script');
+        s.src='https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js';
+        s.onload=res;s.onerror=rej;document.head.appendChild(s);
+      });
+    }
+    const el=document.getElementById('shareStoryPreview');
+    const canvas=await html2canvas(el,{scale:3,useCORS:true,backgroundColor:null,logging:false});
+    canvas.toBlob(async blob=>{
+      try{
+        await navigator.clipboard.write([new ClipboardItem({'image/png':blob})]);
+        toast('🖼 Image copied! Opening Instagram…',4000);
+      }catch(e){
+        const a=document.createElement('a');a.href=canvas.toDataURL();a.download='giet-confession.png';a.click();
+        toast('🖼 Saved! Post it to your story 📸',4000);
+      }
+      setTimeout(()=>{
+        if(/Android|iPhone/i.test(navigator.userAgent))window.location.href='instagram://story-camera';
+        else window.open('https://www.instagram.com/','_blank');
+      },1400);
+    },'image/png');
+  }catch(e){navigator.clipboard?.writeText('"'+shareText.slice(0,120)+'"\n\nGIET Confessions\nhttps://page-confession.vercel.app');toast('📋 Copied! Paste in story');}
+}
+function shareIG(){shareToIG();}
+function shareToWA(){
+  const text=encodeURIComponent('💌 Anonymous confession:\n"'+shareText.slice(0,150)+'"\n\nRead more: https://page-confession.vercel.app');
+  window.open('https://wa.me/?text='+text,'_blank');closeShare();
+}
     const file=new File([blob],'giet-confession-story.png',{type:'image/png'});
     if(navigator.canShare && navigator.canShare({files:[file]})){
       await navigator.share({files:[file],title:'GIET Confession Story'});
@@ -1027,19 +1093,29 @@ function openReport(confId, btn){
 }
 document.querySelectorAll('input[name="reportReason"]').forEach(radio=>{
   radio.addEventListener('change',()=>{
-    document.getElementById('reportSubmitBtn').disabled=false;
+    const btn=document.getElementById('reportSubmitBtn');
+    btn.style.opacity='1';btn.style.cursor='pointer';btn.dataset.enabled='true';
     document.querySelectorAll('.report-reason').forEach(l=>l.classList.remove('selected'));
     radio.closest('.report-reason').classList.add('selected');
     document.getElementById('reportOtherText')?.classList.toggle('show', radio.value==='other');
   });
 });
-function closeReport(){document.getElementById('reportOverlay').classList.remove('open');_rId=null;_rBtn=null;}
+function closeReport(){
+  document.getElementById('reportOverlay').classList.remove('open');
+  _rId=null;_rBtn=null;
+  document.querySelectorAll('input[name="reportReason"]').forEach(r=>r.checked=false);
+  document.querySelectorAll('.report-reason').forEach(l=>l.classList.remove('selected'));
+  const btn=document.getElementById('reportSubmitBtn');
+  if(btn){btn.style.opacity='0.45';btn.style.cursor='not-allowed';btn.dataset.enabled='false';}
+  const ot=document.getElementById('reportOtherText');if(ot){ot.value='';ot.classList.remove('show');}
+}
 // reportOverlay listener added at boot (element must exist first)
 
 
 async function submitReport(){
   const reason=document.querySelector('input[name="reportReason"]:checked')?.value;
-  if(!reason||!_rId)return;
+  if(!reason){toast('Please select a reason first');return;}
+  if(!_rId)return;
   const capturedId=_rId;
   const otherMessage = reason==='other' ? (document.getElementById('reportOtherText')?.value || '').trim() : '';
   if(reason==='other' && !otherMessage){toast('Please enter a short reason');return;}
@@ -1196,14 +1272,20 @@ function applyTheme(key) {
 }
 
 function applyExamTheme() {
-  if(window._adminTheme) return; // admin theme takes priority
+  // Only auto-apply if no admin prompt theme is set
+  if(window._adminTheme) return;
   const m = new Date().getMonth();
   const isExam = (m === 3) || (m === 10);
   if (isExam) {
-    applyTheme('exam');
-    document.body.classList.add('exam-season');
-    document.getElementById('examBanner').style.display = 'flex';
-    window._examParticles = ['📚','✏️','😭','📝','💀','🤯','☕'];
+    // Don't apply until loadPrompt has had a chance to run
+    // Wait 2s for prompt to load — if no admin theme, apply exam
+    setTimeout(()=>{
+      if(window._adminTheme) return; // admin theme loaded in the meantime
+      applyTheme('exam');
+      document.body.classList.add('exam-season');
+      document.getElementById('examBanner').style.display = 'flex';
+      window._examParticles = ['📚','✏️','😭','📝','💀','🤯','☕'];
+    }, 2000);
   }
 }
 
@@ -1561,7 +1643,7 @@ function updateScrollThumb() {
       <label class="report-reason"><input type="radio" name="reportReason" value="other"> 💬 Other reason</label>
     </div>
     <textarea id="reportOtherText" class="report-other" maxlength="500" placeholder="Write your reason for admin review..."></textarea>
-    <button class="report-submit" id="reportSubmitBtn" disabled onclick="submitReport()">Submit Report</button>
+    <button class="report-submit" id="reportSubmitBtn" onclick="submitReport()" style="opacity:0.45;cursor:not-allowed;" data-enabled="false">Submit Report</button>
     <button class="report-cancel" onclick="closeReport()">Cancel</button>
   </div>
 </div>
