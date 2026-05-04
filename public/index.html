@@ -450,7 +450,12 @@ body.exam-season .story-rxn{background:rgba(120,60,255,0.15);}
     <input class="captcha-input" type="number" id="captchaAns" placeholder="Your answer" onkeydown="if(event.key==='Enter')checkCaptcha()"/>
     <button class="captcha-btn" onclick="checkCaptcha()">Enter 💌</button>
     <div class="captcha-err" id="captchaErr"></div>
-    <div class="captcha-hint">Refresh if the question is unclear</div>
+    <div style="margin-top:14px">
+      <button onclick="newCaptchaQ()" style="background:none;border:none;cursor:pointer;display:inline-flex;align-items:center;gap:6px;color:rgba(255,150,190,0.6);font-size:0.75rem;font-family:'DM Sans',sans-serif;transition:all .2s;" onmouseover="this.style.color='rgba(255,100,150,0.9)'" onmouseout="this.style.color='rgba(255,150,190,0.6)'">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2a10 10 0 0 1 7.07 17.07"/><path d="M12 2v4M12 2L9 5M12 2l3 3"/><path d="M12 22a10 10 0 0 1-7.07-17.07"/><path d="M12 22v-4M12 22l-3-3M12 22l3-3"/></svg>
+        New question
+      </button>
+    </div>
   </div>
 </div>
 <div class="toast" id="toast"></div>
@@ -597,7 +602,11 @@ body.exam-season .story-rxn{background:rgba(120,60,255,0.15);}
         <option>CSE</option>
         <option>AIML</option>
         <option>ECE</option>
-        <option>AGRI</option>
+        <option>Civil</option>
+        <option>Mechanical</option>
+        <option>Chemical</option>
+        <option>Aeronautical/AME</option>
+        <option>Agriculture</option>
         <option>BBA</option>
         <option>MBA</option>
         <option>BCA</option>
@@ -682,26 +691,28 @@ const API = 'https://confession-app-1w0s.onrender.com';
 const EMOJI_LIST = ['❤️','😮','😂','🥺','🔥'];
 
 // ── CAPTCHA GATE ──────────────────────────────────────
-// LEARN: Math captcha prevents bots from auto-submitting confessions.
-// We generate a random arithmetic question, store the answer, and check it.
-// localStorage key 'giet_captcha_pass' stores a timestamp so we only ask once per day.
+// 10-minute bypass: once user passes, store timestamp in localStorage.
+// On reload within 10 min on same browser → skip captcha entirely.
+const CAPTCHA_TTL = 10 * 60 * 1000; // 10 minutes in ms
 (function initCaptcha() {
   const gate = document.getElementById('captchaGate');
-  // Captcha shows on EVERY visit — no localStorage skip
-
-  // Generate question: ONLY additions summing up to 10 or less
-  // LEARN: We use an IIFE (Immediately Invoked Function Expression) to keep
-  // captchaAnswer scoped to this function — it's a closure variable.
-  function rnd(min,max){return Math.floor(Math.random()*(max-min+1))+min;}
-  
-  // Only addition operations with results up to 10
-  const a = rnd(1, 9);
-  const b = rnd(1, Math.min(10 - a, 9)); // Ensure a + b <= 10
-  const chosen = {q: `${a} + ${b}`, a: a + b};
-  
-  document.getElementById('captchaQ').textContent = `What is  ${chosen.q}  = ?`;
-  window._captchaAnswer = chosen.a;
+  const saved = localStorage.getItem('giet_captcha_pass');
+  if (saved && (Date.now() - parseInt(saved)) < CAPTCHA_TTL) {
+    gate.style.display = 'none'; return; // skip within 10 min
+  }
+  genCaptchaQ();
 })();
+
+function genCaptchaQ() {
+  function rnd(min,max){return Math.floor(Math.random()*(max-min+1))+min;}
+  const a = rnd(1, 9);
+  const b = rnd(1, Math.min(10 - a, 9));
+  document.getElementById('captchaQ').textContent = `What is  ${a} + ${b}  = ?`;
+  window._captchaAnswer = a + b;
+  document.getElementById('captchaAns').value = '';
+}
+
+function newCaptchaQ() { genCaptchaQ(); document.getElementById('captchaErr').textContent = ''; }
 
 function checkCaptcha() {
   const val = parseInt(document.getElementById('captchaAns').value.trim());
@@ -711,13 +722,13 @@ function checkCaptcha() {
     err.textContent = 'Wrong answer! Try again 🤔';
     document.getElementById('captchaAns').value = '';
     document.getElementById('captchaAns').focus();
-    // Shake animation on wrong answer
     const box = document.querySelector('.captcha-box');
     box.style.animation = 'shake 0.4s ease';
     setTimeout(()=>box.style.animation='', 400);
     return;
   }
-  // Correct! Hide gate
+  // Correct! Save 10-min pass timestamp
+  localStorage.setItem('giet_captcha_pass', String(Date.now()));
   const gate = document.getElementById('captchaGate');
   gate.style.transition = 'opacity 0.5s ease';
   gate.style.opacity = '0';
