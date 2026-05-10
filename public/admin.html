@@ -256,6 +256,15 @@ body.exam-season .logout-btn{color:#a78bfa;border-color:rgba(140,80,255,0.3);}
     </div>
     <div id="reviewList"><div class="empty-msg">No re-review requests</div></div>
   </div>
+
+  <!-- Suggestions from users -->
+  <div class="section" id="suggestionsSection">
+    <div class="section-head">
+      <h2>💡 Suggestions <span class="badge" style="background:#8b5cf6;" id="suggestionsBadge">0</span></h2>
+    </div>
+    <div id="suggestionsList"><div class="empty-msg">No suggestions yet</div></div>
+  </div>
+
   <div id="modStatus"></div>
 </div>
 
@@ -752,6 +761,44 @@ async function loadAll(){
   try{await loadAnalytics();}catch(e){}
   try{await loadCharts();}catch(e){}
   try{await loadReported();}catch(e){}
+  try{await loadSuggestions();}catch(e){}
+}
+
+// ── Suggestions ───────────────────────────────────────
+async function loadSuggestions(){
+  try{
+    const r=await fetch(`${API}/api/suggestions`,{headers:adminH()});
+    if(!r.ok)return;
+    const arr=await r.json();
+    const badge=document.getElementById('suggestionsBadge');
+    if(badge)badge.textContent=arr.length;
+    const container=document.getElementById('suggestionsList');
+    if(!container)return;
+    if(!arr.length){container.innerHTML='<div class="empty-msg">No suggestions yet</div>';return;}
+    container.innerHTML='';
+    arr.forEach(item=>{
+      const div=document.createElement('div');
+      div.className='item';
+      div.style.borderColor='rgba(139,92,246,0.25)';
+      div.innerHTML=`
+        <div class="item-meta">
+          <span style="background:rgba(139,92,246,0.18);border:1px solid rgba(139,92,246,0.35);color:#c4b5fd;border-radius:12px;padding:2px 10px;font-size:0.7rem;font-weight:600;">💡 suggestion</span>
+          <span class="item-time">${ago(item.createdAt)}</span>
+        </div>
+        <div class="item-msg" style="font-size:0.88rem;line-height:1.6;">${item.message.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;')}</div>
+        <div class="item-actions"><button class="ia-btn delete" onclick="deleteSuggestion('${item.id}')">🗑 Delete</button></div>`;
+      container.appendChild(div);
+    });
+  }catch(e){}
+}
+
+async function deleteSuggestion(id){
+  if(!confirm('Delete this suggestion?'))return;
+  try{
+    await fetch(`${API}/api/admin/suggestions/delete`,{method:'POST',headers:adminH(),body:JSON.stringify({suggestionId:id})});
+    setStatus('🗑 Suggestion deleted');
+    loadSuggestions();
+  }catch(e){setStatus('Network error','var(--rose)');}
 }
 </script>
 </body>

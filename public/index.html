@@ -427,6 +427,24 @@ body.exam-season .story-rxn{background:rgba(120,60,255,0.15);}
 .sort-scroll-thumb{position:absolute;left:0;right:0;top:0;height:20%;border-radius:8px;background:linear-gradient(180deg,var(--rose2),var(--rose));}
 .report-other{display:none;width:100%;min-height:72px;background:rgba(0,0,0,0.35);border:1px solid rgba(255,255,255,0.12);border-radius:12px;padding:10px 12px;color:var(--text);font-size:0.84rem;font-family:'DM Sans',sans-serif;outline:none;resize:vertical;}
 .report-other.show{display:block;}
+
+/* ── Page Tabs ── */
+.page-tabs{display:flex;gap:8px;margin-bottom:20px;flex-wrap:wrap;}
+.ptab{flex:1;min-width:80px;padding:10px 16px;border-radius:30px;border:1px solid var(--border);background:rgba(255,255,255,0.05);color:var(--muted);font-size:0.85rem;font-weight:600;cursor:pointer;font-family:'DM Sans',sans-serif;transition:all .22s;text-align:center;}
+.ptab.active{background:linear-gradient(135deg,var(--rose),var(--crimson));color:#fff;border-color:transparent;box-shadow:0 4px 16px rgba(255,45,111,0.35);}
+.ptab.suggest-tab{background:rgba(251,191,36,0.08);border-color:rgba(251,191,36,0.3);color:#fbbf24;flex:0 0 auto;}
+.ptab.suggest-tab:hover{background:rgba(251,191,36,0.18);}
+
+/* ── Discussion feed ── */
+.disc-msg{display:flex;flex-direction:column;background:rgba(255,255,255,0.04);border:1px solid rgba(59,130,246,0.18);border-radius:16px;padding:14px 16px;margin-bottom:10px;position:relative;transition:border-color .2s;}
+.disc-msg:hover{border-color:rgba(59,130,246,0.32);}
+.disc-name{font-size:0.78rem;font-weight:700;color:#93c5fd;margin-bottom:4px;}
+.disc-name.anon{color:rgba(255,200,220,0.5);font-style:italic;}
+.disc-text{font-size:0.92rem;color:var(--text);line-height:1.6;word-break:break-word;flex:1;}
+.disc-meta{font-size:0.7rem;color:var(--muted);margin-top:6px;}
+.disc-flag{position:absolute;top:10px;right:10px;background:rgba(239,68,68,0.08);border:1px solid rgba(239,68,68,0.22);color:rgba(239,68,68,0.7);border-radius:8px;padding:3px 8px;font-size:0.7rem;font-weight:700;cursor:pointer;transition:all .18s;font-family:'DM Sans',sans-serif;}
+.disc-flag:hover{background:rgba(239,68,68,0.2);color:#fca5a5;border-color:rgba(239,68,68,0.45);}
+.disc-flag.flagged{color:rgba(239,68,68,0.4);cursor:default;pointer-events:none;}
 </style>
 </head>
 <body data-theme="dark">
@@ -521,7 +539,7 @@ body.exam-season .story-rxn{background:rgba(120,60,255,0.15);}
   </header>
 
   <div class="top-bar">
-    <a href="https://www.instagram.com/" target="_blank" class="ig-pill">📷 Instagram Page</a>
+    <a href="https://www.instagram.com/gietconfessionwebsite?utm_source=ig_web_button_share_sheet&igsh=ZDNlZDc0MzIxNw==" target="_blank" class="ig-pill">📷 Instagram Page</a>
     <div class="top-right">
       <a href="/confessions-v3.html" class="newpage-pill">✨ New Page</a>
       <a href="/admin.html" class="admin-pill">🔐 Admin</a>
@@ -529,7 +547,15 @@ body.exam-season .story-rxn{background:rgba(120,60,255,0.15);}
     </div>
   </div>
 
+  <!-- Page tabs: Confessions / Discussion / Suggest -->
+  <div class="page-tabs">
+    <button class="ptab active" id="tabConf" onclick="switchTab('conf')">💌 Confessions</button>
+    <button class="ptab" id="tabDisc" onclick="switchTab('disc')">💬 Discussion</button>
+    <button class="ptab suggest-tab" onclick="openSuggestModal()">💡 Suggest</button>
+  </div>
+
   <!-- Exam Season Banner (shown when exam season is active) -->
+  <div id="confSection">
   <div class="exam-banner" id="examBanner" style="display:none">
     <span>📚</span>
     <p><strong>Exam Season Mode 🎓</strong> Semesters are here. Stress, confess, survive. You're not alone — everyone's struggling. Good luck! 💪</p>
@@ -574,7 +600,7 @@ body.exam-season .story-rxn{background:rgba(120,60,255,0.15);}
       <div class="cat-pill" data-cat="🌹 Shayari">🌹 Shayari</div>
       <div class="cat-pill" data-cat="💭 Random">💭 Random</div>
       <div class="cat-pill" data-cat="😂 Funny">😂 Funny</div>
-      <div class="cat-pill" data-cat="📊 Poll">📊 Poll</div>
+            <div class="cat-pill" data-cat="�📊 Poll">📊 Poll</div>
     </div>
 
     <!-- Poll input fields (only visible when Poll is selected) -->
@@ -607,6 +633,7 @@ body.exam-season .story-rxn{background:rgba(120,60,255,0.15);}
         <option>Chemical</option>
         <option>Aeronautical/AME</option>
         <option>Agriculture</option>
+        <option>Biotechnology</option>
         <option>BBA</option>
         <option>MBA</option>
         <option>BCA</option>
@@ -644,7 +671,7 @@ body.exam-season .story-rxn{background:rgba(120,60,255,0.15);}
       <div class="ftag" data-f="🌹 Shayari">🌹</div>
       <div class="ftag" data-f="💭 Random">💭</div>
       <div class="ftag" data-f="😂 Funny">😂</div>
-      <div class="ftag" data-f="📊 Poll">📊</div>
+            <div class="ftag" data-f="�📊 Poll">📊</div>
     </div>
   </div>
 
@@ -659,6 +686,64 @@ body.exam-season .story-rxn{background:rgba(120,60,255,0.15);}
     <div class="skel-card"><div class="skel-line a"></div><div class="skel-line b"></div><div class="skel-line c"></div><div class="skel-line d"></div><div class="skel-line e"></div></div>
     <div class="skel-card"><div class="skel-line a"></div><div class="skel-line c"></div><div class="skel-line b"></div><div class="skel-line d"></div><div class="skel-line e"></div></div>
     <div class="skel-card"><div class="skel-line a"></div><div class="skel-line b"></div><div class="skel-line d"></div><div class="skel-line e"></div></div>
+  </div>
+
+  </div><!-- end #confSection -->
+
+  <!-- ══════════════════════════════════════════════════ -->
+  <!-- DISCUSSION SECTION (Community Chat)               -->
+  <!-- ══════════════════════════════════════════════════ -->
+  <div id="discSection" style="display:none">
+
+    <div class="glass-card submit-card" style="margin-bottom:20px;">
+      <h2>💬 Community Discussion</h2>
+      <div class="disclaimer" style="background:rgba(59,130,246,0.07);border-color:rgba(59,130,246,0.22);margin-bottom:16px;">
+        <span class="disclaimer-icon">ℹ️</span>
+        <p style="color:rgba(160,210,255,0.88);">
+          <strong style="color:#93c5fd;">Unrelated community chatting —</strong> talk about anything college: mess food, class updates, movies, buy/sell, random stuff. Works like a WhatsApp group! <br><br>
+          <strong style="color:#93c5fd;">Name is optional</strong> — you don't have to write your real name or anything that exposes your identity. You can leave it blank to stay fully anonymous. <br><br>
+          <strong style="color:#fbbf24;">🚩 Flag! button</strong> — if someone sends abusive language, hit Flag! next to their message. It gets removed immediately.
+        </p>
+      </div>
+      <div style="margin-bottom:12px;">
+        <input id="discName" maxlength="30" placeholder="Your name (optional — or leave blank to be anonymous 😶)" style="width:100%;background:rgba(0,0,0,0.3);border:1.5px solid var(--border);border-radius:12px;padding:11px 14px;color:var(--text);font-size:0.9rem;font-family:'DM Sans',sans-serif;outline:none;margin-bottom:10px;transition:border-color .2s;"/>
+        <textarea id="discInput" maxlength="500" placeholder="What's on your mind? Mess food, class updates, movies, anything… 💬" style="min-height:90px;margin-bottom:10px;"></textarea>
+        <div style="display:flex;justify-content:space-between;align-items:center;gap:10px;">
+          <span id="discCharCount" style="font-size:0.75rem;color:var(--muted);">0 / 500</span>
+          <button class="submit-btn" id="discSendBtn" onclick="sendDiscussion()" style="width:auto;padding:11px 28px;font-size:0.9rem;">Send 💬</button>
+        </div>
+        <div id="discStatus" style="font-size:0.82rem;margin-top:8px;min-height:18px;"></div>
+      </div>
+    </div>
+
+    <!-- Discussion feed -->
+    <div class="section-head" style="margin-bottom:12px;">
+      <span class="section-label">Recent messages</span>
+      <button onclick="loadDiscussions()" style="background:none;border:none;color:var(--muted);cursor:pointer;font-size:0.78rem;">↻ Refresh</button>
+    </div>
+    <div id="discFeed" style="margin-bottom:20px;">
+      <div class="skel-card"><div class="skel-line a"></div><div class="skel-line b"></div><div class="skel-line c"></div></div>
+    </div>
+    <div id="discShowMoreWrap" style="text-align:center;margin-bottom:28px;display:none;">
+      <button class="submit-btn" onclick="showMoreDisc()" style="width:auto;padding:10px 28px;font-size:0.85rem;background:rgba(255,255,255,0.07);border:1px solid var(--border);color:var(--text);box-shadow:none;">See more 👇</button>
+    </div>
+  </div>
+
+  <!-- ══════════════════════════════════════════════════ -->
+  <!-- SUGGESTION MODAL                                   -->
+  <!-- ══════════════════════════════════════════════════ -->
+  <div id="suggestOverlay" style="display:none;position:fixed;inset:0;z-index:4000;background:rgba(0,0,0,0.7);backdrop-filter:blur(8px);display:none;align-items:center;justify-content:center;padding:20px;">
+    <div style="background:#1a0010;border:1px solid rgba(255,100,150,0.3);border-radius:24px;padding:32px;max-width:440px;width:100%;box-shadow:0 20px 60px rgba(255,45,111,0.2);position:relative;">
+      <button onclick="closeSuggestModal()" style="position:absolute;top:16px;right:16px;background:rgba(255,255,255,0.08);border:none;color:var(--text);border-radius:50%;width:32px;height:32px;cursor:pointer;font-size:1rem;">✕</button>
+      <h2 style="font-family:'Playfair Display',serif;font-size:1.3rem;margin-bottom:8px;">💡 Send a Suggestion</h2>
+      <p style="font-size:0.82rem;color:var(--muted);margin-bottom:20px;line-height:1.6;">Have an idea to make GIET Confessions better? Tell the admin! New features, fixes, anything — your suggestion goes straight to admin.</p>
+      <textarea id="suggestInput" maxlength="1000" placeholder="e.g. Add a dark/light toggle, allow GIFs in replies, bring back category X…" style="width:100%;min-height:120px;background:rgba(0,0,0,0.35);border:1.5px solid var(--border);border-radius:14px;padding:14px;color:var(--text);font-size:0.9rem;font-family:'DM Sans',sans-serif;resize:vertical;outline:none;margin-bottom:12px;"></textarea>
+      <div style="display:flex;justify-content:space-between;align-items:center;gap:10px;">
+        <span id="suggestCharCount" style="font-size:0.75rem;color:var(--muted);">0 / 1000</span>
+        <button class="submit-btn" onclick="sendSuggestion()" style="width:auto;padding:11px 28px;">Send 💡</button>
+      </div>
+      <div id="suggestStatus" style="font-size:0.82rem;margin-top:10px;min-height:18px;text-align:center;"></div>
+    </div>
   </div>
 
   <div class="glass-card updates-card">
@@ -1682,6 +1767,197 @@ function updateScrollThumb() {
     window.scrollTo({ top: targetScroll });
   });
 })();
+
+// ══════════════════════════════════════════════════════
+// PAGE TAB SWITCHER
+// ══════════════════════════════════════════════════════
+let currentTab = 'conf';
+function switchTab(tab) {
+  currentTab = tab;
+  document.getElementById('confSection').style.display = tab === 'conf' ? '' : 'none';
+  document.getElementById('discSection').style.display = tab === 'disc' ? '' : 'none';
+  document.getElementById('tabConf').classList.toggle('active', tab === 'conf');
+  document.getElementById('tabDisc').classList.toggle('active', tab === 'disc');
+  if (tab === 'disc') loadDiscussions();
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+
+// ══════════════════════════════════════════════════════
+// DISCUSSION (Community Chat)
+// ══════════════════════════════════════════════════════
+let allDiscMessages = [];
+const DISC_PAGE_SIZE = 5;
+let discShown = DISC_PAGE_SIZE;
+
+// Char counter
+const discInput = document.getElementById('discInput');
+if (discInput) {
+  discInput.addEventListener('input', () => {
+    const len = discInput.value.length;
+    document.getElementById('discCharCount').textContent = len + ' / 500';
+  });
+}
+
+async function loadDiscussions() {
+  const feed = document.getElementById('discFeed');
+  feed.innerHTML = '<div class="skel-card"><div class="skel-line a"></div><div class="skel-line b"></div><div class="skel-line c"></div></div>';
+  try {
+    const r = await fetch(API + '/api/discussions');
+    allDiscMessages = await r.json();
+    discShown = DISC_PAGE_SIZE;
+    renderDiscFeed();
+  } catch(e) {
+    feed.innerHTML = '<div style="color:var(--muted);text-align:center;padding:20px;">Could not load messages. Try refreshing.</div>';
+  }
+}
+
+function renderDiscFeed() {
+  const feed = document.getElementById('discFeed');
+  const showMoreWrap = document.getElementById('discShowMoreWrap');
+  if (!allDiscMessages.length) {
+    feed.innerHTML = '<div style="color:var(--muted);text-align:center;padding:28px;font-size:0.9rem;">No messages yet. Be the first to say something! 👋</div>';
+    showMoreWrap.style.display = 'none';
+    return;
+  }
+  const flagged = JSON.parse(localStorage.getItem('giet_disc_flagged') || '[]');
+  const toShow = allDiscMessages.slice(0, discShown);
+  feed.innerHTML = toShow.map(msg => {
+    const hasName = msg.displayName && msg.displayName.trim();
+    const nameHtml = hasName
+      ? `<div class="disc-name">${escapeHtml(msg.displayName)}</div>`
+      : `<div class="disc-name anon">Anonymous 😶</div>`;
+    const alreadyFlagged = flagged.includes(msg.id);
+    return `<div class="disc-msg" id="dm-${msg.id}">
+      <button class="disc-flag${alreadyFlagged ? ' flagged' : ''}" onclick="flagDiscMsg('${msg.id}', this)" title="Flag abusive content"${alreadyFlagged ? ' disabled' : ''}>🚩 Flag!</button>
+      ${nameHtml}
+      <div class="disc-text">${escapeHtml(msg.message)}</div>
+      <div class="disc-meta">${ago(msg.createdAt)}</div>
+    </div>`;
+  }).join('');
+  showMoreWrap.style.display = allDiscMessages.length > discShown ? 'block' : 'none';
+}
+
+function showMoreDisc() {
+  discShown += DISC_PAGE_SIZE;
+  renderDiscFeed();
+}
+
+function escapeHtml(str) {
+  return String(str).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+}
+
+async function sendDiscussion() {
+  const btn = document.getElementById('discSendBtn');
+  const statusEl = document.getElementById('discStatus');
+  const msg = (discInput.value || '').trim();
+  const name = (document.getElementById('discName').value || '').trim();
+  if (!msg) { statusEl.textContent = '⚠️ Message cannot be empty.'; statusEl.style.color = '#ff6b9d'; return; }
+  btn.disabled = true; btn.textContent = 'Sending…';
+  try {
+    const r = await fetch(API + '/api/discussions', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ message: msg, displayName: name || null, clientId: cid() })
+    });
+    const d = await r.json();
+    if (d.error) { statusEl.textContent = '⚠️ ' + d.error; statusEl.style.color = '#ff6b9d'; }
+    else {
+      discInput.value = '';
+      document.getElementById('discCharCount').textContent = '0 / 500';
+      statusEl.textContent = '✅ Message sent!';
+      statusEl.style.color = 'var(--green, #22c55e)';
+      // Prepend new message to local array and re-render
+      allDiscMessages.unshift(d.message);
+      renderDiscFeed();
+      setTimeout(() => { statusEl.textContent = ''; }, 3000);
+    }
+  } catch(e) {
+    statusEl.textContent = '⚠️ Network error. Try again.'; statusEl.style.color = '#ff6b9d';
+  }
+  btn.disabled = false; btn.textContent = 'Send 💬';
+}
+
+async function flagDiscMsg(id, btn) {
+  if (btn.classList.contains('flagged')) return;
+  btn.textContent = '🚩 …'; btn.style.pointerEvents = 'none';
+  try {
+    const r = await fetch(API + '/api/discussions/flag/' + id, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ clientId: cid() })
+    });
+    const d = await r.json();
+    if (d.alreadyFlagged || d.flags !== undefined) {
+      // Save locally so button stays flagged on reload
+      const arr = JSON.parse(localStorage.getItem('giet_disc_flagged') || '[]');
+      if (!arr.includes(id)) arr.push(id);
+      localStorage.setItem('giet_disc_flagged', JSON.stringify(arr));
+      btn.textContent = '🚩 Flagged';
+      btn.classList.add('flagged');
+      btn.disabled = true;
+      if (d.hidden) {
+        // Remove from DOM if hidden
+        const el = document.getElementById('dm-' + id);
+        if (el) { el.style.opacity = '0'; setTimeout(() => el.remove(), 300); }
+        allDiscMessages = allDiscMessages.filter(m => m.id !== id);
+        toast('⚠️ Reported! Message removed after enough flags.');
+      } else {
+        toast('🚩 Flagged! Message removed.');
+      }
+    }
+  } catch(e) {
+    btn.textContent = '🚩 Flag!'; btn.style.pointerEvents = '';
+  }
+}
+
+// ══════════════════════════════════════════════════════
+// SUGGESTION MODAL
+// ══════════════════════════════════════════════════════
+const suggestInput = document.getElementById('suggestInput');
+if (suggestInput) {
+  suggestInput.addEventListener('input', () => {
+    document.getElementById('suggestCharCount').textContent = suggestInput.value.length + ' / 1000';
+  });
+}
+
+function openSuggestModal() {
+  const ov = document.getElementById('suggestOverlay');
+  ov.style.display = 'flex';
+  document.getElementById('suggestStatus').textContent = '';
+  if (suggestInput) suggestInput.focus();
+}
+function closeSuggestModal() {
+  document.getElementById('suggestOverlay').style.display = 'none';
+}
+// Close on backdrop click
+document.getElementById('suggestOverlay').addEventListener('click', function(e) {
+  if (e.target === this) closeSuggestModal();
+});
+
+async function sendSuggestion() {
+  const statusEl = document.getElementById('suggestStatus');
+  const msg = (suggestInput.value || '').trim();
+  if (!msg) { statusEl.textContent = '⚠️ Please write something first.'; statusEl.style.color = '#ff6b9d'; return; }
+  statusEl.textContent = 'Sending…'; statusEl.style.color = 'var(--muted)';
+  try {
+    const r = await fetch(API + '/api/suggestions', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ message: msg, clientId: cid() })
+    });
+    const d = await r.json();
+    if (d.error) { statusEl.textContent = '⚠️ ' + d.error; statusEl.style.color = '#ff6b9d'; }
+    else {
+      statusEl.textContent = '✅ Suggestion sent to admin! Thanks for helping improve the site 🙏';
+      statusEl.style.color = '#22c55e';
+      suggestInput.value = '';
+      document.getElementById('suggestCharCount').textContent = '0 / 1000';
+      setTimeout(() => closeSuggestModal(), 2500);
+    }
+  } catch(e) {
+    statusEl.textContent = '⚠️ Network error. Try again.'; statusEl.style.color = '#ff6b9d';
+  }
+}
 </script>
 
 <!-- Report Bottom Sheet -->
