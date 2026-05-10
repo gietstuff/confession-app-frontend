@@ -230,6 +230,37 @@ body.exam-season .logout-btn{color:#a78bfa;border-color:rgba(140,80,255,0.3);}
     <div id="reportedList"><div class="empty-msg">No reported confessions 🎉</div></div>
   </div>
 
+  <!-- Teach AI Panel -->
+  <div class="section">
+    <div class="section-head"><h2>🧠 Teach AI — Add Patterns to Block</h2></div>
+    <div class="control-panel" style="border-color:rgba(139,92,246,0.3);">
+      <p style="font-size:0.82rem;color:var(--muted);margin-bottom:14px;line-height:1.6;">
+        Teach the AI to block confessions with a specific <b>meaning or pattern</b> — without waiting for someone to submit one.
+        Type any example phrase, name context, or Odia abuse, click Teach. Future similar confessions get auto-blocked by Layer 2.
+      </p>
+      <div style="display:flex;gap:8px;flex-wrap:wrap;align-items:flex-end;">
+        <div style="flex:1;min-width:200px;">
+          <label style="font-size:0.75rem;color:var(--muted);display:block;margin-bottom:6px;">Example phrase to block</label>
+          <input type="text" id="teachText"
+            placeholder="e.g. bhaudi tui bahut kharap, or: that CSE girl with specs..."
+            style="width:100%;background:rgba(0,0,0,0.4);border:1.5px solid rgba(139,92,246,0.35);border-radius:12px;padding:11px 14px;color:var(--text);font-size:0.88rem;font-family:'DM Sans',sans-serif;outline:none;"
+            maxlength="300"/>
+        </div>
+        <button class="ia-btn" style="background:rgba(139,92,246,0.2);color:#c4b5fd;border:1px solid rgba(139,92,246,0.4);white-space:nowrap;" onclick="teachAI()">🧠 Teach AI</button>
+      </div>
+      <div id="teachStatus" style="margin-top:10px;font-size:0.8rem;color:#c4b5fd;min-height:18px;"></div>
+      <details style="margin-top:14px;">
+        <summary style="font-size:0.76rem;color:var(--muted);cursor:pointer;">💡 Tips — what to teach</summary>
+        <div style="font-size:0.76rem;color:var(--muted);margin-top:8px;line-height:1.7;padding:10px;background:rgba(0,0,0,0.2);border-radius:10px;">
+          <b style="color:#c4b5fd;">Odia abuse phrases:</b> "bhaudi tui nalayak", "sala ganda kaam karu", "beshya mafia"<br>
+          <b style="color:#c4b5fd;">Name targeting patterns:</b> "that girl from room 204", "the professor who teaches DBMS"<br>
+          <b style="color:#c4b5fd;">Harassment patterns:</b> "everyone knows she is characterless", "he cheated in exam 2nd year"<br>
+          <b style="color:#c4b5fd;">How it works:</b> The AI learns the <i>meaning</i>, not just the words. So teaching one phrase catches many similar ones.
+        </div>
+      </details>
+    </div>
+  </div>
+
   <!-- Weekly Prompt / Themed Day -->
   <div class="section">
     <div class="section-head"><h2>💬 Weekly Theme / Prompt</h2></div>
@@ -445,6 +476,24 @@ async function deleteConf(id){
 //    so similar confessions are auto-blocked in the future
 // This is how the AI system learns without you writing new rules.
 // The more confessions you mark abusive, the smarter the filter gets.
+async function teachAI(){
+  const text = document.getElementById('teachText')?.value?.trim();
+  const status = document.getElementById('teachStatus');
+  if(!text || text.length < 3){ status.textContent = '⚠️ Enter at least a few words'; return; }
+  status.textContent = '⏳ Teaching...';
+  try{
+    const r = await fetch(`${API}/api/admin/teach`, {
+      method:'POST', headers: adminH(),
+      body: JSON.stringify({ text })
+    });
+    const d = await r.json();
+    if(d.error){ status.textContent = '❌ ' + d.error; return; }
+    status.textContent = d.message || '✅ Learned!';
+    document.getElementById('teachText').value = '';
+    setTimeout(() => { status.textContent = ''; }, 4000);
+  } catch(e){ status.textContent = '❌ Network error'; }
+}
+
 async function markAbusive(id){
   if(!confirm('Mark as abusive and teach AI?\n\nThis will:\n✓ Delete the confession\n✓ Save its pattern to AI memory\n✓ Future similar posts will be auto-blocked'))return;
   try{
