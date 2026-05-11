@@ -70,7 +70,6 @@ header{text-align:center;padding:52px 0 24px;position:relative;}
 .ig-pill:hover{transform:scale(1.05);}
 .top-right{display:flex;gap:8px;align-items:center;}
 .theme-pill{background:var(--glass);border:1px solid var(--border);color:var(--text);border-radius:40px;padding:8px 16px;cursor:pointer;font-size:0.82rem;font-weight:500;backdrop-filter:blur(10px);transition:all .2s;font-family:'DM Sans',sans-serif;}
-.theme-pill{display:none;}/* light mode removed */
 .admin-pill{display:inline-flex;align-items:center;gap:6px;background:rgba(255,255,255,0.07);border:1px solid rgba(255,100,150,0.25);color:rgba(255,200,220,0.8);border-radius:40px;padding:8px 14px;font-size:0.8rem;font-weight:600;text-decoration:none;backdrop-filter:blur(10px);transition:all .2s;font-family:'DM Sans',sans-serif;}
 .admin-pill:hover{background:rgba(255,45,111,0.15);border-color:rgba(255,45,111,0.4);color:#fff;}
 /* ── Feature 2: Story mode button ── */
@@ -315,6 +314,86 @@ body.exam-season .story-rxn{background:rgba(120,60,255,0.15);}
 [data-theme="light"] .disclaimer p{color:rgba(120,80,0,0.85);}
 [data-theme="light"] .disclaimer strong{color:rgba(120,80,0,1);}
 [data-theme="light"] .rxn-btn{background:rgba(255,255,255,0.5);border-color:rgba(255,100,150,0.15);color:rgba(150,50,90,0.8);}
+/* ── Full light mode — all remaining elements ── */
+[data-theme="light"] .sort-menu{background:rgba(255,240,248,0.98);border-color:rgba(255,100,150,0.2);}
+[data-theme="light"] .sort-opt{color:rgba(150,50,90,0.8);}
+[data-theme="light"] .sort-opt:hover,[data-theme="light"] .sort-opt.active{background:rgba(255,45,111,0.1);color:#3d0022;}
+[data-theme="light"] .ftag{background:rgba(255,255,255,0.7);border-color:rgba(255,100,150,0.2);color:rgba(150,50,90,0.8);}
+[data-theme="light"] .cat-pill{background:rgba(255,45,111,0.07);border-color:rgba(255,45,111,0.25);color:var(--crimson);}
+[data-theme="light"] .branch-select{background:rgba(255,255,255,0.8);color:#3d0022;border-color:rgba(255,100,150,0.25);}
+[data-theme="light"] .branch-select option{background:#fff0f5;color:#3d0022;}
+[data-theme="light"] textarea{background:rgba(255,255,255,0.8);color:#3d0022;border-color:rgba(255,100,150,0.25);}
+[data-theme="light"] textarea::placeholder{color:rgba(180,80,120,0.35);}
+[data-theme="light"] .conf-card{background:rgba(255,255,255,0.7);border-color:rgba(255,100,150,0.15);}
+[data-theme="light"] .conf-card:hover{border-color:rgba(255,45,111,0.3);}
+[data-theme="light"] .card-cat{background:rgba(255,45,111,0.08);border-color:rgba(255,45,111,0.2);color:var(--crimson);}
+[data-theme="light"] .updates-list li{color:rgba(100,30,60,0.55);}
+[data-theme="light"] .disc{color:rgba(100,30,60,0.4);}
+[data-theme="light"] .page-tabs{background:transparent;}
+[data-theme="light"] .ptab{background:rgba(255,255,255,0.6);border-color:rgba(255,100,150,0.2);color:rgba(150,50,90,0.8);}
+[data-theme="light"] .sort-dropdown{background:rgba(255,255,255,0.6);border-color:rgba(255,100,150,0.2);color:rgba(150,50,90,0.8);}
+[data-theme="light"] .remove-btn{background:rgba(255,255,255,0.5);border-color:rgba(255,100,150,0.15);color:rgba(150,50,90,0.7);}
+[data-theme="light"] #captchaGate{background:#fff2f6;}
+[data-theme="light"] .captcha-box{background:rgba(255,255,255,0.85);border-color:rgba(255,100,150,0.25);}
+[data-theme="light"] .captcha-question{background:rgba(255,45,111,0.06);color:#3d0022;}
+[data-theme="light"] .captcha-input{background:rgba(255,255,255,0.9);color:#3d0022;border-color:rgba(255,100,150,0.3);}
+[data-theme="light"] .captcha-box p{color:rgba(120,50,80,0.75);}
+[data-theme="light"] .report-box{background:#fff0f5;}
+[data-theme="light"] .report-reason{background:rgba(255,255,255,0.6);border-color:rgba(255,100,150,0.15);color:#3d0022;}
+[data-theme="light"] .theme-pill{background:rgba(255,255,255,0.6);border-color:rgba(255,100,150,0.25);color:#3d0022;}
+
+/* ── Light mode: all remaining elements ── */
+/* Header & top bar */
+[data-theme="light"] .site-title{background:linear-gradient(135deg,#8b0000 0%,var(--rose) 50%,#b45309 100%);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;}
+[data-theme="light"] .site-sub{color:rgba(100,30,60,0.75);}
+[data-theme="light"] .stats-bar{background:rgba(255,255,255,0.7);border-color:rgba(255,100,150,0.2);}
+[data-theme="light"] .stats-bar span{color:rgba(120,40,70,0.8);}
+[data-theme="light"] .header-glow{opacity:0.3;}
+[data-theme="light"] .ig-pill{opacity:0.9;}
+[data-theme="light"] .admin-pill{background:rgba(255,255,255,0.7);border-color:rgba(255,100,150,0.2);color:rgba(120,30,60,0.85);}
+/* Glass cards */
+[data-theme="light"] .glass-card{background:rgba(255,255,255,0.75);border-color:rgba(255,100,150,0.18);box-shadow:0 4px 24px rgba(255,45,111,0.08);}
+[data-theme="light"] .glass-card::before{background:linear-gradient(135deg,rgba(255,255,255,0.6) 0%,transparent 60%);}
+[data-theme="light"] .submit-card h2{color:#3d0022;}
+/* Confession cards */
+[data-theme="light"] .cotd-badge{background:rgba(255,183,71,0.15);border-color:rgba(255,183,71,0.35);color:#92400e;}
+[data-theme="light"] .card-footer{border-color:rgba(255,100,150,0.12);}
+[data-theme="light"] .card-meta{color:rgba(120,40,70,0.7);}
+[data-theme="light"] .card-time{color:rgba(120,40,70,0.55);}
+[data-theme="light"] .section-label{color:rgba(120,40,70,0.75);}
+/* Poll elements */
+[data-theme="light"] .poll-question{color:#3d0022;}
+[data-theme="light"] .poll-vote-btn{background:rgba(255,255,255,0.7);border-color:rgba(255,100,150,0.2);color:rgba(120,40,70,0.8);}
+[data-theme="light"] .poll-bar-wrap{background:rgba(255,100,150,0.08);}
+[data-theme="light"] .poll-bar-label{color:rgba(120,40,70,0.7);}
+[data-theme="light"] .poll-total{color:rgba(120,40,70,0.6);}
+[data-theme="light"] .poll-q,[data-theme="light"] .poll-opt-dyn{background:rgba(255,255,255,0.8);color:#3d0022;border-color:rgba(255,100,150,0.25);}
+[data-theme="light"] .poll-q::placeholder,[data-theme="light"] .poll-opt-dyn::placeholder{color:rgba(180,80,120,0.4);}
+[data-theme="light"] .poll-add-btn{background:rgba(255,255,255,0.6);border-color:rgba(255,100,150,0.2);color:rgba(120,40,70,0.75);}
+/* Search bar */
+[data-theme="light"] .search-wrap{background:rgba(255,255,255,0.7);border-color:rgba(255,100,150,0.2);}
+[data-theme="light"] .search-input{color:#3d0022;}
+[data-theme="light"] .search-input::placeholder{color:rgba(180,80,120,0.4);}
+[data-theme="light"] .search-clear{color:rgba(180,80,120,0.6);}
+/* Weekly prompt banner */
+[data-theme="light"] .prompt-banner{background:rgba(255,183,71,0.06);border-color:rgba(255,183,71,0.22);}
+[data-theme="light"] .prompt-text span{color:rgba(120,70,0,0.75);}
+/* Story mode overlay — keep dark (it's an immersive overlay) */
+[data-theme="light"] .story-overlay{background:rgba(0,0,0,0.88);}
+/* Report overlay */
+[data-theme="light"] .report-other{background:rgba(255,255,255,0.8);color:#3d0022;border-color:rgba(255,100,150,0.2);}
+/* Toast */
+[data-theme="light"] .toast{background:rgba(60,0,30,0.92);color:#fff0f5;}
+/* Skel cards */
+[data-theme="light"] .skel-card{background:rgba(255,255,255,0.6);border-color:rgba(255,100,150,0.1);}
+/* Thisisme btn */
+[data-theme="light"] .thisisme-btn{background:rgba(255,255,255,0.6);border-color:rgba(255,100,150,0.2);color:rgba(120,40,70,0.8);}
+[data-theme="light"] .thisisme-count{color:rgba(120,40,70,0.65);}
+/* Word counter bar */
+[data-theme="light"] .wbar-bg{background:rgba(255,100,150,0.1);}
+[data-theme="light"] .wcount{color:rgba(120,40,70,0.65);}
+/* Empty state */
+[data-theme="light"] .empty-icon{filter:none;opacity:0.6;}
 
 @media(max-width:600px){
   .page{padding:0 12px 90px;}
@@ -435,16 +514,131 @@ body.exam-season .story-rxn{background:rgba(120,60,255,0.15);}
 .ptab.suggest-tab{background:rgba(251,191,36,0.08);border-color:rgba(251,191,36,0.3);color:#fbbf24;flex:0 0 auto;}
 .ptab.suggest-tab:hover{background:rgba(251,191,36,0.18);}
 
-/* ── Discussion feed ── */
-.disc-msg{display:flex;flex-direction:column;background:rgba(255,255,255,0.04);border:1px solid rgba(59,130,246,0.18);border-radius:16px;padding:14px 16px;margin-bottom:10px;position:relative;transition:border-color .2s;}
-.disc-msg:hover{border-color:rgba(59,130,246,0.32);}
-.disc-name{font-size:0.78rem;font-weight:700;color:#93c5fd;margin-bottom:4px;}
+/* ══════════════════════════════════════════════════════
+   WHATSAPP-STYLE DISCUSSION CHAT UI
+   ══════════════════════════════════════════════════════
+   LEARN: This mimics WhatsApp's chat bubble layout.
+   Messages from "you" appear on the RIGHT (green/rose tint).
+   Messages from others appear on the LEFT (dark bubble).
+   The chat area has a fixed height with overflow:auto so it
+   scrolls like a real chat, not a blog feed.
+   We detect "own" messages by matching clientId to localStorage.
+   ══════════════════════════════════════════════════════ */
+
+/* Outer wrapper — fixed height chat window */
+.disc-chat-window{
+  height:420px;overflow-y:auto;
+  padding:12px 8px;
+  background:rgba(0,0,0,0.18);
+  border-radius:18px;
+  border:1px solid rgba(59,130,246,0.15);
+  margin-bottom:0;
+  scroll-behavior:smooth;
+  /* Custom scrollbar */
+  scrollbar-width:thin;
+  scrollbar-color:rgba(255,255,255,0.15) transparent;
+}
+.disc-chat-window::-webkit-scrollbar{width:4px;}
+.disc-chat-window::-webkit-scrollbar-thumb{background:rgba(255,255,255,0.15);border-radius:4px;}
+
+/* Each message row — flexbox for left/right alignment */
+.disc-row{display:flex;margin-bottom:6px;align-items:flex-end;gap:8px;}
+.disc-row.mine{flex-direction:row-reverse;}  /* own messages: right side */
+
+/* The bubble itself */
+.disc-bubble{
+  max-width:72%;padding:9px 13px 6px;
+  border-radius:18px;position:relative;
+  word-break:break-word;line-height:1.5;
+}
+/* Other people's messages — dark left bubble */
+.disc-bubble.other{
+  background:rgba(255,255,255,0.08);
+  border:1px solid rgba(255,255,255,0.1);
+  border-bottom-left-radius:4px;
+  color:var(--text);
+}
+/* Your own messages — tinted right bubble */
+.disc-bubble.mine{
+  background:rgba(255,45,111,0.18);
+  border:1px solid rgba(255,45,111,0.3);
+  border-bottom-right-radius:4px;
+  color:var(--text);
+}
+.disc-name{font-size:0.72rem;font-weight:700;color:#93c5fd;margin-bottom:3px;}
 .disc-name.anon{color:rgba(255,200,220,0.5);font-style:italic;}
-.disc-text{font-size:0.92rem;color:var(--text);line-height:1.6;word-break:break-word;flex:1;}
-.disc-meta{font-size:0.7rem;color:var(--muted);margin-top:6px;}
-.disc-flag{position:absolute;top:10px;right:10px;background:rgba(239,68,68,0.08);border:1px solid rgba(239,68,68,0.22);color:rgba(239,68,68,0.7);border-radius:8px;padding:3px 8px;font-size:0.7rem;font-weight:700;cursor:pointer;transition:all .18s;font-family:'DM Sans',sans-serif;}
-.disc-flag:hover{background:rgba(239,68,68,0.2);color:#fca5a5;border-color:rgba(239,68,68,0.45);}
-.disc-flag.flagged{color:rgba(239,68,68,0.4);cursor:default;pointer-events:none;}
+.disc-text{font-size:0.9rem;}
+.disc-meta-row{display:flex;align-items:center;justify-content:flex-end;gap:6px;margin-top:3px;}
+.disc-meta{font-size:0.65rem;color:rgba(255,255,255,0.35);}
+/* Flag button inside bubble — small, unobtrusive */
+.disc-flag{background:none;border:none;color:rgba(239,68,68,0.45);font-size:0.68rem;cursor:pointer;padding:0;font-family:'DM Sans',sans-serif;transition:color .15s;}
+.disc-flag:hover{color:rgba(239,68,68,0.85);}
+.disc-flag.flagged{color:rgba(239,68,68,0.25);pointer-events:none;}
+
+/* Avatar circle for other messages */
+.disc-avatar{width:28px;height:28px;border-radius:50%;background:linear-gradient(135deg,rgba(59,130,246,0.5),rgba(139,92,246,0.5));display:flex;align-items:center;justify-content:center;font-size:0.75rem;flex-shrink:0;font-weight:700;color:#fff;border:1px solid rgba(255,255,255,0.1);}
+
+/* Input area at bottom — WhatsApp style bar */
+.disc-input-bar{
+  display:flex;align-items:flex-end;gap:8px;
+  padding:10px 12px;
+  background:rgba(0,0,0,0.25);
+  border-top:1px solid rgba(255,255,255,0.07);
+  border-radius:0 0 18px 18px;
+}
+.disc-input-bar textarea{
+  flex:1;min-height:38px;max-height:100px;
+  background:rgba(255,255,255,0.07);
+  border:1px solid rgba(255,255,255,0.12);
+  border-radius:22px;padding:9px 14px;
+  color:var(--text);font-size:0.9rem;
+  font-family:'DM Sans',sans-serif;
+  resize:none;outline:none;
+  line-height:1.45;transition:border-color .2s;
+}
+.disc-input-bar textarea:focus{border-color:rgba(59,130,246,0.5);}
+.disc-input-bar textarea::placeholder{color:rgba(255,255,255,0.3);}
+.disc-send-btn{
+  width:40px;height:40px;border-radius:50%;
+  background:linear-gradient(135deg,#2563eb,#1d4ed8);
+  border:none;color:#fff;font-size:1rem;
+  cursor:pointer;display:flex;align-items:center;justify-content:center;
+  flex-shrink:0;transition:all .2s;
+  box-shadow:0 3px 12px rgba(37,99,235,0.4);
+}
+.disc-send-btn:hover{transform:scale(1.08);}
+.disc-send-btn:disabled{opacity:0.4;cursor:not-allowed;transform:none;}
+
+/* Name tag above chat window */
+.disc-name-bar{
+  display:flex;align-items:center;gap:8px;
+  padding:8px 12px;
+  background:rgba(0,0,0,0.2);
+  border-radius:18px 18px 0 0;
+  border:1px solid rgba(59,130,246,0.15);
+  border-bottom:none;
+}
+.disc-name-input{
+  flex:1;background:transparent;border:none;
+  color:var(--text);font-size:0.85rem;
+  font-family:'DM Sans',sans-serif;outline:none;
+}
+.disc-name-input::placeholder{color:rgba(255,255,255,0.3);}
+.disc-online-dot{width:8px;height:8px;border-radius:50%;background:#22c55e;animation:pulse 2s infinite;flex-shrink:0;}
+
+/* Light mode overrides for discussion */
+[data-theme="light"] .disc-chat-window{background:rgba(240,240,240,0.5);border-color:rgba(59,130,246,0.2);}
+[data-theme="light"] .disc-bubble.other{background:rgba(255,255,255,0.9);border-color:rgba(0,0,0,0.08);color:#1a1a2e;}
+[data-theme="light"] .disc-bubble.mine{background:rgba(220,242,255,0.95);border-color:rgba(37,99,235,0.25);color:#0a1628;}
+[data-theme="light"] .disc-name{color:#1d4ed8;}
+[data-theme="light"] .disc-meta{color:rgba(0,0,0,0.35);}
+[data-theme="light"] .disc-flag{color:rgba(239,68,68,0.5);}
+[data-theme="light"] .disc-input-bar{background:rgba(255,255,255,0.7);border-color:rgba(0,0,0,0.08);}
+[data-theme="light"] .disc-input-bar textarea{background:rgba(255,255,255,0.9);border-color:rgba(0,0,0,0.12);color:#1a1a2e;}
+[data-theme="light"] .disc-input-bar textarea::placeholder{color:rgba(0,0,0,0.3);}
+[data-theme="light"] .disc-name-bar{background:rgba(255,255,255,0.8);border-color:rgba(59,130,246,0.2);}
+[data-theme="light"] .disc-name-input{color:#1a1a2e;}
+[data-theme="light"] .disc-name-input::placeholder{color:rgba(0,0,0,0.3);}
 </style>
 </head>
 <body data-theme="dark">
@@ -543,6 +737,7 @@ body.exam-season .story-rxn{background:rgba(120,60,255,0.15);}
     <div class="top-right">
       <a href="/confessions-v3.html" class="newpage-pill">✨ New Page</a>
       <a href="/admin.html" class="admin-pill">🔐 Admin</a>
+      <button class="theme-pill" id="themePill" onclick="toggleTheme()">☀️ Light</button>
       <button class="story-pill" onclick="openStory()">▶ Story Mode</button>
     </div>
   </div>
@@ -600,7 +795,7 @@ body.exam-season .story-rxn{background:rgba(120,60,255,0.15);}
       <div class="cat-pill" data-cat="🌹 Shayari">🌹 Shayari</div>
       <div class="cat-pill" data-cat="💭 Random">💭 Random</div>
       <div class="cat-pill" data-cat="😂 Funny">😂 Funny</div>
-            <div class="cat-pill" data-cat="�📊 Poll">📊 Poll</div>
+            <div class="cat-pill" data-cat="📊 Poll">📊 Poll</div>
     </div>
 
     <!-- Poll input fields (only visible when Poll is selected) -->
@@ -671,7 +866,7 @@ body.exam-season .story-rxn{background:rgba(120,60,255,0.15);}
       <div class="ftag" data-f="🌹 Shayari">🌹</div>
       <div class="ftag" data-f="💭 Random">💭</div>
       <div class="ftag" data-f="😂 Funny">😂</div>
-            <div class="ftag" data-f="�📊 Poll">📊</div>
+            <div class="ftag" data-f="📊 Poll">📊</div>
     </div>
   </div>
 
@@ -695,37 +890,56 @@ body.exam-season .story-rxn{background:rgba(120,60,255,0.15);}
   <!-- ══════════════════════════════════════════════════ -->
   <div id="discSection" style="display:none">
 
-    <div class="glass-card submit-card" style="margin-bottom:20px;">
-      <h2>💬 Community Discussion</h2>
-      <div class="disclaimer" style="background:rgba(59,130,246,0.07);border-color:rgba(59,130,246,0.22);margin-bottom:16px;">
-        <span class="disclaimer-icon">ℹ️</span>
-        <p style="color:rgba(160,210,255,0.88);">
-          <strong style="color:#93c5fd;">Unrelated community chatting —</strong> talk about anything college: mess food, class updates, movies, buy/sell, random stuff. Works like a WhatsApp group! <br><br>
-          <strong style="color:#93c5fd;">Name is optional</strong> — you don't have to write your real name or anything that exposes your identity. You can leave it blank to stay fully anonymous. <br><br>
-          <strong style="color:#fbbf24;">🚩 Flag! button</strong> — if someone sends abusive language, hit Flag! next to their message. It gets removed immediately.
-        </p>
-      </div>
-      <div style="margin-bottom:12px;">
-        <input id="discName" maxlength="30" placeholder="Your name (optional — or leave blank to be anonymous 😶)" style="width:100%;background:rgba(0,0,0,0.3);border:1.5px solid var(--border);border-radius:12px;padding:11px 14px;color:var(--text);font-size:0.9rem;font-family:'DM Sans',sans-serif;outline:none;margin-bottom:10px;transition:border-color .2s;"/>
-        <textarea id="discInput" maxlength="500" placeholder="What's on your mind? Mess food, class updates, movies, anything… 💬" style="min-height:90px;margin-bottom:10px;"></textarea>
-        <div style="display:flex;justify-content:space-between;align-items:center;gap:10px;">
-          <span id="discCharCount" style="font-size:0.75rem;color:var(--muted);">0 / 500</span>
-          <button class="submit-btn" id="discSendBtn" onclick="sendDiscussion()" style="width:auto;padding:11px 28px;font-size:0.9rem;">Send 💬</button>
+    <!-- Disclaimer -->
+    <div class="disclaimer" style="background:rgba(59,130,246,0.07);border-color:rgba(59,130,246,0.22);margin-bottom:14px;">
+      <span class="disclaimer-icon">💬</span>
+      <p style="color:rgba(160,210,255,0.88);">
+        <strong style="color:#93c5fd;">General Discussion —</strong> talk about anything college: mess food, class schedules, events, movies, buy/sell, random stuff.<br><br>
+        <strong style="color:#fbbf24;">⚠️ Admin cannot pre-filter messages here</strong> — this is a live chat. You may occasionally see abusive content. Use <strong>🚩 Flag</strong> to report it — 3 flags hides it for admin review.<br><br>
+        <strong style="color:#a5f3b4;">Name is optional</strong> — leave it blank to stay anonymous 😶
+      </p>
+    </div>
+
+    <!-- WhatsApp-style chat card -->
+    <div class="glass-card" style="padding:0;overflow:hidden;margin-bottom:24px;">
+
+      <!-- Chat header bar -->
+      <div style="display:flex;align-items:center;gap:10px;padding:12px 16px;background:rgba(37,99,235,0.12);border-bottom:1px solid rgba(59,130,246,0.15);">
+        <div style="width:36px;height:36px;border-radius:50%;background:linear-gradient(135deg,#2563eb,#7c3aed);display:flex;align-items:center;justify-content:center;font-size:1.1rem;">🎓</div>
+        <div style="flex:1;">
+          <div style="font-weight:700;font-size:0.9rem;color:var(--text);">GIET Community Chat</div>
+          <div style="font-size:0.72rem;color:rgba(34,197,94,0.8);display:flex;align-items:center;gap:4px;"><span style="width:6px;height:6px;border-radius:50%;background:#22c55e;display:inline-block;"></span>Open for everyone</div>
         </div>
-        <div id="discStatus" style="font-size:0.82rem;margin-top:8px;min-height:18px;"></div>
+        <button onclick="loadDiscussions()" style="background:none;border:none;color:rgba(255,255,255,0.4);cursor:pointer;font-size:1rem;padding:4px;" title="Refresh">↻</button>
+      </div>
+
+      <!-- Name bar (above messages) -->
+      <div class="disc-name-bar">
+        <span style="font-size:0.72rem;color:rgba(255,255,255,0.35);white-space:nowrap;">Your name:</span>
+        <input id="discName" class="disc-name-input" maxlength="30" placeholder="Anonymous 😶 (optional)"/>
+        <div class="disc-online-dot"></div>
+      </div>
+
+      <!-- Chat window (scrollable messages) -->
+      <div class="disc-chat-window" id="discFeed">
+        <div class="skel-card"><div class="skel-line a"></div><div class="skel-line b"></div></div>
+      </div>
+
+      <!-- Input bar -->
+      <div class="disc-input-bar">
+        <textarea id="discInput" maxlength="500" placeholder="Message…" rows="1"
+          oninput="autoResizeDisc(this);document.getElementById('discCharCount').textContent=this.value.length+' / 500'"
+          onkeydown="if(event.key==='Enter'&&!event.shiftKey){event.preventDefault();sendDiscussion();}"></textarea>
+        <button class="disc-send-btn" id="discSendBtn" onclick="sendDiscussion()" title="Send">➤</button>
+      </div>
+      <div style="display:flex;justify-content:space-between;padding:4px 14px 8px;font-size:0.68rem;color:rgba(255,255,255,0.25);">
+        <span id="discStatus"></span>
+        <span id="discCharCount">0 / 500</span>
       </div>
     </div>
 
-    <!-- Discussion feed -->
-    <div class="section-head" style="margin-bottom:12px;">
-      <span class="section-label">Recent messages</span>
-      <button onclick="loadDiscussions()" style="background:none;border:none;color:var(--muted);cursor:pointer;font-size:0.78rem;">↻ Refresh</button>
-    </div>
-    <div id="discFeed" style="margin-bottom:20px;">
-      <div class="skel-card"><div class="skel-line a"></div><div class="skel-line b"></div><div class="skel-line c"></div></div>
-    </div>
     <div id="discShowMoreWrap" style="text-align:center;margin-bottom:28px;display:none;">
-      <button class="submit-btn" onclick="showMoreDisc()" style="width:auto;padding:10px 28px;font-size:0.85rem;background:rgba(255,255,255,0.07);border:1px solid var(--border);color:var(--text);box-shadow:none;">See more 👇</button>
+      <button onclick="showMoreDisc()" style="background:none;border:1px solid var(--border);color:var(--muted);border-radius:30px;padding:8px 22px;font-size:0.8rem;cursor:pointer;font-family:'DM Sans',sans-serif;">Load older messages ↑</button>
     </div>
   </div>
 
@@ -1374,11 +1588,41 @@ function applyTheme(key) {
   s.setProperty('--crimson', `rgb(${t.c})`);
   s.setProperty('--border',  `rgba(${t.r},0.28)`);
   s.setProperty('--card-shadow', `0 8px 40px rgba(${t.r},0.2)`);
-  document.body.style.background = t.bodyBg;
-  const bg = document.querySelector('.bg');
-  if(bg) bg.style.background = `radial-gradient(ellipse 80% 60% at 20% 10%,${t.bgStop} 0%,transparent 60%),radial-gradient(ellipse 60% 80% at 80% 90%,${t.bgStop2} 0%,transparent 55%),radial-gradient(ellipse 50% 50% at 50% 50%,${t.bodyBg} 0%,${t.bodyBg} 100%)`;
+  // LEARN: Only apply dark background if we're in dark mode.
+  // In light mode, body stays white and we just change the accent colour.
+  const isLight = document.documentElement.getAttribute('data-theme') === 'light';
+  if (!isLight) {
+    document.body.style.background = t.bodyBg;
+    const bg = document.querySelector('.bg');
+    if(bg) bg.style.background = `radial-gradient(ellipse 80% 60% at 20% 10%,${t.bgStop} 0%,transparent 60%),radial-gradient(ellipse 60% 80% at 80% 90%,${t.bgStop2} 0%,transparent 55%),radial-gradient(ellipse 50% 50% at 50% 50%,${t.bodyBg} 0%,${t.bodyBg} 100%)`;
+  }
   document.querySelectorAll('.stats-dot').forEach(d=>{ d.style.background=`rgb(${t.r2})`; d.style.boxShadow=`0 0 8px rgb(${t.r2})`; });
 }
+
+// ── Theme toggle (Dark ↔ Light) ──────────────────────────────────────────────
+// LEARN: document.documentElement is the <html> element.
+// We set data-theme="light" or "dark" on it, and CSS [data-theme="light"] rules apply.
+// localStorage persists the preference so it's remembered on reload.
+function toggleTheme() {
+  const html = document.documentElement;
+  const current = html.getAttribute('data-theme') || 'dark';
+  const next = current === 'dark' ? 'light' : 'dark';
+  html.setAttribute('data-theme', next);
+  localStorage.setItem('giet_theme', next);
+  const pill = document.getElementById('themePill');
+  if (pill) pill.textContent = next === 'dark' ? '☀️ Light' : '🌙 Dark';
+  // Light mode uses a white background — override the animated bg
+  document.body.style.background = next === 'light' ? '#fff2f6' : '';
+}
+
+// Apply saved theme on load
+(function(){
+  const saved = localStorage.getItem('giet_theme') || 'dark';
+  document.documentElement.setAttribute('data-theme', saved);
+  if (saved === 'light') document.body.style.background = '#fff2f6';
+  const pill = document.getElementById('themePill');
+  if (pill) pill.textContent = saved === 'dark' ? '☀️ Light' : '🌙 Dark';
+})();
 
 function applyExamTheme() {
   // Only auto-apply if no admin prompt theme is set
@@ -1798,43 +2042,76 @@ if (discInput) {
   });
 }
 
+// ── Discussion: WhatsApp-style chat ───────────────────────────────────────────
+// LEARN: We detect "own" messages by comparing msg.clientId to cid() (localStorage UUID).
+// Messages matching yours show on the RIGHT with a rose-tinted bubble.
+// Others show on the LEFT with a dark bubble.
+// The chat window auto-scrolls to bottom on new messages (scrollTop = scrollHeight).
+// DISC_PAGE_SIZE controls how many old messages are shown before "Load older" appears.
+
+function escapeHtml(str) {
+  return String(str).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+}
+
+function autoResizeDisc(el) {
+  el.style.height = 'auto';
+  el.style.height = Math.min(el.scrollHeight, 100) + 'px';
+}
+
 async function loadDiscussions() {
   const feed = document.getElementById('discFeed');
-  feed.innerHTML = '<div class="skel-card"><div class="skel-line a"></div><div class="skel-line b"></div><div class="skel-line c"></div></div>';
+  feed.innerHTML = '<div style="padding:20px;text-align:center;color:rgba(255,255,255,0.3);font-size:0.85rem;">Loading messages…</div>';
   try {
     const r = await fetch(API + '/api/discussions');
-    allDiscMessages = await r.json();
+    // API returns newest first — we reverse so oldest is at top (chat style)
+    allDiscMessages = (await r.json()).reverse();
     discShown = DISC_PAGE_SIZE;
-    renderDiscFeed();
+    renderDiscFeed(true); // true = scroll to bottom
   } catch(e) {
-    feed.innerHTML = '<div style="color:var(--muted);text-align:center;padding:20px;">Could not load messages. Try refreshing.</div>';
+    feed.innerHTML = '<div style="color:var(--muted);text-align:center;padding:20px;">Could not load. Try refreshing.</div>';
   }
 }
 
-function renderDiscFeed() {
+function renderDiscFeed(scrollToBottom = false) {
   const feed = document.getElementById('discFeed');
   const showMoreWrap = document.getElementById('discShowMoreWrap');
   if (!allDiscMessages.length) {
-    feed.innerHTML = '<div style="color:var(--muted);text-align:center;padding:28px;font-size:0.9rem;">No messages yet. Be the first to say something! 👋</div>';
+    feed.innerHTML = '<div style="color:rgba(255,255,255,0.3);text-align:center;padding:40px 20px;font-size:0.85rem;">No messages yet.<br/>Be the first to say something! 👋</div>';
     showMoreWrap.style.display = 'none';
     return;
   }
-  const flagged = JSON.parse(localStorage.getItem('giet_disc_flagged') || '[]');
-  const toShow = allDiscMessages.slice(0, discShown);
+  const flaggedSet = new Set(JSON.parse(localStorage.getItem('giet_disc_flagged') || '[]'));
+  const myId = cid();
+  // Show last DISC_PAGE_SIZE messages (all loaded, just slicing for display)
+  const toShow = allDiscMessages.slice(-discShown);
   feed.innerHTML = toShow.map(msg => {
+    const isMine = msg.clientId && msg.clientId === myId;
     const hasName = msg.displayName && msg.displayName.trim();
-    const nameHtml = hasName
-      ? `<div class="disc-name">${escapeHtml(msg.displayName)}</div>`
-      : `<div class="disc-name anon">Anonymous 😶</div>`;
-    const alreadyFlagged = flagged.includes(msg.id);
-    return `<div class="disc-msg" id="dm-${msg.id}">
-      <button class="disc-flag${alreadyFlagged ? ' flagged' : ''}" onclick="flagDiscMsg('${msg.id}', this)" title="Flag abusive content"${alreadyFlagged ? ' disabled' : ''}>🚩 Flag!</button>
-      ${nameHtml}
-      <div class="disc-text">${escapeHtml(msg.message)}</div>
-      <div class="disc-meta">${ago(msg.createdAt)}</div>
+    const initials = hasName ? escapeHtml(msg.displayName.trim()[0].toUpperCase()) : '?';
+    const nameLabel = hasName ? escapeHtml(msg.displayName) : 'Anonymous';
+    const alreadyFlagged = flaggedSet.has(msg.id);
+    // Avatar only for others (left side)
+    const avatarHtml = !isMine
+      ? `<div class="disc-avatar">${initials}</div>`
+      : '';
+    return `<div class="disc-row${isMine ? ' mine' : ''}" id="dm-${msg.id}">
+      ${avatarHtml}
+      <div class="disc-bubble ${isMine ? 'mine' : 'other'}">
+        ${!isMine ? `<div class="disc-name${!hasName ? ' anon' : ''}">${nameLabel}</div>` : ''}
+        <div class="disc-text">${escapeHtml(msg.message)}</div>
+        <div class="disc-meta-row">
+          <span class="disc-meta">${ago(msg.createdAt)}</span>
+          ${!isMine ? `<button class="disc-flag${alreadyFlagged ? ' flagged' : ''}" onclick="flagDiscMsg('${msg.id}',this)"${alreadyFlagged ? ' disabled' : ''}>🚩</button>` : ''}
+        </div>
+      </div>
     </div>`;
   }).join('');
+  // Load older messages button
   showMoreWrap.style.display = allDiscMessages.length > discShown ? 'block' : 'none';
+  // Scroll to bottom on initial load and new message
+  if (scrollToBottom) {
+    setTimeout(() => { feed.scrollTop = feed.scrollHeight; }, 50);
+  }
 }
 
 function showMoreDisc() {
@@ -1842,17 +2119,14 @@ function showMoreDisc() {
   renderDiscFeed();
 }
 
-function escapeHtml(str) {
-  return String(str).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
-}
-
 async function sendDiscussion() {
   const btn = document.getElementById('discSendBtn');
   const statusEl = document.getElementById('discStatus');
-  const msg = (discInput.value || '').trim();
+  const input = document.getElementById('discInput');
+  const msg = (input.value || '').trim();
   const name = (document.getElementById('discName').value || '').trim();
-  if (!msg) { statusEl.textContent = '⚠️ Message cannot be empty.'; statusEl.style.color = '#ff6b9d'; return; }
-  btn.disabled = true; btn.textContent = 'Sending…';
+  if (!msg) { statusEl.textContent = '⚠️ Empty'; setTimeout(()=>{statusEl.textContent='';},2000); return; }
+  btn.disabled = true;
   try {
     const r = await fetch(API + '/api/discussions', {
       method: 'POST',
@@ -1860,26 +2134,27 @@ async function sendDiscussion() {
       body: JSON.stringify({ message: msg, displayName: name || null, clientId: cid() })
     });
     const d = await r.json();
-    if (d.error) { statusEl.textContent = '⚠️ ' + d.error; statusEl.style.color = '#ff6b9d'; }
-    else {
-      discInput.value = '';
+    if (d.error) {
+      statusEl.textContent = '⚠️ ' + d.error;
+      setTimeout(()=>{statusEl.textContent='';},3000);
+    } else {
+      input.value = '';
+      input.style.height = 'auto';
       document.getElementById('discCharCount').textContent = '0 / 500';
-      statusEl.textContent = '✅ Message sent!';
-      statusEl.style.color = 'var(--green, #22c55e)';
-      // Prepend new message to local array and re-render
-      allDiscMessages.unshift(d.message);
-      renderDiscFeed();
-      setTimeout(() => { statusEl.textContent = ''; }, 3000);
+      // Append to end (chat order: oldest first)
+      allDiscMessages.push(d.message);
+      renderDiscFeed(true); // scroll to bottom
     }
   } catch(e) {
-    statusEl.textContent = '⚠️ Network error. Try again.'; statusEl.style.color = '#ff6b9d';
+    statusEl.textContent = '⚠️ Network error';
+    setTimeout(()=>{statusEl.textContent='';},3000);
   }
-  btn.disabled = false; btn.textContent = 'Send 💬';
+  btn.disabled = false;
 }
 
 async function flagDiscMsg(id, btn) {
   if (btn.classList.contains('flagged')) return;
-  btn.textContent = '🚩 …'; btn.style.pointerEvents = 'none';
+  btn.style.pointerEvents = 'none';
   try {
     const r = await fetch(API + '/api/discussions/flag/' + id, {
       method: 'POST',
@@ -1887,27 +2162,21 @@ async function flagDiscMsg(id, btn) {
       body: JSON.stringify({ clientId: cid() })
     });
     const d = await r.json();
-    if (d.alreadyFlagged || d.flags !== undefined) {
-      // Save locally so button stays flagged on reload
-      const arr = JSON.parse(localStorage.getItem('giet_disc_flagged') || '[]');
-      if (!arr.includes(id)) arr.push(id);
-      localStorage.setItem('giet_disc_flagged', JSON.stringify(arr));
-      btn.textContent = '🚩 Flagged';
-      btn.classList.add('flagged');
-      btn.disabled = true;
-      if (d.hidden) {
-        // Remove from DOM if hidden
-        const el = document.getElementById('dm-' + id);
-        if (el) { el.style.opacity = '0'; setTimeout(() => el.remove(), 300); }
-        allDiscMessages = allDiscMessages.filter(m => m.id !== id);
-        toast('⚠️ Reported! Message removed after enough flags.');
-      } else {
-        toast('🚩 Flagged! Message removed.');
-      }
+    // Save to localStorage so flag persists on reload
+    const arr = JSON.parse(localStorage.getItem('giet_disc_flagged') || '[]');
+    if (!arr.includes(id)) { arr.push(id); localStorage.setItem('giet_disc_flagged', JSON.stringify(arr)); }
+    btn.classList.add('flagged');
+    btn.disabled = true;
+    if (d.hidden) {
+      // 3 flags reached — message hidden, tell user
+      const el = document.getElementById('dm-' + id);
+      if (el) { el.style.opacity='0'; el.style.transition='opacity .3s'; setTimeout(()=>el.remove(),300); }
+      allDiscMessages = allDiscMessages.filter(m => m.id !== id);
+      toast('✅ Reported! Message flagged for admin review.');
+    } else {
+      toast(`🚩 Flagged (${d.flags}/3 needed to remove)`);
     }
-  } catch(e) {
-    btn.textContent = '🚩 Flag!'; btn.style.pointerEvents = '';
-  }
+  } catch(e) { btn.style.pointerEvents = ''; }
 }
 
 // ══════════════════════════════════════════════════════
