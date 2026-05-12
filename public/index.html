@@ -75,6 +75,11 @@ header{text-align:center;padding:52px 0 24px;position:relative;}
 /* ── Feature 2: Story mode button ── */
 .story-pill{background:linear-gradient(135deg,var(--rose),var(--crimson));border:none;color:#fff;border-radius:40px;padding:8px 16px;cursor:pointer;font-size:0.82rem;font-weight:600;font-family:'DM Sans',sans-serif;transition:all .2s;box-shadow:0 4px 16px rgba(255,45,111,0.35);}
 .story-pill:hover{transform:scale(1.05);}
+.notif-pill{background:rgba(255,255,255,0.07);border:1px solid rgba(255,200,100,0.3);color:rgba(255,220,120,0.9);border-radius:40px;padding:8px 16px;cursor:pointer;font-size:0.82rem;font-weight:600;font-family:'DM Sans',sans-serif;transition:all .2s;backdrop-filter:blur(10px);}
+.notif-pill:hover{background:rgba(255,180,0,0.15);border-color:rgba(255,200,100,0.55);color:#ffe066;}
+.notif-pill.subscribed{color:rgba(100,255,150,0.9);border-color:rgba(100,255,150,0.3);}
+.notif-pill.subscribed:hover{background:rgba(100,255,150,0.1);border-color:rgba(100,255,150,0.5);}
+[data-theme="light"] .notif-pill{background:rgba(255,255,255,0.7);border-color:rgba(200,120,0,0.3);color:rgba(140,80,0,0.9);}
 
 /* Glass card */
 .glass-card{background:var(--glass);border:1px solid var(--border);border-radius:24px;padding:28px;backdrop-filter:blur(16px);box-shadow:var(--card-shadow);position:relative;overflow:hidden;}
@@ -526,6 +531,24 @@ body.exam-season .story-rxn{background:rgba(120,60,255,0.15);}
    ══════════════════════════════════════════════════════ */
 
 /* Outer wrapper — fixed height chat window */
+/* ── Confetti celebration overlay ── */
+#confettiCanvas{position:fixed;top:0;left:0;width:100%;height:100%;pointer-events:none;z-index:9999;}
+.celebration-banner{
+  position:fixed;bottom:80px;left:50%;transform:translateX(-50%) translateY(40px);
+  background:linear-gradient(135deg,rgba(30,0,60,0.97),rgba(80,0,40,0.97));
+  border:1px solid rgba(255,200,100,0.4);border-radius:24px;padding:18px 28px;
+  text-align:center;z-index:10000;backdrop-filter:blur(20px);
+  box-shadow:0 8px 48px rgba(255,45,111,0.4);
+  opacity:0;transition:all .5s cubic-bezier(.175,.885,.32,1.275);pointer-events:none;
+  max-width:340px;width:calc(100% - 40px);
+}
+.celebration-banner.show{opacity:1;transform:translateX(-50%) translateY(0);}
+.celebration-banner h3{font-family:'Playfair Display',serif;font-size:1.3rem;color:#fff0f5;margin:0 0 6px;}
+.celebration-banner p{font-size:0.85rem;color:rgba(255,200,220,0.8);margin:0;}
+[data-theme="light"] .celebration-banner{background:linear-gradient(135deg,rgba(255,240,250,0.98),rgba(255,220,240,0.98));border-color:rgba(255,100,150,0.4);}
+[data-theme="light"] .celebration-banner h3{color:#3d0022;}
+[data-theme="light"] .celebration-banner p{color:rgba(120,40,70,0.85);}
+
 .disc-chat-window{
   height:420px;overflow-y:auto;
   padding:12px 8px;
@@ -650,6 +673,11 @@ body.exam-season .story-rxn{background:rgba(120,60,255,0.15);}
 <body>
 <div class="bg"></div>
 <canvas id="particles"></canvas>
+<canvas id="confettiCanvas"></canvas>
+<div class="celebration-banner" id="celebrationBanner">
+  <h3 id="celebTitle">🎉 Milestone!</h3>
+  <p id="celebMsg">Thank you for being part of GIET Confessions!</p>
+</div>
 
 <!-- ── CAPTCHA GATE ── 
   LEARN: This is a client-side math captcha. It generates a simple arithmetic
@@ -743,6 +771,7 @@ body.exam-season .story-rxn{background:rgba(120,60,255,0.15);}
     <div class="top-right">
       <a href="/confessions-v3.html" class="newpage-pill">✨ New Page</a>
       <a href="/admin.html" class="admin-pill">🔐 Admin</a>
+      <button class="notif-pill" id="notifPill" onclick="handleNotifBtn()">🔔 Notify me</button>
       <button class="theme-pill" id="themePill" onclick="toggleTheme()">☀️ Light</button>
       <button class="story-pill" onclick="openStory()">▶ Story Mode</button>
     </div>
@@ -1847,10 +1876,187 @@ async function pingVisit(){
     document.getElementById('statLive').textContent=d.activeVisitors||0;
     document.getElementById('statVisits').textContent=d.visits||0;
     document.getElementById('statUnique').textContent=d.uniqueVisitors||0;
+    // Check if any visit milestone was just crossed (only fires once per device)
+    if (d.visits) checkMilestoneCelebration(d.visits);
   }catch(e){}
 }
 
 // ── Push Notifications ────────────────────────────────
+// ══════════════════════════════════════════════════════════════════
+// CONFETTI + CELEBRATION SYSTEM
+// ══════════════════════════════════════════════════════════════════
+// LEARN: We track seen celebrations in localStorage so they only fire
+// once per device. Key: 'giet_seen_celeb' stores array of celebration IDs.
+// Each milestone (1000 visits, 1500 visits, update v3.1) has a unique ID.
+// When visits are fetched from API, we check if a milestone was crossed
+// and whether this device has already seen it. If not → fire confetti.
+//
+// Confetti uses canvas requestAnimationFrame with particles that have
+// random colors, sizes, rotation and gravity. Pure JS, no library needed.
+
+const CONFETTI_COLORS = ['#ff2d6f','#ff6b9d','#ffd700','#a855f7','#38bdf8','#4ade80','#fb923c'];
+
+function launchConfetti(duration = 3500) {
+  const canvas = document.getElementById('confettiCanvas');
+  if (!canvas) return;
+  const ctx = canvas.getContext('2d');
+  canvas.width = window.innerWidth;
+  canvas.height = window.innerHeight;
+  const pieces = Array.from({length: 120}, () => ({
+    x: Math.random() * canvas.width,
+    y: -10 - Math.random() * 100,
+    r: Math.random() * 7 + 3,
+    color: CONFETTI_COLORS[Math.floor(Math.random() * CONFETTI_COLORS.length)],
+    rot: Math.random() * Math.PI * 2,
+    vx: (Math.random() - 0.5) * 4,
+    vy: Math.random() * 4 + 2,
+    vr: (Math.random() - 0.5) * 0.2,
+    shape: Math.random() < 0.5 ? 'rect' : 'circle',
+    w: Math.random() * 10 + 5,
+    h: Math.random() * 6 + 3,
+    opacity: 1,
+  }));
+
+  const end = Date.now() + duration;
+  function draw() {
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+    const now = Date.now();
+    const remaining = end - now;
+    pieces.forEach(p => {
+      p.x += p.vx; p.y += p.vy; p.rot += p.vr; p.vy += 0.07; // gravity
+      // Fade out in last 800ms
+      if (remaining < 800) p.opacity = Math.max(0, remaining / 800);
+      ctx.save();
+      ctx.globalAlpha = p.opacity;
+      ctx.translate(p.x, p.y);
+      ctx.rotate(p.rot);
+      ctx.fillStyle = p.color;
+      if (p.shape === 'rect') ctx.fillRect(-p.w/2, -p.h/2, p.w, p.h);
+      else { ctx.beginPath(); ctx.arc(0, 0, p.r, 0, Math.PI*2); ctx.fill(); }
+      ctx.restore();
+      // Reset pieces that fall off screen
+      if (p.y > canvas.height + 20) {
+        p.y = -10; p.x = Math.random() * canvas.width;
+        p.vy = Math.random() * 3 + 1; p.opacity = 1;
+      }
+    });
+    if (now < end) requestAnimationFrame(draw);
+    else ctx.clearRect(0, 0, canvas.width, canvas.height);
+  }
+  draw();
+}
+
+function showCelebration(title, msg, duration = 5000) {
+  const banner = document.getElementById('celebrationBanner');
+  if (!banner) return;
+  document.getElementById('celebTitle').textContent = title;
+  document.getElementById('celebMsg').textContent = msg;
+  banner.classList.add('show');
+  launchConfetti(duration - 500);
+  setTimeout(() => banner.classList.remove('show'), duration);
+}
+
+// Check and fire celebrations — called after fetching visit stats
+// LEARN: Each celebration has a unique string ID stored in localStorage.
+// We also store the site version. When a new version is detected,
+// we show a "new update!" celebration (once per device per version).
+const CELEBRATIONS = [
+  { id: 'visits_1000', threshold: 1000, title: '🎉 1,000 Visits!', msg: 'GIET Confessions crossed 1,000 visits! Thank you for making this ours 💕' },
+  { id: 'visits_1500', threshold: 1500, title: '🔥 1,500 Visits!', msg: 'The campus is talking! 1,500 visits and counting 🚀' },
+  { id: 'visits_2000', threshold: 2000, title: '🏆 2,000 Visits!', msg: '2,000 visits — GIET Confessions is now a campus legend 👑' },
+  { id: 'visits_5000', threshold: 5000, title: '🌟 5,000 Visits!', msg: 'Unreal. 5,000 visits. You all are amazing 💫' },
+];
+
+// Called once we know visit count from /api/analytics
+function checkMilestoneCelebration(visits) {
+  const seen = JSON.parse(localStorage.getItem('giet_seen_celeb') || '[]');
+  // Find the highest milestone crossed that hasn't been celebrated yet
+  // We go from highest to lowest so the most impressive milestone shows
+  const toFire = [...CELEBRATIONS]
+    .filter(c => visits >= c.threshold && !seen.includes(c.id))
+    .sort((a,b) => b.threshold - a.threshold)[0];
+
+  if (toFire) {
+    const updated = [...seen, toFire.id];
+    localStorage.setItem('giet_seen_celeb', JSON.stringify(updated));
+    // Small delay so page loads first
+    setTimeout(() => showCelebration(toFire.title, toFire.msg), 2000);
+  }
+}
+
+// Check for a new site update — fires once per device per version string
+// LEARN: We store 'giet_last_version' in localStorage. If the server returns
+// a different version string, the user hasn't seen this update yet → celebrate.
+// Admin sets the version string from the admin panel (/api/admin/version).
+async function checkUpdateCelebration() {
+  try {
+    const r = await fetch(API + '/api/version');
+    if (!r.ok) return;
+    const { version, label } = await r.json();
+    if (!version) return;
+    const seenVersion = localStorage.getItem('giet_last_version');
+    if (seenVersion !== version) {
+      localStorage.setItem('giet_last_version', version);
+      // Don't show on very first visit (seenVersion===null) — that's just new user
+      if (seenVersion !== null) {
+        setTimeout(() => showCelebration(
+          '✨ New Update!',
+          label || `GIET Confessions just got an update (${version})! Check out what's new 🎉`
+        ), 3500); // after visit milestone if any
+      }
+    }
+  } catch(e) {}
+}
+
+// ══════════════════════════════════════════════════════════════════
+// NOTIFICATION BUTTON — wires to existing push system
+// ══════════════════════════════════════════════════════════════════
+// LEARN: The button has 3 states:
+//   1. "🔔 Notify me"  — not yet subscribed
+//   2. "✅ Subscribed" — already subscribed (green)
+//   3. "🔕 Blocked"    — user denied permission in browser
+// We check Notification.permission on load to set the right initial state.
+
+function updateNotifPillState() {
+  const pill = document.getElementById('notifPill');
+  if (!pill) return;
+  if (!('Notification' in window)) { pill.style.display = 'none'; return; }
+  if (Notification.permission === 'granted') {
+    pill.textContent = '✅ Subscribed';
+    pill.classList.add('subscribed');
+  } else if (Notification.permission === 'denied') {
+    pill.textContent = '🔕 Blocked';
+    pill.style.opacity = '0.5';
+    pill.title = 'Notifications blocked in browser. Go to site settings to re-enable.';
+  } else {
+    pill.textContent = '🔔 Notify me';
+    pill.classList.remove('subscribed');
+  }
+}
+
+async function handleNotifBtn() {
+  if (!('serviceWorker' in navigator) || !('PushManager' in window)) {
+    toast('🔔 Push notifications not supported in this browser. Try Chrome on Android.'); return;
+  }
+  if (Notification.permission === 'denied') {
+    toast('🔕 Notifications blocked. Go to browser site settings → Allow notifications.'); return;
+  }
+  if (Notification.permission === 'granted') {
+    toast('✅ Already subscribed! You'll get notified of new confessions.'); return;
+  }
+  // Request permission
+  const perm = await Notification.requestPermission();
+  if (perm === 'granted') {
+    const reg = await navigator.serviceWorker.ready;
+    await subscribeToPush(reg);
+    updateNotifPillState();
+    toast('🔔 Subscribed! You'll be notified when new confessions drop.');
+  } else {
+    updateNotifPillState();
+    toast('🔕 Permission denied. You can re-enable in browser site settings.');
+  }
+}
+
 async function setupPushNotifications(){
   if(!('serviceWorker' in navigator)||!('PushManager' in window))return;
   if(Notification.permission==='denied')return;
@@ -1936,10 +2142,13 @@ window.addEventListener('load',()=>{
   fetchConf(); loadPrompt(); // load once on page open
   pingVisit();
   setInterval(pingVisit,60000);
+  updateNotifPillState(); // set button state based on current permission
+  checkUpdateCelebration(); // show confetti if new site version detected
   if('serviceWorker' in navigator){
     navigator.serviceWorker.register('/sw.js').then(reg=>{
       reg.update();
-      if(!localStorage.getItem('pushDeclined'))setupPushNotifications();
+      // No longer auto-prompt — user must click the 🔔 Notify me button
+      // setupPushNotifications() is still available for the banner flow
     }).catch(()=>{});
   }
   window.addEventListener('scroll', updateScrollThumb, { passive:true });
