@@ -9,6 +9,7 @@
 <title>GIET Confessions 💌</title>
 <link rel="manifest" href="/manifest.json"/>
 <meta name="theme-color" content="#ff2d6f"/>
+<meta name="mobile-web-app-capable" content="yes"/>
 <meta name="apple-mobile-web-app-capable" content="yes"/>
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent"/>
 <meta name="apple-mobile-web-app-title" content="Confessions 💌"/>
@@ -2042,7 +2043,7 @@ async function handleNotifBtn() {
     toast('🔕 Notifications blocked. Go to browser site settings → Allow notifications.'); return;
   }
   if (Notification.permission === 'granted') {
-    toast('✅ Already subscribed! You'll get notified of new confessions.'); return;
+    toast('✅ Already subscribed! You\'ll get notified of new confessions.'); return;
   }
   // Request permission
   const perm = await Notification.requestPermission();
@@ -2050,7 +2051,7 @@ async function handleNotifBtn() {
     const reg = await navigator.serviceWorker.ready;
     await subscribeToPush(reg);
     updateNotifPillState();
-    toast('🔔 Subscribed! You'll be notified when new confessions drop.');
+    toast('🔔 Subscribed! You\'ll be notified when new confessions drop.');
   } else {
     updateNotifPillState();
     toast('🔕 Permission denied. You can re-enable in browser site settings.');
