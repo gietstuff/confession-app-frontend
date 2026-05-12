@@ -573,7 +573,13 @@ body.exam-season .story-rxn{background:rgba(120,60,255,0.15);}
 /* Flag button inside bubble — small, unobtrusive */
 .disc-flag{background:none;border:none;color:rgba(239,68,68,0.45);font-size:0.68rem;cursor:pointer;padding:0;font-family:'DM Sans',sans-serif;transition:color .15s;}
 .disc-flag:hover{color:rgba(239,68,68,0.85);}
-.disc-flag.flagged{color:rgba(239,68,68,0.25);pointer-events:none;}
+.disc-flag.flagged{color:rgba(239,68,68,0.2);pointer-events:none;}
+/* Delete own message button — subtle, only visible on hover of the bubble */
+.disc-delete-btn{background:none;border:none;color:rgba(255,255,255,0.2);font-size:0.68rem;cursor:pointer;padding:0;font-family:'DM Sans',sans-serif;transition:color .15s;opacity:0;}
+.disc-bubble.mine:hover .disc-delete-btn{opacity:1;}
+.disc-delete-btn:hover{color:rgba(239,68,68,0.8);}
+[data-theme="light"] .disc-delete-btn{color:rgba(0,0,0,0.15);}
+[data-theme="light"] .disc-flag{color:rgba(239,68,68,0.5);}
 
 /* Avatar circle for other messages */
 .disc-avatar{width:28px;height:28px;border-radius:50%;background:linear-gradient(135deg,rgba(59,130,246,0.5),rgba(139,92,246,0.5));display:flex;align-items:center;justify-content:center;font-size:0.75rem;flex-shrink:0;font-weight:700;color:#fff;border:1px solid rgba(255,255,255,0.1);}
@@ -641,7 +647,7 @@ body.exam-season .story-rxn{background:rgba(120,60,255,0.15);}
 [data-theme="light"] .disc-name-input::placeholder{color:rgba(0,0,0,0.3);}
 </style>
 </head>
-<body data-theme="dark">
+<body>
 <div class="bg"></div>
 <canvas id="particles"></canvas>
 
@@ -1049,7 +1055,7 @@ document.head.appendChild(shakeStyle);
   for(let i=0;i<60;i++)pts.push(spawn());
   function draw(){
     ctx.clearRect(0,0,W,H);
-    const dark=document.body.getAttribute('data-theme')!=='light';
+    const dark=document.documentElement.getAttribute('data-theme')!=='light';
     pts.forEach((p,i)=>{
       p.x+=p.vx;p.y+=p.vy;p.life-=p.decay;
       if(p.life<=0||p.y<-20)pts[i]=spawn();
@@ -1062,9 +1068,8 @@ document.head.appendChild(shakeStyle);
   draw();
 })();
 
-// ── Theme — dark only ─────────────────────────────────
-// Light mode removed. Always dark.
-document.body.setAttribute('data-theme','dark');
+// ── Theme applied on load (see toggleTheme below) ────
+// data-theme is set on <html> element only. Do NOT set it on body.
 
 // ── Utils ─────────────────────────────────────────────
 function cid(){let i=localStorage.getItem('giet_cid');if(!i){i=crypto.randomUUID();localStorage.setItem('giet_cid',i);}return i;}
@@ -1591,10 +1596,17 @@ function applyTheme(key) {
   // LEARN: Only apply dark background if we're in dark mode.
   // In light mode, body stays white and we just change the accent colour.
   const isLight = document.documentElement.getAttribute('data-theme') === 'light';
+  // Only apply dark background gradients in dark mode
+  // In light mode, [data-theme="light"] body CSS handles background
   if (!isLight) {
     document.body.style.background = t.bodyBg;
     const bg = document.querySelector('.bg');
     if(bg) bg.style.background = `radial-gradient(ellipse 80% 60% at 20% 10%,${t.bgStop} 0%,transparent 60%),radial-gradient(ellipse 60% 80% at 80% 90%,${t.bgStop2} 0%,transparent 55%),radial-gradient(ellipse 50% 50% at 50% 50%,${t.bodyBg} 0%,${t.bodyBg} 100%)`;
+  } else {
+    // In light mode: clear any JS-set background so CSS takes over
+    document.body.style.background = '';
+    const bg = document.querySelector('.bg');
+    if(bg) bg.style.background = '';
   }
   document.querySelectorAll('.stats-dot').forEach(d=>{ d.style.background=`rgb(${t.r2})`; d.style.boxShadow=`0 0 8px rgb(${t.r2})`; });
 }
@@ -1603,6 +1615,10 @@ function applyTheme(key) {
 // LEARN: document.documentElement is the <html> element.
 // We set data-theme="light" or "dark" on it, and CSS [data-theme="light"] rules apply.
 // localStorage persists the preference so it's remembered on reload.
+// LEARN: One single source of truth for theme: data-theme on <html> element only.
+// CSS [data-theme="light"] rules cascade to all children automatically.
+// We never set data-theme on <body> or use body.style.background directly —
+// those fight against the CSS and cause the half-light/half-dark glitch.
 function toggleTheme() {
   const html = document.documentElement;
   const current = html.getAttribute('data-theme') || 'dark';
@@ -1611,15 +1627,14 @@ function toggleTheme() {
   localStorage.setItem('giet_theme', next);
   const pill = document.getElementById('themePill');
   if (pill) pill.textContent = next === 'dark' ? '☀️ Light' : '🌙 Dark';
-  // Light mode uses a white background — override the animated bg
-  document.body.style.background = next === 'light' ? '#fff2f6' : '';
+  // Re-apply current admin theme so it respects new light/dark mode
+  if (window._adminTheme) applyTheme(window._adminTheme);
 }
 
-// Apply saved theme on load
+// Apply saved theme immediately on load — runs before DOM paint to avoid flash
 (function(){
   const saved = localStorage.getItem('giet_theme') || 'dark';
   document.documentElement.setAttribute('data-theme', saved);
-  if (saved === 'light') document.body.style.background = '#fff2f6';
   const pill = document.getElementById('themePill');
   if (pill) pill.textContent = saved === 'dark' ? '☀️ Light' : '🌙 Dark';
 })();
@@ -2094,6 +2109,14 @@ function renderDiscFeed(scrollToBottom = false) {
     const avatarHtml = !isMine
       ? `<div class="disc-avatar">${initials}</div>`
       : '';
+    // Own messages: show 🗑 delete button on the left of timestamp
+    // Others' messages: show 🚩 flag button on the right of timestamp
+    // LEARN: We show delete only for isMine because clientId matching is our
+    // only ownership proof. Flag only shown for others — can't flag yourself.
+    const actionBtn = isMine
+      ? `<button class="disc-delete-btn" onclick="deleteOwnDiscMsg('${msg.id}')" title="Delete your message">🗑</button>`
+      : `<button class="disc-flag${alreadyFlagged ? ' flagged' : ''}" onclick="flagDiscMsg('${msg.id}',this)"${alreadyFlagged ? ' disabled' : ''} title="Flag as abusive">🚩</button>`;
+
     return `<div class="disc-row${isMine ? ' mine' : ''}" id="dm-${msg.id}">
       ${avatarHtml}
       <div class="disc-bubble ${isMine ? 'mine' : 'other'}">
@@ -2101,7 +2124,7 @@ function renderDiscFeed(scrollToBottom = false) {
         <div class="disc-text">${escapeHtml(msg.message)}</div>
         <div class="disc-meta-row">
           <span class="disc-meta">${ago(msg.createdAt)}</span>
-          ${!isMine ? `<button class="disc-flag${alreadyFlagged ? ' flagged' : ''}" onclick="flagDiscMsg('${msg.id}',this)"${alreadyFlagged ? ' disabled' : ''}>🚩</button>` : ''}
+          ${actionBtn}
         </div>
       </div>
     </div>`;
@@ -2150,6 +2173,23 @@ async function sendDiscussion() {
     setTimeout(()=>{statusEl.textContent='';},3000);
   }
   btn.disabled = false;
+}
+
+async function deleteOwnDiscMsg(id) {
+  if (!confirm('Delete your message for everyone?')) return;
+  const row = document.getElementById('dm-' + id);
+  try {
+    const r = await fetch(API + '/api/discussions/delete/' + id, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ clientId: cid() })
+    });
+    const d = await r.json();
+    if (d.error) { toast('⚠️ ' + d.error); return; }
+    // Fade out and remove from DOM + local array
+    if (row) { row.style.opacity = '0'; row.style.transition = 'opacity .25s'; setTimeout(() => row.remove(), 260); }
+    allDiscMessages = allDiscMessages.filter(m => m.id !== id);
+  } catch(e) { toast('⚠️ Network error'); }
 }
 
 async function flagDiscMsg(id, btn) {
