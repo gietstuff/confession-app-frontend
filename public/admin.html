@@ -333,6 +333,49 @@ body.exam-season .logout-btn{color:#a78bfa;border-color:rgba(140,80,255,0.3);}
     <div id="suggestionsList"><div class="empty-msg">No suggestions yet</div></div>
   </div>
 
+  <!-- ══════════════════════════════════════════════════════ -->
+  <!-- BIRTHDAY MANAGEMENT                                    -->
+  <!-- ══════════════════════════════════════════════════════ -->
+  <!-- LEARN: This section has two parts:
+       1) Birthday REQUESTS — submitted by users via the 🎂 Birthday form on index.html.
+          Admin reviews these and can "set" them as official birthdays.
+       2) Birthday ENTRIES — admin-approved entries in the birthdays collection.
+          These display on the site on the matching MM-DD date each year.
+  -->
+  <div class="section" style="border-color:rgba(255,200,50,0.35);background:linear-gradient(135deg,rgba(255,179,0,0.05),rgba(255,100,150,0.04));">
+    <div class="section-head">
+      <h2 style="color:#ffd700;">🎂 Birthday Requests <span class="badge" style="background:linear-gradient(135deg,#b8860b,#d4a017);" id="bdayReqBadge">0</span></h2>
+      <button class="ctrl-btn" onclick="loadBirthdayRequests()" style="background:rgba(255,200,50,0.1);border:1px solid rgba(255,200,50,0.3);color:#ffd700;">↻ Refresh</button>
+    </div>
+    <p style="font-size:0.8rem;color:rgba(255,210,120,0.7);margin-bottom:14px;line-height:1.5;">
+      These are birthday messages submitted by students. Review and use "✅ Set as Birthday" to officially publish it — it'll appear on the site on the matching date with confetti!
+    </p>
+    <div id="bdayRequestsList"><div class="empty-msg">No birthday requests yet</div></div>
+  </div>
+
+  <div class="section" style="border-color:rgba(255,200,50,0.35);background:linear-gradient(135deg,rgba(255,179,0,0.05),rgba(255,100,150,0.04));">
+    <div class="section-head">
+      <h2 style="color:#ffd700;">🎂 Birthday Entries (Active)</h2>
+      <button class="ctrl-btn" onclick="loadBirthdayEntries()" style="background:rgba(255,200,50,0.1);border:1px solid rgba(255,200,50,0.3);color:#ffd700;">↻ Refresh</button>
+    </div>
+    <!-- Manual add form -->
+    <div style="background:rgba(255,200,50,0.06);border:1px solid rgba(255,200,50,0.2);border-radius:14px;padding:16px;margin-bottom:16px;">
+      <p style="font-size:0.78rem;font-weight:700;color:rgba(255,210,80,0.9);margin-bottom:12px;">➕ Add / Edit Birthday Entry</p>
+      <input type="hidden" id="bdayEditId"/>
+      <div style="display:flex;gap:10px;flex-wrap:wrap;margin-bottom:10px;">
+        <input id="bdaySetName" placeholder="Name (e.g. Priya Sharma)" maxlength="80" style="flex:2;min-width:140px;background:rgba(0,0,0,0.3);border:1px solid rgba(255,200,50,0.3);border-radius:10px;padding:9px 12px;color:var(--text);font-family:'DM Sans',sans-serif;font-size:0.85rem;outline:none;"/>
+        <input id="bdaySetDate" placeholder="MM-DD (e.g. 05-29)" maxlength="5" style="flex:1;min-width:100px;background:rgba(0,0,0,0.3);border:1px solid rgba(255,200,50,0.3);border-radius:10px;padding:9px 12px;color:var(--text);font-family:'DM Sans',sans-serif;font-size:0.85rem;outline:none;"/>
+      </div>
+      <textarea id="bdaySetMsg" placeholder="Birthday message that'll appear on the site…" maxlength="500" style="width:100%;min-height:80px;background:rgba(0,0,0,0.3);border:1px solid rgba(255,200,50,0.3);border-radius:10px;padding:9px 12px;color:var(--text);font-family:'DM Sans',sans-serif;font-size:0.85rem;resize:vertical;outline:none;margin-bottom:10px;"></textarea>
+      <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap;">
+        <button class="ctrl-btn approve-all-btn" onclick="saveBirthdayEntry()" style="background:linear-gradient(135deg,#b8860b,#d4a017);box-shadow:0 4px 16px rgba(255,179,0,0.3);">🎂 Save Birthday Entry</button>
+        <button class="ctrl-btn" onclick="clearBdayForm()" style="background:rgba(255,255,255,0.06);border:1px solid rgba(255,255,255,0.12);color:var(--muted);">✕ Clear</button>
+        <span id="bdaySetStatus" style="font-size:0.8rem;color:var(--green);"></span>
+      </div>
+    </div>
+    <div id="bdayEntriesList"><div class="empty-msg">No birthday entries yet — add one above or approve a request below</div></div>
+  </div>
+
   <div id="modStatus"></div>
 </div>
 
@@ -949,6 +992,8 @@ async function loadAll(){
   try{await loadReported();}catch(e){}
   try{await loadSuggestions();}catch(e){}
   try{await loadFlaggedDisc();}catch(e){}
+  try{await loadBirthdayRequests();}catch(e){}
+  try{await loadBirthdayEntries();}catch(e){}
 }
 
 // ── Suggestions ───────────────────────────────────────
@@ -986,6 +1031,152 @@ async function deleteSuggestion(id){
     setStatus('🗑 Suggestion deleted');
     loadSuggestions();
   }catch(e){setStatus('Network error','var(--rose)');}
+}
+
+// ══════════════════════════════════════════════════════════════════
+// BIRTHDAY MANAGEMENT (Admin)
+// ══════════════════════════════════════════════════════════════════
+// LEARN: Two functions:
+//   loadBirthdayRequests() — shows user-submitted birthday messages for review.
+//     Each request has a "Set as Birthday" button that pre-fills the save form.
+//   loadBirthdayEntries() — shows all admin-saved birthdays in the birthdays collection.
+//
+// saveBirthdayEntry() — upserts a birthday in the DB via POST /api/admin/birthday/set
+// deleteBirthdayEntry(id) — removes a birthday
+// loadBdayIntoForm(req) — pre-fills the form from a request card (for easy approval)
+
+async function loadBirthdayRequests() {
+  try {
+    const r = await fetch(`${API}/api/admin/birthday-requests`, { headers: adminH() });
+    if (!r.ok) return;
+    const arr = await r.json();
+    const badge = document.getElementById('bdayReqBadge');
+    if (badge) badge.textContent = arr.length;
+    const container = document.getElementById('bdayRequestsList');
+    if (!container) return;
+    if (!arr.length) { container.innerHTML = '<div class="empty-msg">No birthday requests yet</div>'; return; }
+    container.innerHTML = '';
+    arr.forEach(item => {
+      const div = document.createElement('div');
+      div.className = 'item';
+      div.style.borderColor = 'rgba(255,200,50,0.25)';
+      div.style.background = 'rgba(255,200,50,0.04)';
+      const esc = s => s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+      div.innerHTML = `
+        <div class="item-meta">
+          <span style="background:rgba(255,200,50,0.18);border:1px solid rgba(255,200,50,0.4);color:#ffd700;border-radius:12px;padding:2px 10px;font-size:0.7rem;font-weight:600;">🎂 Birthday Request</span>
+          <span style="background:rgba(255,200,50,0.1);border:1px solid rgba(255,200,50,0.3);color:#ffd700;border-radius:12px;padding:2px 10px;font-size:0.7rem;font-weight:600;">📅 ${esc(item.date)}</span>
+          <span class="item-time">${ago(item.createdAt)}</span>
+        </div>
+        <div style="font-size:0.8rem;color:rgba(255,210,80,0.8);font-weight:700;margin-bottom:4px;">For: ${esc(item.name)}</div>
+        <div class="item-msg" style="font-size:0.88rem;line-height:1.6;">${esc(item.message)}</div>
+        <div class="item-actions">
+          <button class="ia-btn approve" onclick="loadBdayIntoForm('${esc(item.id)}','${esc(item.name)}','${esc(item.date)}',\`${item.message.replace(/`/g,"'")}\`)">✅ Set as Birthday</button>
+          <button class="ia-btn delete" onclick="deleteBirthdayRequest('${esc(item.id)}')">🗑 Delete</button>
+        </div>`;
+      container.appendChild(div);
+    });
+  } catch(e) {}
+}
+
+async function loadBirthdayEntries() {
+  try {
+    const r = await fetch(`${API}/api/admin/birthdays`, { headers: adminH() });
+    if (!r.ok) return;
+    const arr = await r.json();
+    const container = document.getElementById('bdayEntriesList');
+    if (!container) return;
+    if (!arr.length) { container.innerHTML = '<div class="empty-msg">No birthday entries yet — add one above or approve a request below</div>'; return; }
+    container.innerHTML = '';
+    arr.forEach(item => {
+      const div = document.createElement('div');
+      div.className = 'item';
+      div.style.borderColor = item.active !== false ? 'rgba(255,200,50,0.4)' : 'rgba(255,255,255,0.1)';
+      div.style.background = item.active !== false ? 'rgba(255,200,50,0.05)' : 'rgba(0,0,0,0.1)';
+      const esc = s => s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+      const activeLabel = item.active !== false
+        ? '<span style="background:rgba(34,197,94,0.18);border:1px solid rgba(34,197,94,0.4);color:#22c55e;border-radius:12px;padding:2px 10px;font-size:0.7rem;font-weight:600;">✅ Active</span>'
+        : '<span style="background:rgba(255,255,255,0.06);border:1px solid rgba(255,255,255,0.12);color:rgba(255,200,220,0.5);border-radius:12px;padding:2px 10px;font-size:0.7rem;font-weight:600;">⏸ Inactive</span>';
+      div.innerHTML = `
+        <div class="item-meta">
+          ${activeLabel}
+          <span style="background:rgba(255,200,50,0.15);border:1px solid rgba(255,200,50,0.35);color:#ffd700;border-radius:12px;padding:2px 10px;font-size:0.7rem;font-weight:600;">📅 ${esc(item.date)}</span>
+        </div>
+        <div style="font-size:0.9rem;font-weight:700;color:#ffd700;margin-bottom:4px;">🎂 ${esc(item.name)}</div>
+        <div class="item-msg" style="font-size:0.85rem;line-height:1.6;">${esc(item.message)}</div>
+        <div class="item-actions">
+          <button class="ia-btn approve" onclick="loadBdayIntoForm('${esc(item.id)}','${esc(item.name)}','${esc(item.date)}',\`${item.message.replace(/`/g,"'")}\`)">✏️ Edit</button>
+          <button class="ia-btn" style="background:rgba(255,200,50,0.12);border:1px solid rgba(255,200,50,0.3);color:#ffd700;" onclick="toggleBirthdayActive('${esc(item.id)}',${item.active!==false})">${item.active!==false?'⏸ Deactivate':'▶ Activate'}</button>
+          <button class="ia-btn delete" onclick="deleteBirthdayEntry('${esc(item.id)}')">🗑 Delete</button>
+        </div>`;
+      container.appendChild(div);
+    });
+  } catch(e) {}
+}
+
+function loadBdayIntoForm(id, name, date, message) {
+  // Pre-fills the set form from either a request or an existing entry
+  document.getElementById('bdayEditId').value = id || '';
+  document.getElementById('bdaySetName').value = name;
+  document.getElementById('bdaySetDate').value = date;
+  document.getElementById('bdaySetMsg').value = message;
+  document.getElementById('bdaySetStatus').textContent = '';
+  // Scroll to form
+  document.getElementById('bdaySetName').scrollIntoView({ behavior: 'smooth', block: 'center' });
+  document.getElementById('bdaySetName').focus();
+}
+
+function clearBdayForm() {
+  document.getElementById('bdayEditId').value = '';
+  document.getElementById('bdaySetName').value = '';
+  document.getElementById('bdaySetDate').value = '';
+  document.getElementById('bdaySetMsg').value = '';
+  document.getElementById('bdaySetStatus').textContent = '';
+}
+
+async function saveBirthdayEntry() {
+  const id      = document.getElementById('bdayEditId').value.trim() || null;
+  const name    = document.getElementById('bdaySetName').value.trim();
+  const date    = document.getElementById('bdaySetDate').value.trim();
+  const message = document.getElementById('bdaySetMsg').value.trim();
+  const status  = document.getElementById('bdaySetStatus');
+  if (!name || !date || !message) { status.textContent = '⚠️ All fields required'; status.style.color = 'var(--red)'; return; }
+  if (!/^\d{2}-\d{2}$/.test(date)) { status.textContent = '⚠️ Date must be MM-DD (e.g. 05-29)'; status.style.color = 'var(--red)'; return; }
+  status.textContent = 'Saving…'; status.style.color = 'var(--muted)';
+  try {
+    const r = await fetch(`${API}/api/admin/birthday/set`, { method:'POST', headers: adminH(), body: JSON.stringify({ id, name, date, message }) });
+    const d = await r.json();
+    if (d.error) { status.textContent = '⚠️ ' + d.error; status.style.color = 'var(--red)'; return; }
+    status.textContent = '🎂 Birthday saved! It will display on ' + date; status.style.color = 'var(--green)';
+    clearBdayForm();
+    loadBirthdayEntries();
+  } catch(e) { status.textContent = 'Network error'; status.style.color = 'var(--red)'; }
+}
+
+async function deleteBirthdayRequest(id) {
+  if (!confirm('Delete this birthday request?')) return;
+  try {
+    await fetch(`${API}/api/admin/birthday-requests/delete`, { method:'POST', headers: adminH(), body: JSON.stringify({ id }) });
+    setStatus('🗑 Birthday request deleted');
+    loadBirthdayRequests();
+  } catch(e) { setStatus('Network error', 'var(--rose)'); }
+}
+
+async function deleteBirthdayEntry(id) {
+  if (!confirm('Delete this birthday entry? It will no longer appear on the site.')) return;
+  try {
+    await fetch(`${API}/api/admin/birthday/delete`, { method:'POST', headers: adminH(), body: JSON.stringify({ id }) });
+    setStatus('🗑 Birthday entry deleted');
+    loadBirthdayEntries();
+  } catch(e) { setStatus('Network error', 'var(--rose)'); }
+}
+
+async function toggleBirthdayActive(id, currentlyActive) {
+  try {
+    await fetch(`${API}/api/admin/birthday/toggle`, { method:'POST', headers: adminH(), body: JSON.stringify({ id, active: !currentlyActive }) });
+    setStatus(currentlyActive ? '⏸ Birthday deactivated' : '✅ Birthday activated');
+    loadBirthdayEntries();
+  } catch(e) { setStatus('Network error', 'var(--rose)'); }
 }
 </script>
 </body>
