@@ -1161,23 +1161,186 @@ body.exam-season .search-input:focus{border-color:#7c3aff;}
    Column count could also be set to 1 via media query; we
    reset `columns` to 1 for a simple linear feed on phone screens.
    ═══════════════════════════════════════════════════════════════ */
+/* ─── HIGHLIGHT OF THE WEEK ────────────────────────────────── */
+/* LEARN: This box is rendered dynamically in JS. We compute the
+   confession with the highest sum of all emoji reactions on the
+   client side from the already-loaded allConf array. No server
+   call needed — the reaction counts are already in the data. */
+.highlight-wrap{margin-bottom:18px;}
+.highlight-card{
+  background:linear-gradient(135deg,rgba(124,58,237,0.18) 0%,rgba(240,22,138,0.12) 50%,rgba(255,184,0,0.1) 100%);
+  border:1.5px solid rgba(255,184,0,0.4);
+  border-radius:24px;padding:0;overflow:hidden;
+  box-shadow:0 8px 40px rgba(255,184,0,0.15),0 0 0 1px rgba(255,184,0,0.08);
+  position:relative;animation:bdayFadeIn .5s ease both;
+}
+.highlight-card::before{
+  content:'';position:absolute;inset:0;
+  background:linear-gradient(105deg,transparent 40%,rgba(255,255,255,0.04) 50%,transparent 60%);
+  animation:bdayShimmer 4s ease-in-out infinite;pointer-events:none;
+}
+.highlight-header{
+  display:flex;align-items:center;gap:8px;
+  background:linear-gradient(90deg,rgba(255,184,0,0.2),rgba(124,58,237,0.12));
+  padding:10px 18px;border-bottom:1px solid rgba(255,184,0,0.18);
+}
+.highlight-crown{font-size:1.1rem;animation:bdayIconBounce 2.5s ease-in-out infinite;}
+.highlight-label{font-size:0.72rem;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:rgba(255,210,80,0.92);}
+.highlight-body{padding:18px 20px;}
+.highlight-cat{
+  display:inline-flex;align-items:center;gap:5px;
+  background:rgba(255,184,0,0.14);border:1px solid rgba(255,184,0,0.35);
+  color:#FFB800;border-radius:20px;padding:3px 12px;
+  font-size:0.72rem;font-weight:700;margin-bottom:12px;
+}
+.highlight-msg{
+  font-size:0.97rem;line-height:1.78;
+  color:rgba(242,237,255,0.92);
+  white-space:pre-wrap;word-wrap:break-word;
+  margin-bottom:14px;font-family:'DM Sans',sans-serif;
+  /* Clamp to 6 lines max */
+  display:-webkit-box;-webkit-line-clamp:6;-webkit-box-orient:vertical;overflow:hidden;
+}
+.highlight-reactions{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:10px;}
+.highlight-rxn{
+  display:inline-flex;align-items:center;gap:5px;
+  background:rgba(255,184,0,0.1);border:1px solid rgba(255,184,0,0.28);
+  border-radius:12px;padding:5px 11px;font-size:0.9rem;color:rgba(255,220,130,0.9);
+  font-family:'DM Sans',sans-serif;font-size:0.8rem;font-weight:700;
+}
+.highlight-total{font-size:0.72rem;color:rgba(255,200,80,0.65);margin-top:4px;}
+[data-theme="light"] .highlight-card{background:linear-gradient(135deg,rgba(255,244,180,0.9),rgba(255,230,200,0.85));border-color:rgba(200,140,0,0.4);}
+[data-theme="light"] .highlight-header{background:linear-gradient(90deg,rgba(255,220,80,0.25),rgba(200,100,0,0.12));}
+[data-theme="light"] .highlight-label{color:rgba(140,80,0,0.9);}
+[data-theme="light"] .highlight-msg{color:#1a0a3d;}
+[data-theme="light"] .highlight-cat{background:rgba(200,130,0,0.12);border-color:rgba(180,110,0,0.3);color:#92400e;}
+[data-theme="light"] .highlight-rxn{background:rgba(200,130,0,0.1);border-color:rgba(180,110,0,0.25);color:rgba(120,60,0,0.9);}
+
+/* ─── PAGINATION ────────────────────────────────────────────── */
+/* LEARN: Client-side pagination — we only render PAGE_SIZE (10)
+   cards per page. `currentPage` tracks position. Clicking a page
+   number calls goToPage(n) which updates state and re-runs render().
+   We scroll to the feed top on page change so the user sees new cards.
+   The active page button gets a gradient background to show selection. */
+.pagination{
+  display:flex;align-items:center;justify-content:center;
+  gap:6px;flex-wrap:wrap;margin-top:20px;padding:16px 0 8px;
+}
+.pg-btn{
+  min-width:38px;height:38px;
+  background:rgba(255,255,255,0.05);
+  border:1px solid rgba(139,92,246,0.22);
+  color:var(--muted);border-radius:12px;
+  font-size:0.85rem;font-weight:700;
+  cursor:pointer;font-family:'DM Sans',sans-serif;
+  transition:all .2s cubic-bezier(.34,1.2,.64,1);
+  display:flex;align-items:center;justify-content:center;padding:0 10px;
+}
+.pg-btn:hover{background:rgba(124,58,237,0.18);border-color:rgba(139,92,246,0.5);color:var(--text);}
+.pg-btn.active{
+  background:linear-gradient(135deg,var(--violet),var(--rose));
+  color:#fff;border-color:transparent;
+  box-shadow:0 4px 18px rgba(124,58,237,0.4);
+  transform:translateY(-1px);
+}
+.pg-btn:disabled{opacity:0.35;cursor:default;transform:none;}
+.pg-info{font-size:0.75rem;color:var(--muted);text-align:center;margin-top:6px;padding-bottom:8px;}
+[data-theme="light"] .pg-btn{background:rgba(255,255,255,0.72);border-color:rgba(124,58,237,0.2);color:rgba(100,70,160,0.8);}
+[data-theme="light"] .pg-btn:hover{background:rgba(124,58,237,0.1);}
+
+/* ─── ACTIVE CONFESSION BADGE ───────────────────────────────── */
+/* LEARN: Confessions identified as "active" (top 2 by reply count
+   on page 1) get a subtle badge. The JS adds class 'active-conf'
+   on the card element when placing them. */
+.conf-card.active-conf::after{
+  content:'💬 Active';
+  position:absolute;top:14px;right:16px;
+  font-size:0.65rem;font-weight:700;letter-spacing:.06em;
+  background:rgba(16,212,142,0.15);border:1px solid rgba(16,212,142,0.35);
+  color:#10D48E;border-radius:20px;padding:2px 10px;
+  text-transform:uppercase;z-index:1;
+}
+/* Override the nth-child accent pseudo after for active cards */
+.conf-card.active-conf{border-color:rgba(16,212,142,0.35);}
+
+/* ─── REPLY COLLAPSE ────────────────────────────────────────── */
+/* LEARN: First 2 replies always show. If there are more, we render
+   a "Read more" button. Clicking it calls expandReplies(confId) which
+   sets the hidden div to display:block and hides the button.
+   This keeps the card height manageable in the masonry grid. */
+.reply-more-btn{
+  display:inline-flex;align-items:center;gap:6px;
+  background:rgba(139,92,246,0.1);border:1px solid rgba(139,92,246,0.28);
+  color:var(--violet2);border-radius:30px;padding:6px 16px;
+  font-size:0.8rem;font-weight:600;cursor:pointer;
+  font-family:'DM Sans',sans-serif;margin:6px 0;
+  transition:all .2s;
+}
+.reply-more-btn:hover{background:rgba(139,92,246,0.2);transform:translateY(-1px);}
+[data-theme="light"] .reply-more-btn{background:rgba(124,58,237,0.08);border-color:rgba(124,58,237,0.22);color:var(--violet);}
+
+/* ─── BIRTHDAY "SUBMIT" TEASER (no birthday today) ──────────── */
+/* LEARN: The birthday section is now always visible. When no birthday
+   is set for today, we show a soft teaser prompting users to submit
+   a birthday for their friend using the 🎂 Birthday category. */
+.bday-teaser{padding:18px 22px;text-align:center;}
+.bday-teaser-title{font-size:0.95rem;font-weight:700;color:rgba(255,210,80,0.85);margin-bottom:6px;}
+.bday-teaser-sub{font-size:0.82rem;color:rgba(255,200,80,0.55);line-height:1.6;}
+.bday-teaser-btn{
+  display:inline-flex;align-items:center;gap:6px;
+  background:linear-gradient(135deg,rgba(184,134,11,0.5),rgba(212,160,23,0.4));
+  border:1px solid rgba(255,184,0,0.35);
+  color:rgba(255,220,100,0.95);
+  border-radius:30px;padding:8px 20px;
+  font-size:0.82rem;font-weight:700;cursor:pointer;
+  font-family:'DM Sans',sans-serif;margin-top:12px;
+  transition:all .2s;text-decoration:none;
+}
+.bday-teaser-btn:hover{background:linear-gradient(135deg,#b8860b,#d4a017);color:#fff;transform:scale(1.04);}
+[data-theme="light"] .bday-teaser-title{color:rgba(130,80,0,0.88);}
+[data-theme="light"] .bday-teaser-sub{color:rgba(120,70,0,0.6);}
+
+/* ─── RESPONSIVE — MOBILE FIRST ────────────────────────────── */
+/* LEARN: We KEEP columns:2 on mobile to match the Pinterest/masonry
+   grid that already works on desktop. We just reduce card padding
+   and font sizes for comfort on smaller screens. The masonry grid
+   works great on mobile because shorter cards flow naturally. */
 @media(max-width:640px){
-  .feed{columns:1;}
-  .page{padding:0 12px 90px;}
-  header{padding:36px 0 22px;}
-  .site-title{font-size:1.95rem;}
-  .glass-card{padding:20px 18px;}
-  .conf-card{padding:18px 16px;}
-  .action-row{gap:4px;}
-  .act-btn{padding:4px 9px;font-size:0.73rem;}
+  /* Keep columns:2 — this IS the Pinterest style on mobile */
+  .feed{columns:2;column-gap:10px;}
+  .page{padding:0 10px 90px;}
+  header{padding:36px 0 20px;}
+  .site-title{font-size:1.8rem;}
+  .glass-card{padding:16px 14px;}
+  .conf-card{padding:14px 12px;}
+  .conf-card::before{width:2.5px;}
+  .card-msg{font-size:0.87rem;line-height:1.7;}
+  .action-row{gap:3px;}
+  .act-btn{padding:4px 8px;font-size:0.7rem;}
+  .rxn-btn{padding:5px 9px;font-size:0.85rem;}
+  .rxn-count{font-size:0.65rem;}
   .toast{width:90%;text-align:center;white-space:normal;}
-  .top-right{gap:6px;}
-  .bday-body{flex-direction:column;align-items:flex-start;gap:14px;padding:18px;}
-  .bday-icon-wrap{width:56px;height:56px;font-size:1.7rem;}
+  .top-right{gap:5px;}
+  .bday-body{flex-direction:column;align-items:flex-start;gap:12px;padding:14px;}
+  .bday-icon-wrap{width:52px;height:52px;font-size:1.6rem;}
+  /* Stack reply input on mobile */
+  .reply-input-wrap{flex-direction:column;}
+  .reply-send{width:100%;text-align:center;}
+  /* Pagination fits small screen */
+  .pg-btn{min-width:32px;height:32px;font-size:0.78rem;}
+  /* Highlight card */
+  .highlight-body{padding:12px 14px;}
+  .highlight-msg{font-size:0.88rem;-webkit-line-clamp:4;}
 }
 @media(max-width:420px){
   .top-right{flex-wrap:wrap;}
-  .stats-bar{gap:12px;padding:8px 16px;}
+  .stats-bar{gap:10px;padding:7px 14px;font-size:0.72rem;}
+  .conf-card{padding:12px 10px;}
+  .card-meta{margin-bottom:10px;}
+  /* Branch badge wraps */
+  .branch-badge{font-size:0.64rem;padding:2px 7px;}
+  .section-head{flex-direction:column;align-items:flex-start;gap:8px;}
+  .filter-row{gap:5px;}
 }
 </style>
 </head>
@@ -1333,23 +1496,52 @@ body.exam-season .search-input:focus{border-color:#7c3aff;}
   <div class="disc">Anonymous · Safe · For GIET students only · Admin reviews every message</div>
 
   <!-- ══════════════════════════════════════════════════════ -->
-  <!-- BIRTHDAY SECTION                                       -->
-  <!-- Shown only when admin has set a birthday for today.   -->
-  <!-- On page load, checkBirthdayToday() polls the server.  -->
+  <!-- BIRTHDAY SECTION — always visible                      -->
+  <!-- checkBirthdayToday() fills with real data or teaser.  -->
   <!-- ══════════════════════════════════════════════════════ -->
-  <div id="birthdaySection" class="bday-section" style="display:none">
+  <div id="birthdaySection" class="bday-section">
     <div class="bday-card">
       <div class="bday-header">
         <span class="bday-today-dot"></span>
         <span class="bday-header-label">🎂 Today's Birthday</span>
       </div>
-      <div class="bday-body">
+      <!-- Real birthday content (shown when admin has set one for today) -->
+      <div class="bday-body" id="bdayRealContent" style="display:none">
         <div class="bday-icon-wrap">🎂</div>
         <div class="bday-content">
           <div class="bday-name" id="bdayName">Happy Birthday!</div>
           <div class="bday-wish" id="bdayWish"></div>
           <div class="bday-meta">🎉 From GIET Confessions &nbsp;·&nbsp; Send love in the Discussion tab!</div>
         </div>
+      </div>
+      <!-- Teaser (shown when no birthday is set for today) -->
+      <!-- LEARN: The teaser is default-visible. checkBirthdayToday()
+           hides it and shows bdayRealContent when a birthday exists. -->
+      <div class="bday-teaser" id="bdayTeaser">
+        <div class="bday-teaser-title">🎉 Is it someone's birthday today?</div>
+        <div class="bday-teaser-sub">Send a birthday wish for your friend, classmate or crush — the admin will display it on their big day with 🎉 confetti for the whole campus to see!</div>
+        <button class="bday-teaser-btn" onclick="document.getElementById('bdayCatPill').click();document.getElementById('submitBtn').scrollIntoView({behavior:'smooth',block:'center'});">🎂 Drop a Birthday Message</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ══════════════════════════════════════════════════════ -->
+  <!-- CONFESSION HIGHLIGHT OF THE WEEK                       -->
+  <!-- LEARN: Computed client-side in updateHighlight()       -->
+  <!-- after allConf loads. Picks the confession with the     -->
+  <!-- highest sum of all emoji reaction counts.              -->
+  <!-- ══════════════════════════════════════════════════════ -->
+  <div class="highlight-wrap" id="highlightWrap" style="display:none">
+    <div class="highlight-card" id="highlightCard">
+      <div class="highlight-header">
+        <span class="highlight-crown">👑</span>
+        <span class="highlight-label">🔥 Confession Highlight of the Week</span>
+      </div>
+      <div class="highlight-body">
+        <div class="highlight-cat" id="highlightCat">💘 Crush</div>
+        <div class="highlight-msg" id="highlightMsg"></div>
+        <div class="highlight-reactions" id="highlightReactions"></div>
+        <div class="highlight-total" id="highlightTotal"></div>
       </div>
     </div>
   </div>
@@ -1466,6 +1658,9 @@ body.exam-season .search-input:focus{border-color:#7c3aff;}
     <div class="skel-card"><div class="skel-line a"></div><div class="skel-line c"></div><div class="skel-line b"></div><div class="skel-line d"></div><div class="skel-line e"></div></div>
     <div class="skel-card"><div class="skel-line a"></div><div class="skel-line b"></div><div class="skel-line d"></div><div class="skel-line e"></div></div>
   </div>
+
+  <!-- Pagination controls — rendered by renderPagination() in JS -->
+  <div id="paginationWrap"></div>
 
   </div><!-- end #confSection -->
 
@@ -1680,6 +1875,7 @@ function setConfSort(mode, el) {
   const labels = {new:'New', top:'Top', best:'Best', hot:'Hot'};
   document.getElementById('sortDropBtn').textContent = '⬆️ Sort: ' + labels[mode] + ' ▾';
   document.getElementById('sortMenu').classList.remove('open');
+  currentPage = 1;
   safeRender();
 }
 
@@ -1687,7 +1883,7 @@ function setConfSort(mode, el) {
 let activeF='all';
 let searchQ = '';
 document.querySelectorAll('.ftag').forEach(t=>{
-  t.addEventListener('click',()=>{document.querySelectorAll('.ftag').forEach(x=>x.classList.remove('active'));t.classList.add('active');activeF=t.dataset.f;render();});
+  t.addEventListener('click',()=>{document.querySelectorAll('.ftag').forEach(x=>x.classList.remove('active'));t.classList.add('active');activeF=t.dataset.f;currentPage=1;render();});
 });
 
 // ── Search ────────────────────────────────────────────
@@ -1699,11 +1895,13 @@ const searchClear = document.getElementById('searchClear');
 searchInput.addEventListener('input', () => {
   searchQ = searchInput.value.trim().toLowerCase();
   searchClear.style.display = searchQ ? 'block' : 'none';
+  currentPage = 1;
   render();
 });
 function clearSearch() {
   searchInput.value = ''; searchQ = '';
   searchClear.style.display = 'none';
+  currentPage = 1;
   render();
 }
 
@@ -1784,6 +1982,13 @@ function updateReactionBar(card, confId, reactions, myReaction) {
   }).join('');
 }
 
+// ── Pagination state ──────────────────────────────────
+// LEARN: PAGE_SIZE = how many cards per page.
+// currentPage resets to 1 on filter/sort/search change.
+// Active confessions = top 2 by replyCount, pinned to page 1 top.
+const PAGE_SIZE = 10;
+let currentPage = 1;
+
 // ── Render ────────────────────────────────────────────
 function render() {
   const feed = document.getElementById('feed');
@@ -1816,19 +2021,54 @@ function render() {
     });
   }
 
+  // ── ACTIVE CONFESSIONS — page 1 top 2 ──────────────────────
+  // LEARN: We find up to 2 confessions with replies and place them
+  // at the very start of page 1. These are "active" because someone
+  // is engaging with them right now. They are removed from the regular
+  // sorted list so they don't appear twice.
+  let activeConfs = [];
+  let restList = list;
+  if (currentPage === 1) {
+    const byActivity = [...list]
+      .filter(c => (c.replyCount || 0) > 0)
+      .sort((a,b) => (b.replyCount||0) - (a.replyCount||0))
+      .slice(0, 2);
+    activeConfs = byActivity;
+    const activeIds = new Set(activeConfs.map(c => c.id));
+    restList = list.filter(c => !activeIds.has(c.id));
+  }
+
+  // ── PAGINATION ──────────────────────────────────────────────
+  // Page 1 = activeConfs + up to (PAGE_SIZE - activeConfs.length) from restList
+  // Page N = slice of restList, offset by page-1 slots
+  const page1Slots = PAGE_SIZE - activeConfs.length;
+  const page1Rest  = restList.slice(0, page1Slots);
+  const afterPage1 = restList.slice(page1Slots);
+  const totalPages = 1 + Math.ceil(afterPage1.length / PAGE_SIZE);
+
+  let pageList;
+  if (currentPage === 1) {
+    pageList = [...activeConfs, ...page1Rest];
+  } else {
+    const offset = (currentPage - 2) * PAGE_SIZE;
+    pageList = afterPage1.slice(offset, offset + PAGE_SIZE);
+  }
+
   // Wipe skeletons / empty nodes
   feed.querySelectorAll(':scope > :not(.conf-card)').forEach(el=>el.remove());
 
   if (!list.length) {
     feed.innerHTML = `<div class="empty"><span class="empty-icon">💭</span>${activeF==='all'?'No confessions yet — be the first 💌':'No confessions in this category yet'}</div>`;
+    renderPagination(0, 1);
     return;
   }
 
-  const listIds = new Set(list.map(m=>m.id));
-  feed.querySelectorAll('.conf-card').forEach(el=>{if(!listIds.has(el.dataset.id))el.remove();});
+  const pageIds = new Set(pageList.map(m=>m.id));
+  feed.querySelectorAll('.conf-card').forEach(el=>{if(!pageIds.has(el.dataset.id))el.remove();});
 
+  const activeIds = new Set(activeConfs.map(c=>c.id));
   const fragment = document.createDocumentFragment();
-  list.forEach((m, i) => {
+  pageList.forEach((m, i) => {
     let card = feed.querySelector(`.conf-card[data-id="${m.id}"]`);
     if (card) {
       // Update in-place — never touch reply section
@@ -1850,7 +2090,8 @@ function render() {
       }
     } else {
       card = document.createElement('div');
-      card.className = 'conf-card' + (m.isConfessionOfDay?' cotd':'');
+      const isActive = activeIds.has(m.id);
+      card.className = 'conf-card' + (m.isConfessionOfDay?' cotd':'') + (isActive?' active-conf':'');
       card.dataset.id = m.id;
       card.style.animationDelay = (i*0.05)+'s';
 
@@ -1903,7 +2144,57 @@ function render() {
   feed.appendChild(fragment);
   // Read-receipt: observe newly rendered cards
   if(typeof _viewObs!=='undefined'){document.querySelectorAll('.conf-card[data-id]').forEach(c=>{if(!_viewed.has(c.dataset.id))_viewObs.observe(c);});}
+
+  renderPagination(list.length, totalPages);
 }
+
+// ── Pagination renderer ───────────────────────────────
+// LEARN: We build numbered buttons. For long page counts, we show
+// ellipsis (...) so the bar doesn't overflow on mobile.
+function renderPagination(total, totalPages) {
+  const wrap = document.getElementById('paginationWrap');
+  if (!wrap) return;
+  if (totalPages <= 1) { wrap.innerHTML = ''; return; }
+
+  const perPage = PAGE_SIZE;
+  const start = currentPage === 1 ? 1 : PAGE_SIZE * (currentPage - 1) + 1;
+  const end   = Math.min(total, start + perPage - 1);
+
+  // Build page numbers with ellipsis
+  const pages = [];
+  for (let i = 1; i <= totalPages; i++) {
+    if (i === 1 || i === totalPages || (i >= currentPage - 1 && i <= currentPage + 1)) {
+      pages.push(i);
+    } else if (pages[pages.length-1] !== '…') {
+      pages.push('…');
+    }
+  }
+
+  wrap.innerHTML = `
+    <div class="pagination">
+      <button class="pg-btn" onclick="goToPage(${currentPage-1})" ${currentPage<=1?'disabled':''}>‹</button>
+      ${pages.map(p => p === '…'
+        ? `<button class="pg-btn" disabled style="border:none;background:none;">…</button>`
+        : `<button class="pg-btn${p===currentPage?' active':''}" onclick="goToPage(${p})">${p}</button>`
+      ).join('')}
+      <button class="pg-btn" onclick="goToPage(${currentPage+1})" ${currentPage>=totalPages?'disabled':''}>›</button>
+    </div>
+    <div class="pg-info">Showing ${start}–${end} of ${total} confessions</div>
+  `;
+}
+
+function goToPage(n) {
+  if (n < 1) return;
+  currentPage = n;
+  render();
+  // Scroll to section head
+  const sh = document.querySelector('.section-head');
+  if (sh) sh.scrollIntoView({ behavior: 'smooth', block: 'start' });
+}
+
+// Reset pagination on filter/sort/search change
+const _origSetConfSort = setConfSort;
+// (setConfSort and filter/search already call render or safeRender)
 
 // ── Safe render ───────────────────────────────────────
 let pendingRender = false;
@@ -1946,6 +2237,12 @@ function fetchConf() {
 }
 
 // ── Replies ───────────────────────────────────────────
+// LEARN: We always show the first 2 replies directly.
+// If a confession has more than 2 replies, a "Read more"
+// button appears. Clicking it calls expandReplies() which
+// reveals the hidden replies without a new network request.
+// The "Read more" button only appears when needed — if a
+// confession has ≤2 replies, no button is shown at all.
 async function loadReplies(confId) {
   const list = document.getElementById('rl-'+confId);
   if (!list) return;
@@ -1953,8 +2250,32 @@ async function loadReplies(confId) {
     const r = await fetch(`${API}/api/replies/${confId}`);
     const replies = await r.json();
     if (!replies.length) { list.innerHTML='<div class="no-replies">No replies yet — be the first 💬</div>'; return; }
-    list.innerHTML = replies.map(r=>`<div class="reply-item">${r.message}<div class="reply-time">${ago(r.createdAt)}</div><div class="reaction-bar">${EMOJI_LIST.map(e=>`<button class="rxn-btn${(r.reactedBy?.[cid()]===e)?' active':''}" onclick="reactReply('${r.id}','${e}',this)">${e} <span class="rxn-count">${r.reactions?.[e]||''}</span></button>`).join('')}</div></div>`).join('');
+
+    const renderReplyItem = (rep) =>
+      `<div class="reply-item">${rep.message}<div class="reply-time">${ago(rep.createdAt)}</div><div class="reaction-bar">${EMOJI_LIST.map(e=>`<button class="rxn-btn${(rep.reactedBy?.[cid()]===e)?' active':''}" onclick="reactReply('${rep.id}','${e}',this)">${e} <span class="rxn-count">${rep.reactions?.[e]||''}</span></button>`).join('')}</div></div>`;
+
+    const first2 = replies.slice(0, 2);
+    const rest   = replies.slice(2);
+
+    let html = first2.map(renderReplyItem).join('');
+
+    if (rest.length > 0) {
+      // Hidden replies + Read more button
+      html += `<div id="rmw-${confId}">
+        <button class="reply-more-btn" onclick="expandReplies('${confId}')">💬 Read more (${rest.length} more repl${rest.length>1?'ies':'y'})</button>
+        <div id="rmc-${confId}" style="display:none;">${rest.map(renderReplyItem).join('')}</div>
+      </div>`;
+    }
+
+    list.innerHTML = html;
   } catch(e) { list.innerHTML='<div class="no-replies">Could not load replies</div>'; }
+}
+
+function expandReplies(confId) {
+  const content = document.getElementById('rmc-'+confId);
+  const btn = document.querySelector(`#rmw-${confId} .reply-more-btn`);
+  if (content) content.style.display = 'block';
+  if (btn) btn.style.display = 'none';
 }
 async function reactReply(replyId, emoji, btn) {
   try{
@@ -2825,31 +3146,68 @@ async function checkBirthdayToday() {
   try {
     const r = await fetch(`${API}/api/birthdays/today`);
     const data = await r.json();
-    if (!data.birthday) return; // no birthday today — section stays hidden
 
-    // Reveal the birthday section
-    const section = document.getElementById('birthdaySection');
-    const nameEl   = document.getElementById('bdayName');
-    const wishEl   = document.getElementById('bdayWish');
-    if (!section || !nameEl || !wishEl) return;
+    const section      = document.getElementById('birthdaySection');
+    const realContent  = document.getElementById('bdayRealContent');
+    const teaser       = document.getElementById('bdayTeaser');
+    const nameEl       = document.getElementById('bdayName');
+    const wishEl       = document.getElementById('bdayWish');
 
-    nameEl.textContent = `🎂 Happy Birthday, ${data.birthday.name}!`;
-    wishEl.textContent = data.birthday.message;
-    section.style.display = 'block';
+    // Birthday section is always visible — toggle between real and teaser
+    if (data.birthday) {
+      // Real birthday: show content, hide teaser
+      if (nameEl) nameEl.textContent = `🎂 Happy Birthday, ${data.birthday.name}!`;
+      if (wishEl) wishEl.textContent = data.birthday.message;
+      if (realContent) realContent.style.display = 'flex';
+      if (teaser) teaser.style.display = 'none';
+      // Fire birthday confetti after a brief delay
+      setTimeout(() => {
+        launchBirthdayConfetti(7000);
+        document.getElementById('celebTitle').textContent = `🎂 Happy Birthday, ${data.birthday.name}!`;
+        document.getElementById('celebMsg').textContent = '🎉 Wishing you an amazing day from GIET Confessions!';
+        const banner = document.getElementById('celebrationBanner');
+        if (banner) { banner.classList.add('show'); setTimeout(()=>banner.classList.remove('show'), 6000); }
+      }, 1500);
+    } else {
+      // No birthday today → show teaser (default state)
+      if (realContent) realContent.style.display = 'none';
+      if (teaser) teaser.style.display = 'block';
+    }
+  } catch(e) { /* silently fail */ }
+}
 
-    // Fire birthday confetti after a brief delay (so page is ready)
-    // LEARN: We delay 1.5s so the page finishes rendering and the confetti
-    // appears as a "surprise" rather than firing before the UI loads.
-    setTimeout(() => {
-      launchBirthdayConfetti(7000);
-      // Also show the celebration banner with birthday message
-      document.getElementById('celebTitle').textContent = `🎂 Happy Birthday, ${data.birthday.name}!`;
-      document.getElementById('celebMsg').textContent = '🎉 Wishing you an amazing day from GIET Confessions!';
-      const banner = document.getElementById('celebrationBanner');
-      if (banner) { banner.classList.add('show'); setTimeout(()=>banner.classList.remove('show'), 6000); }
-    }, 1500);
+// ══════════════════════════════════════════════════════════════════
+// CONFESSION HIGHLIGHT OF THE WEEK
+// ══════════════════════════════════════════════════════════════════
+// LEARN: We compute this 100% client-side. After allConf is loaded,
+// we sum all 5 emoji reaction counts for each confession and pick
+// the one with the highest total. If no confession has any reactions,
+// we keep the box hidden. The box updates every time fetchConf() runs.
+function updateHighlight() {
+  if (!allConf.length) return;
 
-  } catch(e) { /* silently fail — birthday check is not critical */ }
+  // Find confession with max total reactions
+  let best = null, bestTotal = 0;
+  allConf.forEach(c => {
+    const total = EMOJI_LIST.reduce((sum, e) => sum + (c.reactions?.[e] || 0), 0);
+    if (total > bestTotal) { bestTotal = total; best = c; }
+  });
+
+  const wrap = document.getElementById('highlightWrap');
+  if (!wrap) return;
+  if (!best || bestTotal === 0) { wrap.style.display = 'none'; return; }
+
+  wrap.style.display = 'block';
+  document.getElementById('highlightCat').textContent = best.category || '💭 Random';
+  document.getElementById('highlightMsg').textContent = best.isPoll ? `📊 ${best.message}` : best.message;
+
+  // Reaction summary: only show emojis with counts
+  const rxnHtml = EMOJI_LIST
+    .filter(e => (best.reactions?.[e] || 0) > 0)
+    .map(e => `<span class="highlight-rxn">${e} ${best.reactions[e]}</span>`)
+    .join('');
+  document.getElementById('highlightReactions').innerHTML = rxnHtml;
+  document.getElementById('highlightTotal').textContent = `🔥 ${bestTotal} total reaction${bestTotal!==1?'s':''} this week`;
 }
 
 async function syncReplyCounts() {
@@ -2875,6 +3233,7 @@ fetchConf = function() {
       firstLoad = false;
       safeRender();
       checkReplyNotifications();
+      updateHighlight(); // update highlight of the week
     }).catch(()=>{});
 };
 

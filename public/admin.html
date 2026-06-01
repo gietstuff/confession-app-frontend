@@ -209,6 +209,9 @@ body.exam-season .logout-btn{color:#a78bfa;border-color:rgba(140,80,255,0.3);}
     </div>
   </div>
 
+  <!-- ════════════════════════════════════════════════════
+       1) PENDING APPROVALS — Always at top
+       ════════════════════════════════════════════════════ -->
   <div class="section">
     <div class="section-head">
       <h2>📥 Pending <span class="badge" id="pendingBadge">0</span> <span class="badge flagged-badge" id="flaggedBadge" style="display:none">⚑ Flagged</span></h2>
@@ -216,6 +219,9 @@ body.exam-season .logout-btn{color:#a78bfa;border-color:rgba(140,80,255,0.3);}
     <div id="pendingList"><div class="empty-msg">No pending confessions 🎉</div></div>
   </div>
 
+  <!-- ════════════════════════════════════════════════════
+       2) APPROVED CONFESSIONS
+       ════════════════════════════════════════════════════ -->
   <div class="section">
     <div class="section-head">
       <h2>✅ Approved <span class="badge" id="approvedBadge">0</span></h2>
@@ -223,6 +229,9 @@ body.exam-season .logout-btn{color:#a78bfa;border-color:rgba(140,80,255,0.3);}
     <div id="approvedList"><div class="empty-msg">No approved confessions yet</div></div>
   </div>
 
+  <!-- ════════════════════════════════════════════════════
+       3) REPORTED CONFESSIONS
+       ════════════════════════════════════════════════════ -->
   <div class="section" id="reportedSection" style="display:none">
     <div class="section-head">
       <h2>🚨 Reported <span class="badge" style="background:#ef4444" id="reportedBadge">0</span></h2>
@@ -230,94 +239,9 @@ body.exam-season .logout-btn{color:#a78bfa;border-color:rgba(140,80,255,0.3);}
     <div id="reportedList"><div class="empty-msg">No reported confessions 🎉</div></div>
   </div>
 
-  <!-- Teach AI Panel -->
-  <div class="section">
-    <div class="section-head"><h2>🧠 Teach AI — Add Patterns to Block</h2></div>
-    <div class="control-panel" style="border-color:rgba(139,92,246,0.3);">
-      <p style="font-size:0.82rem;color:var(--muted);margin-bottom:14px;line-height:1.6;">
-        Teach the AI to block confessions with a specific <b>meaning or pattern</b> — without waiting for someone to submit one.
-        Type any example phrase, name context, or Odia abuse, click Teach. Future similar confessions get auto-blocked by Layer 2.
-      </p>
-      <div style="display:flex;gap:8px;flex-wrap:wrap;align-items:flex-end;">
-        <div style="flex:1;min-width:200px;">
-          <label style="font-size:0.75rem;color:var(--muted);display:block;margin-bottom:6px;">Example phrase to block</label>
-          <input type="text" id="teachText"
-            placeholder="e.g. bhaudi tui bahut kharap, or: that CSE girl with specs..."
-            style="width:100%;background:rgba(0,0,0,0.4);border:1.5px solid rgba(139,92,246,0.35);border-radius:12px;padding:11px 14px;color:var(--text);font-size:0.88rem;font-family:'DM Sans',sans-serif;outline:none;"
-            maxlength="300"/>
-        </div>
-        <button class="ia-btn" style="background:rgba(139,92,246,0.2);color:#c4b5fd;border:1px solid rgba(139,92,246,0.4);white-space:nowrap;" onclick="teachAI()">🧠 Teach AI</button>
-      </div>
-      <div id="teachStatus" style="margin-top:10px;font-size:0.8rem;color:#c4b5fd;min-height:18px;"></div>
-      <details style="margin-top:14px;">
-        <summary style="font-size:0.76rem;color:var(--muted);cursor:pointer;">💡 Tips — what to teach</summary>
-        <div style="font-size:0.76rem;color:var(--muted);margin-top:8px;line-height:1.7;padding:10px;background:rgba(0,0,0,0.2);border-radius:10px;">
-          <b style="color:#c4b5fd;">Odia abuse phrases:</b> "bhaudi tui nalayak", "sala ganda kaam karu", "beshya mafia"<br>
-          <b style="color:#c4b5fd;">Name targeting patterns:</b> "that girl from room 204", "the professor who teaches DBMS"<br>
-          <b style="color:#c4b5fd;">Harassment patterns:</b> "everyone knows she is characterless", "he cheated in exam 2nd year"<br>
-          <b style="color:#c4b5fd;">How it works:</b> The AI learns the <i>meaning</i>, not just the words. So teaching one phrase catches many similar ones.
-        </div>
-      </details>
-    </div>
-  </div>
-
-  <!-- Flagged Discussion Messages -->
-  <div class="section">
-    <div class="section-head">
-      <h2>🚩 Flagged Discussion Messages <span id="flaggedDiscCount" style="font-size:0.75rem;background:rgba(239,68,68,0.15);color:#fca5a5;border-radius:20px;padding:2px 10px;margin-left:6px;"></span></h2>
-    </div>
-    <div class="control-panel" style="border-color:rgba(239,68,68,0.25);padding:14px;">
-      <p style="font-size:0.78rem;color:var(--muted);margin-bottom:12px;">Messages flagged by 3+ users. Review and decide: restore (innocent) or Mark Abusive (teach AI + delete).</p>
-      <div id="flaggedDiscFeed">
-        <div style="font-size:0.8rem;color:var(--muted);">Loading…</div>
-      </div>
-    </div>
-  </div>
-
-  <!-- Site Version / Update Celebration Trigger -->
-  <div class="section">
-    <div class="section-head"><h2>🎉 Trigger Update Celebration</h2></div>
-    <div class="control-panel" style="border-color:rgba(255,200,0,0.25);">
-      <p style="font-size:0.82rem;color:var(--muted);margin-bottom:14px;line-height:1.6;">
-        After deploying a new update, set the version here. Every user who visits for the first time since the update will see a <strong style="color:#fde68a;">confetti celebration</strong> once. Works once per device per version.
-      </p>
-      <div style="display:flex;gap:8px;flex-wrap:wrap;align-items:flex-end;">
-        <div>
-          <label style="font-size:0.75rem;color:var(--muted);display:block;margin-bottom:6px;">Version tag (e.g. v3.2)</label>
-          <input type="text" id="versionTag" placeholder="v3.2" maxlength="20"
-            style="width:110px;background:rgba(0,0,0,0.4);border:1.5px solid rgba(255,200,0,0.3);border-radius:12px;padding:10px 14px;color:var(--text);font-size:0.88rem;font-family:'DM Sans',sans-serif;outline:none;"/>
-        </div>
-        <div style="flex:1;min-width:160px;">
-          <label style="font-size:0.75rem;color:var(--muted);display:block;margin-bottom:6px;">Celebration message (optional)</label>
-          <input type="text" id="versionLabel" placeholder="e.g. WhatsApp-style chat is here!" maxlength="100"
-            style="width:100%;background:rgba(0,0,0,0.4);border:1.5px solid rgba(255,200,0,0.3);border-radius:12px;padding:10px 14px;color:var(--text);font-size:0.88rem;font-family:'DM Sans',sans-serif;outline:none;"/>
-        </div>
-        <button class="ia-btn" style="background:rgba(255,200,0,0.15);color:#fde68a;border:1px solid rgba(255,200,0,0.35);white-space:nowrap;" onclick="setVersion()">🎉 Set Version</button>
-      </div>
-      <div id="versionStatus" style="margin-top:10px;font-size:0.8rem;color:#fde68a;min-height:18px;"></div>
-    </div>
-  </div>
-
-  <!-- Weekly Prompt / Themed Day -->
-  <div class="section">
-    <div class="section-head"><h2>💬 Weekly Theme / Prompt</h2></div>
-    <div class="prompt-setter">
-      <label>Theme type</label>
-      <select id="promptTheme">
-        <option value="">-- No theme (clear) --</option>
-        <option value="crush">💘 Crush Confessions Week — Deep Rose / Pink</option>
-        <option value="hostel">🏠 Hostel Life Week — Amber / Warm Orange</option>
-        <option value="exam">📚 Exam Season — Violet / Dark Purple</option>
-        <option value="general">💭 General Theme — Teal / Soft Blue</option>
-      </select>
-      <label>Prompt message (shown to all users as banner)</label>
-      <input type="text" id="promptText" placeholder="e.g. This week: confess something about your hostel life 🏠" maxlength="200"/>
-      <button class="ia-btn approve" onclick="savePrompt()">💾 Save Theme</button>
-      <button class="ia-btn delete" style="margin-left:8px;" onclick="clearPrompt()">✕ Clear</button>
-    </div>
-  </div>
-
-  <!-- Re-review section (confessions with 4+ REMOVE clicks) -->
+  <!-- ════════════════════════════════════════════════════
+       4) RE-REVIEW (4+ REMOVE clicks)
+       ════════════════════════════════════════════════════ -->
   <div class="section" id="reviewSection" style="display:none">
     <div class="section-head">
       <h2>⚠️ Re-Review Requested <span class="badge" style="background:#f59e0b" id="reviewBadge">0</span></h2>
@@ -325,7 +249,9 @@ body.exam-season .logout-btn{color:#a78bfa;border-color:rgba(140,80,255,0.3);}
     <div id="reviewList"><div class="empty-msg">No re-review requests</div></div>
   </div>
 
-  <!-- Suggestions from users -->
+  <!-- ════════════════════════════════════════════════════
+       5) SUGGESTIONS FROM USERS
+       ════════════════════════════════════════════════════ -->
   <div class="section" id="suggestionsSection">
     <div class="section-head">
       <h2>💡 Suggestions <span class="badge" style="background:#8b5cf6;" id="suggestionsBadge">0</span></h2>
@@ -333,9 +259,9 @@ body.exam-season .logout-btn{color:#a78bfa;border-color:rgba(140,80,255,0.3);}
     <div id="suggestionsList"><div class="empty-msg">No suggestions yet</div></div>
   </div>
 
-  <!-- ══════════════════════════════════════════════════════ -->
-  <!-- BIRTHDAY MANAGEMENT                                    -->
-  <!-- ══════════════════════════════════════════════════════ -->
+  <!-- ════════════════════════════════════════════════════
+       6) BIRTHDAY MANAGEMENT
+       ════════════════════════════════════════════════════ -->
   <!-- LEARN: This section has two parts:
        1) Birthday REQUESTS — submitted by users via the 🎂 Birthday form on index.html.
           Admin reviews these and can "set" them as official birthdays.
@@ -374,6 +300,102 @@ body.exam-season .logout-btn{color:#a78bfa;border-color:rgba(140,80,255,0.3);}
       </div>
     </div>
     <div id="bdayEntriesList"><div class="empty-msg">No birthday entries yet — add one above or approve a request below</div></div>
+  </div>
+
+  <!-- ════════════════════════════════════════════════════
+       7) TEACH AI PANEL
+       ════════════════════════════════════════════════════ -->
+  <!-- Teach AI Panel -->
+  <div class="section">
+    <div class="section-head"><h2>🧠 Teach AI — Add Patterns to Block</h2></div>
+    <div class="control-panel" style="border-color:rgba(139,92,246,0.3);">
+      <p style="font-size:0.82rem;color:var(--muted);margin-bottom:14px;line-height:1.6;">
+        Teach the AI to block confessions with a specific <b>meaning or pattern</b> — without waiting for someone to submit one.
+        Type any example phrase, name context, or Odia abuse, click Teach. Future similar confessions get auto-blocked by Layer 2.
+      </p>
+      <div style="display:flex;gap:8px;flex-wrap:wrap;align-items:flex-end;">
+        <div style="flex:1;min-width:200px;">
+          <label style="font-size:0.75rem;color:var(--muted);display:block;margin-bottom:6px;">Example phrase to block</label>
+          <input type="text" id="teachText"
+            placeholder="e.g. bhaudi tui bahut kharap, or: that CSE girl with specs..."
+            style="width:100%;background:rgba(0,0,0,0.4);border:1.5px solid rgba(139,92,246,0.35);border-radius:12px;padding:11px 14px;color:var(--text);font-size:0.88rem;font-family:'DM Sans',sans-serif;outline:none;"
+            maxlength="300"/>
+        </div>
+        <button class="ia-btn" style="background:rgba(139,92,246,0.2);color:#c4b5fd;border:1px solid rgba(139,92,246,0.4);white-space:nowrap;" onclick="teachAI()">🧠 Teach AI</button>
+      </div>
+      <div id="teachStatus" style="margin-top:10px;font-size:0.8rem;color:#c4b5fd;min-height:18px;"></div>
+      <details style="margin-top:14px;">
+        <summary style="font-size:0.76rem;color:var(--muted);cursor:pointer;">💡 Tips — what to teach</summary>
+        <div style="font-size:0.76rem;color:var(--muted);margin-top:8px;line-height:1.7;padding:10px;background:rgba(0,0,0,0.2);border-radius:10px;">
+          <b style="color:#c4b5fd;">Odia abuse phrases:</b> "bhaudi tui nalayak", "sala ganda kaam karu", "beshya mafia"<br>
+          <b style="color:#c4b5fd;">Name targeting patterns:</b> "that girl from room 204", "the professor who teaches DBMS"<br>
+          <b style="color:#c4b5fd;">Harassment patterns:</b> "everyone knows she is characterless", "he cheated in exam 2nd year"<br>
+          <b style="color:#c4b5fd;">How it works:</b> The AI learns the <i>meaning</i>, not just the words. So teaching one phrase catches many similar ones.
+        </div>
+      </details>
+    </div>
+  </div>
+
+  <!-- ════════════════════════════════════════════════════
+       8) FLAGGED DISCUSSION MESSAGES
+       ════════════════════════════════════════════════════ -->
+  <div class="section">
+    <div class="section-head">
+      <h2>🚩 Flagged Discussion Messages <span id="flaggedDiscCount" style="font-size:0.75rem;background:rgba(239,68,68,0.15);color:#fca5a5;border-radius:20px;padding:2px 10px;margin-left:6px;"></span></h2>
+    </div>
+    <div class="control-panel" style="border-color:rgba(239,68,68,0.25);padding:14px;">
+      <p style="font-size:0.78rem;color:var(--muted);margin-bottom:12px;">Messages flagged by 3+ users. Review and decide: restore (innocent) or Mark Abusive (teach AI + delete).</p>
+      <div id="flaggedDiscFeed">
+        <div style="font-size:0.8rem;color:var(--muted);">Loading…</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ════════════════════════════════════════════════════
+       9) SITE VERSION / UPDATE CELEBRATION
+       ════════════════════════════════════════════════════ -->
+  <div class="section">
+    <div class="section-head"><h2>🎉 Trigger Update Celebration</h2></div>
+    <div class="control-panel" style="border-color:rgba(255,200,0,0.25);">
+      <p style="font-size:0.82rem;color:var(--muted);margin-bottom:14px;line-height:1.6;">
+        After deploying a new update, set the version here. Every user who visits for the first time since the update will see a <strong style="color:#fde68a;">confetti celebration</strong> once. Works once per device per version.
+      </p>
+      <div style="display:flex;gap:8px;flex-wrap:wrap;align-items:flex-end;">
+        <div>
+          <label style="font-size:0.75rem;color:var(--muted);display:block;margin-bottom:6px;">Version tag (e.g. v3.2)</label>
+          <input type="text" id="versionTag" placeholder="v3.2" maxlength="20"
+            style="width:110px;background:rgba(0,0,0,0.4);border:1.5px solid rgba(255,200,0,0.3);border-radius:12px;padding:10px 14px;color:var(--text);font-size:0.88rem;font-family:'DM Sans',sans-serif;outline:none;"/>
+        </div>
+        <div style="flex:1;min-width:160px;">
+          <label style="font-size:0.75rem;color:var(--muted);display:block;margin-bottom:6px;">Celebration message (optional)</label>
+          <input type="text" id="versionLabel" placeholder="e.g. WhatsApp-style chat is here!" maxlength="100"
+            style="width:100%;background:rgba(0,0,0,0.4);border:1.5px solid rgba(255,200,0,0.3);border-radius:12px;padding:10px 14px;color:var(--text);font-size:0.88rem;font-family:'DM Sans',sans-serif;outline:none;"/>
+        </div>
+        <button class="ia-btn" style="background:rgba(255,200,0,0.15);color:#fde68a;border:1px solid rgba(255,200,0,0.35);white-space:nowrap;" onclick="setVersion()">🎉 Set Version</button>
+      </div>
+      <div id="versionStatus" style="margin-top:10px;font-size:0.8rem;color:#fde68a;min-height:18px;"></div>
+    </div>
+  </div>
+
+  <!-- ════════════════════════════════════════════════════
+       10) WEEKLY THEME / PROMPT
+       ════════════════════════════════════════════════════ -->
+  <div class="section">
+    <div class="section-head"><h2>💬 Weekly Theme / Prompt</h2></div>
+    <div class="prompt-setter">
+      <label>Theme type</label>
+      <select id="promptTheme">
+        <option value="">-- No theme (clear) --</option>
+        <option value="crush">💘 Crush Confessions Week — Deep Rose / Pink</option>
+        <option value="hostel">🏠 Hostel Life Week — Amber / Warm Orange</option>
+        <option value="exam">📚 Exam Season — Violet / Dark Purple</option>
+        <option value="general">💭 General Theme — Teal / Soft Blue</option>
+      </select>
+      <label>Prompt message (shown to all users as banner)</label>
+      <input type="text" id="promptText" placeholder="e.g. This week: confess something about your hostel life 🏠" maxlength="200"/>
+      <button class="ia-btn approve" onclick="savePrompt()">💾 Save Theme</button>
+      <button class="ia-btn delete" style="margin-left:8px;" onclick="clearPrompt()">✕ Clear</button>
+    </div>
   </div>
 
   <div id="modStatus"></div>
