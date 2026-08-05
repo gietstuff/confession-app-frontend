@@ -317,7 +317,7 @@ textarea#confText::placeholder{color:var(--text3)}
 .emoji-btn.reacted{border-color:rgba(232,96,122,.4);background:rgba(232,96,122,.1);color:var(--text)}
 .emoji-btn .count{font-size:.7rem}
 
-/* Like/dislike + actions */
+/* Cleaned up actions row */
 .actions-row{
   display:flex;align-items:center;gap:6px;
   margin-top:10px;
@@ -329,9 +329,6 @@ textarea#confText::placeholder{color:var(--text3)}
   color:var(--text3);font-size:.76rem;transition:all .18s;
 }
 .act-btn:hover{border-color:var(--border2);color:var(--text)}
-.act-btn.liked{border-color:rgba(232,96,122,.5);color:var(--crush);background:rgba(232,96,122,.1)}
-.act-btn.disliked{border-color:rgba(106,173,223,.5);color:var(--random);background:rgba(106,173,223,.1)}
-.act-btn.spacer{margin-left:auto}
 .reply-toggle{
   display:flex;align-items:center;gap:4px;
   padding:5px 10px;border-radius:20px;
@@ -339,6 +336,7 @@ textarea#confText::placeholder{color:var(--text3)}
   color:var(--text3);font-size:.76rem;transition:all .18s;
 }
 .reply-toggle:hover{border-color:var(--border2);color:var(--text)}
+.act-btn.spacer{margin-left:auto}
 
 /* Replies section */
 .replies-section{margin-top:10px;border-top:1px solid var(--border);padding-top:10px;display:none}
@@ -406,7 +404,7 @@ textarea#confText::placeholder{color:var(--text3)}
 
 /* ══════════ COMMUNITY CHAT ══════════ */
 .chat-wrap{
-  display:flex;flex-direction:column;height:360px;background:var(--surf2);
+  display:flex;flex-direction:column;height:60vh;min-height:400px;background:var(--surf2);
   border:1px solid var(--border);border-radius:var(--radius);overflow:hidden;
 }
 .chat-header{
@@ -619,7 +617,7 @@ body.light .bottom-nav{background:rgba(245,242,240,.95)}
 
 <!-- WEEKLY PROMPT -->
 <div class="prompt-banner" id="promptBanner">
-  <div class="prompt-label">✨ This Week's Highlight</div>
+  <div class="prompt-label">✨ This Week's Prompt</div>
   <div class="prompt-text" id="promptText"></div>
 </div>
 
@@ -935,14 +933,21 @@ async function loadFeed(){
   document.getElementById('feed').innerHTML='<div class="shimmer"></div><div class="shimmer" style="height:120px"></div><div class="shimmer" style="height:90px"></div>';
   try{
     const r=await fetch(`${API}/api/confessions`);
-    confessions=await r.json();
-    // get reply counts
-    try{
-      const ids=confessions.map(c=>c.id);
-      const rc=await fetch(`${API}/api/replies/counts`,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({ids})});
-      const rcData=await rc.json();
-      confessions.forEach(c=>{c._replyCount=rcData[c.id]||0});
-    }catch(e){}
+    const data=await r.json();
+    confessions = Array.isArray(data) ? data : (data.confessions || []); // Safe fallback
+
+    // get reply counts safely
+    if (confessions.length > 0) {
+      try{
+        const ids=confessions.map(c=>c.id);
+        const rc=await fetch(`${API}/api/replies/counts`,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({ids})});
+        if(rc.ok) {
+           const rcData=await rc.json();
+           confessions.forEach(c=>{c._replyCount=rcData[c.id]||0});
+        }
+      }catch(e){}
+    }
+    
     renderFeed();
     document.getElementById('sSouls').textContent=confessions.length;
   }catch(e){
@@ -980,7 +985,6 @@ function timeAgo(ts){
 function confCard(c,i){
   const ck=catKey(c.category);
   const myReaction=c.reactedBy?.[CID]||null;
-  const myLike=c.votes?.[CID];
   const reactionBar=EMOJIS.map(e=>{
     const cnt=c.reactions?.[e]||0;
     return `<button class="emoji-btn${myReaction===e?' reacted':''}" onclick="reactEmoji(this,'${c.id}','${e}')">${e}<span class="count">${cnt||''}</span></button>`;
@@ -1016,11 +1020,9 @@ function confCard(c,i){
     ${bodyHtml}
     <div class="reactions-row">${reactionBar}</div>
     <div class="actions-row">
-      <button class="act-btn${myLike==='like'?' liked':''}" onclick="likeConf(this,'${c.id}')">❤️ <span>${c.likes||0}</span></button>
-      <button class="act-btn${myLike==='dislike'?' disliked':''}" onclick="dislikeConf(this,'${c.id}')">💔 <span>${c.dislikes||0}</span></button>
-      <button class="reply-toggle act-btn spacer" onclick="toggleReplies(this,'${c.id}')">💬 ${c._replyCount||0}</button>
-      <button class="act-btn" onclick="shareConf('${c.id}')">🔗</button>
-      <button class="act-btn" onclick="openReport('${c.id}')">🚩</button>
+      <button class="reply-toggle act-btn" onclick="toggleReplies(this,'${c.id}')">💬 ${c._replyCount||0} Replies</button>
+      <button class="act-btn spacer" onclick="shareConf('${c.id}')">🔗 Share</button>
+      <button class="act-btn" onclick="openReport('${c.id}')">🚩 Report</button>
     </div>
     <div class="replies-section" id="replies-${c.id}"></div>
   </div>`;
@@ -1034,7 +1036,7 @@ async function reactEmoji(btn,id,emoji){
     const r=await fetch(`${API}/api/react/${id}`,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({clientId:CID,emoji})});
     const d=await r.json();
     // update all emoji buttons in this card
-    const card=document.getElementById('conf-${id}')||btn.closest('.conf-card');
+    const card=document.getElementById(`conf-${id}`)||btn.closest('.conf-card');
     const allBtns=card.querySelectorAll('.emoji-btn');
     allBtns.forEach(b=>{
       const e=b.textContent.replace(/\d+/g,'').trim();
@@ -1046,44 +1048,6 @@ async function reactEmoji(btn,id,emoji){
     const c=confessions.find(x=>x.id===id);
     if(c){c.reactions=d.reactions;c.reactedBy=c.reactedBy||{};c.reactedBy[CID]=d.myReaction}
     if(d.myReaction===emoji) burstHeartsAt(btn);
-  }catch(e){toast('❌ Failed')}
-}
-
-// ══════════ LIKE/DISLIKE ══════════
-async function likeConf(btn,id){
-  try{
-    const r=await fetch(`${API}/api/like/${id}`,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({clientId:CID})});
-    const d=await r.json();
-    const row=btn.parentNode;
-    const likeBtn=row.querySelector('.act-btn:nth-child(1)');
-    const disBtn=row.querySelector('.act-btn:nth-child(2)');
-    likeBtn.querySelector('span').textContent=d.likes;
-    disBtn.querySelector('span').textContent=d.dislikes;
-    const c=confessions.find(x=>x.id===id);
-    if(c){
-      const wasLiked=c.votes?.[CID]==='like';
-      likeBtn.classList.toggle('liked',!wasLiked);
-      disBtn.classList.remove('disliked');
-      c.votes=c.votes||{};c.votes[CID]=wasLiked?null:'like';c.likes=d.likes;c.dislikes=d.dislikes;
-    }
-  }catch(e){toast('❌ Failed')}
-}
-async function dislikeConf(btn,id){
-  try{
-    const r=await fetch(`${API}/api/dislike/${id}`,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({clientId:CID})});
-    const d=await r.json();
-    const row=btn.parentNode;
-    const likeBtn=row.querySelector('.act-btn:nth-child(1)');
-    const disBtn=row.querySelector('.act-btn:nth-child(2)');
-    likeBtn.querySelector('span').textContent=d.likes;
-    disBtn.querySelector('span').textContent=d.dislikes;
-    const c=confessions.find(x=>x.id===id);
-    if(c){
-      const wasDis=c.votes?.[CID]==='dislike';
-      disBtn.classList.toggle('disliked',!wasDis);
-      likeBtn.classList.remove('liked');
-      c.votes=c.votes||{};c.votes[CID]=wasDis?null:'dislike';c.likes=d.likes;c.dislikes=d.dislikes;
-    }
   }catch(e){toast('❌ Failed')}
 }
 
@@ -1146,7 +1110,7 @@ async function sendReply(id){
     const c=confessions.find(x=>x.id===id);
     if(c){c._replyCount=(c._replyCount||0)+1;
       const btn=document.querySelector(`#conf-${id} .reply-toggle`);
-      if(btn) btn.textContent=`💬 ${c._replyCount}`;
+      if(btn) btn.innerHTML=`💬 ${c._replyCount} Replies`;
     }
   }catch(e){toast('❌ Failed to send reply')}
 }
