@@ -929,6 +929,27 @@ async function loadPendingBadge(){
 }
 
 // ══════════ LOAD FEED ══════════
+async function fetchReplyCounts(ids){
+  const result = {};
+  const chunkSize = 80;
+  for (let i = 0; i < ids.length; i += chunkSize) {
+    const chunk = ids.slice(i, i + chunkSize);
+    try {
+      const rc = await fetch(`${API}/api/replies/counts`, {
+        method: 'POST',
+        headers: {'Content-Type':'application/json'},
+        body: JSON.stringify({ids: chunk})
+      });
+      if (!rc.ok) continue;
+      const rcData = await rc.json();
+      Object.assign(result, rcData);
+    } catch (e) {
+      continue;
+    }
+  }
+  return result;
+}
+
 async function loadFeed(){
   document.getElementById('feed').innerHTML='<div class="shimmer"></div><div class="shimmer" style="height:120px"></div><div class="shimmer" style="height:90px"></div>';
   try{
@@ -938,14 +959,9 @@ async function loadFeed(){
 
     // get reply counts safely
     if (confessions.length > 0) {
-      try{
-        const ids=confessions.map(c=>c.id);
-        const rc=await fetch(`${API}/api/replies/counts`,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({ids})});
-        if(rc.ok) {
-           const rcData=await rc.json();
-           confessions.forEach(c=>{c._replyCount=rcData[c.id]||0});
-        }
-      }catch(e){}
+      const ids = confessions.map(c => c.id);
+      const rcData = await fetchReplyCounts(ids);
+      confessions.forEach(c => { c._replyCount = rcData[c.id] || 0; });
     }
     
     renderFeed();
