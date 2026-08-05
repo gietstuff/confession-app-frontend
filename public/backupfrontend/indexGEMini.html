@@ -1,0 +1,308 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1.0, maximum-scale=1.0, user-scalable=no"/>
+<title>GIET Confessions 💌</title>
+<link rel="manifest" href="/manifest.json"/>
+<meta name="theme-color" content="#CCFF00"/>
+<link rel="preconnect" href="https://fonts.googleapis.com"/>
+<link href="https://fonts.googleapis.com/css2?family=Archivo+Black&family=Roboto+Mono:wght@400;500;700&family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet"/>
+
+<style>
+/* ══════════════════════════════════════════════════
+   1. BASE VARIABLES (LIGHT MODE DEFAULT)
+══════════════════════════════════════════════════ */
+:root {
+  --bg: #FFFDF8;         /* Soft light cream background */
+  --surface: #FFFFFF;    /* Pure white cards */
+  --surface2: #F0F0F0;   /* Light gray secondary cards */
+  --text: #121212;       /* Dark text */
+  --text-dim: #555555;
+  
+  /* Neo-Brutalist Hard Borders & Shadows */
+  --border: 3px solid #000;
+  --shadow: 5px 5px 0px #000;
+  --shadow-sm: 3px 3px 0px #000;
+  
+  /* Vibe Accent (Defaults to Wholesome Lime) */
+  --accent: #CCFF00;
+  --accent-text: #000;
+}
+
+/* ══════════════════════════════════════════════════
+   2. DARK MODE OVERRIDES
+══════════════════════════════════════════════════ */
+[data-theme="dark"] {
+  --bg: #121212;
+  --surface: #1a1a1a;
+  --surface2: #2a2a2a;
+  --text: #f0f0f0;
+  --text-dim: #aaaaaa;
+  /* Note: Borders and shadows stay black for the brutalist look */
+}
+
+/* ══════════════════════════════════════════════════
+   3. MOBILE-FIRST RESET (Fixes the right-side glitch)
+══════════════════════════════════════════════════ */
+*, *::before, *::after {
+  box-sizing: border-box; /* Crucial: includes borders in width calculations */
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  background: var(--bg);
+  color: var(--text);
+  font-family: 'Space Grotesk', sans-serif;
+  max-width: 100vw;       /* Prevents side-scrolling */
+  overflow-x: hidden;     /* Hides anything pushed off-screen */
+  padding-bottom: 80px;
+}
+
+.page { max-width: 1100px; margin: 0 auto; padding: 0 12px; }
+
+/* ══════════════════════════════════════════════════
+   4. TYPOGRAPHY & BUTTONS
+══════════════════════════════════════════════════ */
+h1, h2, h3 { font-family: 'Archivo Black', sans-serif; text-transform: uppercase; }
+.mono { font-family: 'Roboto Mono', monospace; }
+
+.brut-btn {
+  background: var(--surface2);
+  color: var(--text);
+  border: var(--border);
+  box-shadow: var(--shadow-sm);
+  padding: 10px 16px;
+  font-family: 'Archivo Black', sans-serif;
+  font-size: 0.85rem;
+  cursor: pointer;
+  transition: transform 0.1s, box-shadow 0.1s;
+  text-decoration: none;
+  display: inline-block;
+  text-transform: uppercase;
+}
+.brut-btn:active { transform: translate(3px, 3px); box-shadow: 0 0 0 #000; }
+.brut-btn.accent { background: var(--accent); color: var(--accent-text); }
+
+/* ══════════════════════════════════════════════════
+   5. LAYOUT (Bento Grid -> Single Column Mobile)
+══════════════════════════════════════════════════ */
+header { text-align: center; padding: 30px 0 20px; border-bottom: var(--border); }
+.site-title { font-size: clamp(2rem, 8vw, 4rem); color: var(--accent); text-shadow: 3px 3px 0 #000; }
+
+.bento-grid {
+  display: grid;
+  grid-template-columns: 350px 1fr;
+  gap: 0;
+  border: var(--border);
+  border-top: none;
+}
+
+.bento-submit { border-right: var(--border); padding: 20px; }
+.bento-feed { padding: 20px; background: var(--surface); }
+
+/* Mobile View adjustments */
+@media (max-width: 768px) {
+  .bento-grid { grid-template-columns: 1fr; }
+  .bento-submit { border-right: none; border-bottom: var(--border); }
+  
+  /* Shrink shadows slightly on mobile to save space */
+  :root {
+    --shadow: 3px 3px 0px #000;
+    --shadow-sm: 2px 2px 0px #000;
+  }
+}
+
+/* ══════════════════════════════════════════════════
+   6. FORMS & CARDS
+══════════════════════════════════════════════════ */
+textarea, input, select {
+  width: 100%;
+  background: var(--surface);
+  color: var(--text);
+  border: var(--border);
+  padding: 12px;
+  font-family: 'Roboto Mono', monospace;
+  font-size: 0.9rem;
+  margin-bottom: 12px;
+  outline: none;
+}
+textarea:focus, input:focus { border-color: var(--accent); }
+
+.conf-card {
+  background: var(--surface2);
+  border: var(--border);
+  box-shadow: var(--shadow);
+  padding: 20px;
+  margin-bottom: 20px;
+}
+.card-msg { font-family: 'Roboto Mono', monospace; font-size: 0.95rem; line-height: 1.6; margin: 12px 0; }
+
+.vibe-bar { display: flex; overflow-x: auto; border-bottom: var(--border); background: var(--surface); }
+.vibe-bar::-webkit-scrollbar { display: none; }
+.vibe-pill { padding: 12px 20px; font-family: 'Archivo Black'; cursor: pointer; border-right: var(--border); white-space: nowrap; }
+
+/* Notifications / Modals */
+.toast { position: fixed; bottom: 20px; left: 50%; transform: translate(-50%, 100px); background: var(--accent); color: var(--accent-text); border: var(--border); padding: 10px 20px; font-family: 'Archivo Black'; transition: 0.3s; z-index: 1000; }
+.toast.show { transform: translate(-50%, 0); }
+</style>
+</head>
+<body>
+
+<div class="page">
+  <header>
+    <h1 class="site-title">GIET CONFESSIONS</h1>
+    <p class="mono">say what your heart won't let you say out loud</p>
+  </header>
+
+  <div style="padding: 10px; border-bottom: var(--border); display: flex; justify-content: space-between;">
+    <button class="brut-btn" onclick="toggleTheme()" id="themeBtn">🌙 DARK MODE</button>
+    <a href="/admin.html" class="brut-btn">🔐 ADMIN</a>
+  </div>
+
+  <div class="vibe-bar" id="vibeBar">
+    <div class="vibe-pill" onclick="setVibe('wholesome', this)">🌿 WHOLESOME</div>
+    <div class="vibe-pill" onclick="setVibe('spicy', this)">🌶️ SPICY</div>
+    <div class="vibe-pill" onclick="setVibe('chaos', this)">🌪️ CHAOS</div>
+  </div>
+
+  <div class="bento-grid">
+    <div class="bento-submit">
+      <h2>✍️ Spill it</h2>
+      <select id="catSelect">
+        <option>💘 Crush</option>
+        <option>🌹 Shayari</option>
+        <option>💭 Random</option>
+      </select>
+      <textarea id="confInput" rows="5" placeholder="Write your confession anonymously..."></textarea>
+      <button class="brut-btn accent" style="width: 100%;" onclick="submitConf()">SEND ANONYMOUSLY 💌</button>
+      <div id="statusMsg" class="mono" style="margin-top: 10px; font-size: 0.8rem; color: #ff007f;"></div>
+    </div>
+
+    <div class="bento-feed" id="feed">
+      <div class="mono">Loading confessions...</div>
+    </div>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+/* ══════════════════════════════════════════════════
+   MASTER CONFIGURATION
+   Beginners: Change your colors and links right here!
+══════════════════════════════════════════════════ */
+const CONFIG = {
+  API_URL: 'https://confession-app-6sr0.onrender.com',
+  VIBES: {
+    wholesome: { accent: '#CCFF00', text: '#000' },
+    spicy:     { accent: '#FF007F', text: '#fff' },
+    chaos:     { accent: '#FFAC1C', text: '#000' }
+  }
+};
+
+/* ══════════════════════════════════════════════════
+   THEME & VIBE LOGIC
+══════════════════════════════════════════════════ */
+function toggleTheme() {
+  const html = document.documentElement;
+  const isDark = html.getAttribute('data-theme') === 'dark';
+  const nextTheme = isDark ? 'light' : 'dark';
+  
+  html.setAttribute('data-theme', nextTheme);
+  localStorage.setItem('giet_theme', nextTheme);
+  document.getElementById('themeBtn').textContent = isDark ? '🌙 DARK MODE' : '☀️ LIGHT MODE';
+}
+
+function setVibe(vibeName, element) {
+  // 1. Get colors from CONFIG
+  const colors = CONFIG.VIBES[vibeName];
+  
+  // 2. Inject colors into CSS variables
+  document.documentElement.style.setProperty('--accent', colors.accent);
+  document.documentElement.style.setProperty('--accent-text', colors.text);
+  
+  // 3. Save preference
+  localStorage.setItem('giet_vibe', vibeName);
+}
+
+// Run on page load to restore user's previous choices
+window.onload = () => {
+  const savedTheme = localStorage.getItem('giet_theme') || 'light';
+  document.documentElement.setAttribute('data-theme', savedTheme);
+  document.getElementById('themeBtn').textContent = savedTheme === 'light' ? '🌙 DARK MODE' : '☀️ LIGHT MODE';
+
+  const savedVibe = localStorage.getItem('giet_vibe') || 'wholesome';
+  setVibe(savedVibe);
+  fetchConfessions(); // Load posts
+};
+
+/* ══════════════════════════════════════════════════
+   CORE API LOGIC (Refactored for readability)
+══════════════════════════════════════════════════ */
+let allConfessions = [];
+
+// Helper function to show tiny notifications at bottom
+function showToast(msg) {
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.classList.add('show');
+  setTimeout(() => t.classList.remove('show'), 3000);
+}
+
+async function fetchConfessions() {
+  try {
+    const res = await fetch(`${CONFIG.API_URL}/api/confessions`);
+    const data = await res.json();
+    allConfessions = Array.isArray(data) ? data : (data.confessions || []);
+    renderFeed();
+  } catch (err) {
+    document.getElementById('feed').innerHTML = '<div class="mono">Failed to connect to server.</div>';
+  }
+}
+
+function renderFeed() {
+  const feed = document.getElementById('feed');
+  if (!allConfessions.length) { feed.innerHTML = 'No confessions yet.'; return; }
+  
+  feed.innerHTML = allConfessions.map(c => `
+    <div class="conf-card">
+      <div class="brut-btn" style="padding: 2px 8px; font-size: 0.6rem; pointer-events: none;">${c.category || 'Random'}</div>
+      <div class="card-msg">${c.message}</div>
+      <div class="mono" style="font-size: 0.7rem; color: var(--text-dim);">❤️ ${c.likes || 0} Likes</div>
+    </div>
+  `).join('');
+}
+
+async function submitConf() {
+  const msg = document.getElementById('confInput').value.trim();
+  const cat = document.getElementById('catSelect').value;
+  const status = document.getElementById('statusMsg');
+  
+  if (!msg) { status.textContent = 'Please write something!'; return; }
+  
+  status.textContent = 'Sending...';
+  
+  try {
+    const res = await fetch(`${CONFIG.API_URL}/api/confessions`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ message: msg, category: cat })
+    });
+    
+    const data = await res.json();
+    if (data.error) {
+      status.textContent = data.error;
+    } else {
+      status.textContent = '';
+      document.getElementById('confInput').value = '';
+      showToast('Sent successfully! Waiting for admin approval.');
+    }
+  } catch (err) {
+    status.textContent = 'Network error. Try again.';
+  }
+}
+</script>
+</body>
+</html>

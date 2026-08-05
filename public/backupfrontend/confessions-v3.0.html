@@ -1,0 +1,903 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1.0,viewport-fit=cover"/>
+<title>GIET Confessions 💌</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,700;0,900;1,400;1,700&family=DM+Sans:wght@400;500;600;700&display=swap" rel="stylesheet"/>
+<style>
+/* ─────────────────────────────────────────────────────────────
+   RESET & BASE
+───────────────────────────────────────────────────────────── */
+*{margin:0;padding:0;box-sizing:border-box;}
+html,body{width:100%;height:100%;overflow:hidden;font-family:'DM Sans',sans-serif;}
+
+/* ─────────────────────────────────────────────────────────────
+   BOOK + PAGE FLIP ENGINE
+   Each page stacks in #book. JS adds .flip-out to current page
+   and .flip-in to incoming page. The perspective + rotateY
+   creates the Legwork-style jump/flip between pages.
+───────────────────────────────────────────────────────────── */
+#book{
+  position:fixed;inset:0;
+  perspective:1800px;
+  perspective-origin:50% 50%;
+  overflow:hidden;
+}
+
+.pg{
+  position:absolute;inset:0;
+  width:100%;height:100%;
+  display:flex;flex-direction:column;
+  padding:50px 56px 90px;
+  /* Hidden by default */
+  opacity:0;pointer-events:none;
+  transform:rotateY(90deg) scale(0.92);
+  transform-origin:left center;
+  transform-style:preserve-3d;
+  backface-visibility:hidden;
+  transition:none;
+}
+.pg.active{
+  opacity:1;pointer-events:all;
+  transform:rotateY(0deg) scale(1);
+  transition:transform 0.55s cubic-bezier(0.22,1,0.36,1), opacity 0.35s ease;
+}
+.pg.flip-in-right{
+  /* Entering from right (next page) */
+  transform:rotateY(90deg) scale(0.92);
+  transform-origin:left center;
+}
+.pg.flip-in-left{
+  /* Entering from left (prev page) */
+  transform:rotateY(-90deg) scale(0.92);
+  transform-origin:right center;
+}
+.pg.flip-out-left{
+  /* Exiting to left (going forward) */
+  opacity:0;
+  transform:rotateY(-90deg) scale(0.88);
+  transform-origin:right center;
+  transition:transform 0.38s cubic-bezier(0.55,0,1,0.45), opacity 0.28s ease;
+  pointer-events:none;
+}
+.pg.flip-out-right{
+  /* Exiting to right (going backward) */
+  opacity:0;
+  transform:rotateY(90deg) scale(0.88);
+  transform-origin:left center;
+  transition:transform 0.38s cubic-bezier(0.55,0,1,0.45), opacity 0.28s ease;
+  pointer-events:none;
+}
+
+/* ─────────────────────────────────────────────────────────────
+   PAGE COLOR PALETTE — Legwork-style flat solid backgrounds
+   Cycling across confession pages
+───────────────────────────────────────────────────────────── */
+.c-landing {background:#1a0008;}
+.c-confess  {background:#0a1a2e;}
+.c-cl       {background:#0f0f0f;}
+/* Confession page colors */
+.c-0{background:#6eccc8;}
+.c-1{background:#e8543a;}
+.c-2{background:#98c898;}
+.c-3{background:#5b3aee;}
+.c-4{background:#f09a3e;}
+.c-5{background:#d4799a;}
+.c-6{background:#3a7ec8;}
+.c-7{background:#8cd4b4;}
+.c-8{background:#e03878;}
+.c-9{background:#b8a83c;}
+
+/* Text on dark vs light pages */
+.on-dark{color:#fff0f5;}
+.on-light{color:#1a0008;}
+.on-dark .muted{color:rgba(255,200,220,0.6);}
+.on-light .muted{color:rgba(40,0,15,0.55);}
+
+/* ─────────────────────────────────────────────────────────────
+   FIXED UI CHROME
+───────────────────────────────────────────────────────────── */
+/* Live visitor bubble */
+#liveBubble{
+  position:fixed;top:20px;right:20px;z-index:500;
+  background:rgba(255,255,255,0.13);
+  backdrop-filter:blur(16px);-webkit-backdrop-filter:blur(16px);
+  border:1px solid rgba(255,255,255,0.22);
+  border-radius:18px;padding:10px 14px;
+  display:flex;flex-direction:column;align-items:center;gap:2px;
+  min-width:76px;
+}
+.live-row{display:flex;align-items:center;gap:5px;font-size:0.6rem;font-weight:800;text-transform:uppercase;letter-spacing:.1em;color:#4ade80;}
+.ldot{width:7px;height:7px;border-radius:50%;background:#4ade80;
+  animation:lpulse 1.2s ease-in-out infinite;box-shadow:0 0 8px #4ade80;}
+@keyframes lpulse{0%,100%{opacity:1;transform:scale(1);}50%{opacity:.25;transform:scale(1.6);}}
+#liveNum{font-size:1.5rem;font-weight:900;color:#fff;line-height:1.1;text-align:center;}
+.live-lbl{font-size:0.56rem;color:rgba(255,255,255,0.5);font-weight:600;text-transform:uppercase;letter-spacing:.08em;}
+
+/* Page counter — Legwork style bottom center */
+#pgCounter{
+  position:fixed;bottom:30px;left:50%;transform:translateX(-50%);
+  z-index:500;font-size:1rem;font-weight:800;
+  color:rgba(255,255,255,0.8);font-family:'DM Sans',sans-serif;
+  letter-spacing:.02em;pointer-events:none;
+  transition:color .3s;
+}
+#pgCounter sub{font-size:0.55em;opacity:.5;font-weight:500;}
+
+/* PREV / NEXT — bottom right */
+#pgArrows{
+  position:fixed;bottom:24px;right:40px;z-index:500;
+  display:flex;align-items:center;gap:20px;
+}
+.parr{
+  background:none;border:none;cursor:pointer;
+  display:flex;align-items:center;gap:6px;
+  font-size:0.7rem;font-weight:800;letter-spacing:.12em;text-transform:uppercase;
+  color:rgba(255,255,255,0.6);transition:color .2s;padding:6px 0;
+  font-family:'DM Sans',sans-serif;
+}
+.parr:hover:not(:disabled){color:#fff;}
+.parr:disabled{opacity:.18;cursor:default;}
+
+/* Page dots — right side */
+#pgDots{
+  position:fixed;right:14px;top:50%;transform:translateY(-50%);
+  z-index:500;display:flex;flex-direction:column;gap:9px;align-items:center;
+}
+.pdot{width:5px;height:5px;border-radius:50%;
+  background:rgba(255,255,255,0.28);cursor:pointer;transition:all .25s;}
+.pdot.on{background:#fff;height:16px;border-radius:3px;}
+.pdot:hover{background:rgba(255,255,255,0.65);}
+
+/* ─────────────────────────────────────────────────────────────
+   PAGE 1 — LANDING
+───────────────────────────────────────────────────────────── */
+.land-logo{font-size:2.8rem;margin-bottom:22px;
+  filter:drop-shadow(0 0 24px rgba(255,45,111,0.6));
+  animation:lFloat 4s ease-in-out infinite;display:inline-block;}
+@keyframes lFloat{0%,100%{transform:translateY(0);}50%{transform:translateY(-8px);}}
+.land-title{
+  font-family:'Playfair Display',serif;
+  font-size:clamp(3.2rem,9vw,6.5rem);
+  font-weight:900;line-height:0.95;letter-spacing:-0.03em;
+  color:#fff0f5;margin-bottom:14px;
+}
+.land-title em{font-style:italic;color:#ff6b9d;}
+.land-sub{
+  font-family:'Playfair Display',serif;font-style:italic;
+  font-size:clamp(0.95rem,2.2vw,1.3rem);
+  color:rgba(255,200,220,0.6);margin-bottom:36px;
+}
+.land-nav{display:flex;gap:10px;flex-wrap:wrap;}
+.lbtn{
+  display:inline-flex;align-items:center;gap:7px;
+  padding:11px 22px;border-radius:40px;
+  font-size:0.84rem;font-weight:700;cursor:pointer;
+  border:none;font-family:'DM Sans',sans-serif;text-decoration:none;
+  transition:transform .2s,box-shadow .2s;
+}
+.lbtn:hover{transform:scale(1.06);}
+.lbtn.ig{background:linear-gradient(135deg,#f09433,#e6683c,#dc2743,#cc2366,#bc1888);color:#fff;}
+.lbtn.adm{background:rgba(255,255,255,0.1);border:1.5px solid rgba(255,255,255,0.2);color:#fff;}
+.lbtn.go{background:rgba(255,45,111,0.25);border:1.5px solid rgba(255,45,111,0.45);color:#ff9dc0;}
+.disclaim{
+  margin-top:30px;max-width:540px;
+  background:rgba(255,200,0,0.07);border:1px solid rgba(255,200,0,0.2);
+  border-radius:13px;padding:13px 16px;display:flex;gap:11px;
+}
+.disclaim p{font-size:0.72rem;color:rgba(255,220,120,0.8);line-height:1.6;}
+.disclaim strong{color:rgba(255,220,120,1);}
+
+/* ─────────────────────────────────────────────────────────────
+   PAGE 2 — CONFESS FORM
+───────────────────────────────────────────────────────────── */
+.cf-wrap{width:100%;max-width:540px;margin:auto;}
+.cf-eye{font-size:0.68rem;letter-spacing:.16em;text-transform:uppercase;
+  color:rgba(180,210,255,0.55);font-weight:700;margin-bottom:8px;}
+.cf-h{font-family:'Playfair Display',serif;font-size:clamp(2rem,5vw,3rem);
+  font-weight:900;color:#fff;margin-bottom:4px;}
+.cf-sub{color:rgba(180,210,255,0.5);font-size:0.84rem;margin-bottom:22px;}
+
+/* Category pills */
+.cat-row{display:flex;gap:7px;flex-wrap:wrap;margin-bottom:14px;}
+.cpill{
+  display:inline-flex;align-items:center;gap:5px;
+  background:rgba(255,255,255,0.09);border:1.5px solid rgba(255,255,255,0.15);
+  color:rgba(255,255,255,0.65);border-radius:30px;
+  padding:8px 16px;font-size:0.8rem;font-weight:600;
+  cursor:pointer;transition:all .18s;font-family:'DM Sans',sans-serif;
+  user-select:none;-webkit-user-select:none;
+}
+.cpill:hover{background:rgba(255,100,150,0.2);border-color:rgba(255,100,150,0.45);color:#fff;}
+.cpill.on{background:rgba(255,45,111,0.28);border-color:rgba(255,45,111,0.65);color:#fff;
+  box-shadow:0 0 14px rgba(255,45,111,0.25);}
+
+.batch-row{display:flex;gap:8px;margin-bottom:12px;}
+.bsel{
+  flex:1;background:rgba(0,0,0,0.28);border:1.5px solid rgba(255,255,255,0.13);
+  color:#fff;border-radius:12px;padding:9px 13px;font-size:0.8rem;
+  font-family:'DM Sans',sans-serif;cursor:pointer;
+}
+.bsel option{background:#0a1a2e;}
+.poll-sec{display:none;margin-bottom:12px;}
+.poll-sec.show{display:block;}
+.pinp{
+  width:100%;background:rgba(0,0,0,0.28);border:1.5px solid rgba(255,255,255,0.13);
+  border-radius:12px;padding:10px 14px;color:#fff;font-size:0.87rem;
+  font-family:'DM Sans',sans-serif;margin-bottom:8px;outline:none;
+}
+.pinp::placeholder{color:rgba(200,220,255,0.28);}
+.cta{
+  width:100%;min-height:120px;
+  background:rgba(0,0,0,0.28);border:1.5px solid rgba(255,255,255,0.13);
+  border-radius:15px;padding:15px;color:#fff;font-size:0.9rem;
+  font-family:'DM Sans',sans-serif;resize:none;outline:none;
+  line-height:1.65;margin-bottom:6px;transition:border-color .2s;
+}
+.cta::placeholder{color:rgba(200,220,255,0.28);}
+.cta:focus{border-color:rgba(255,100,150,0.55);}
+.wc-line{text-align:right;font-size:0.68rem;color:rgba(200,220,255,0.35);margin-bottom:14px;}
+.subm{
+  width:100%;padding:14px;
+  background:linear-gradient(135deg,#ff2d6f,#c0144c);
+  border:none;color:#fff;border-radius:14px;
+  font-size:0.96rem;font-weight:700;cursor:pointer;
+  font-family:'DM Sans',sans-serif;
+  box-shadow:0 6px 28px rgba(255,45,111,0.4);
+  transition:transform .2s,box-shadow .2s;
+}
+.subm:hover{transform:translateY(-2px);box-shadow:0 10px 36px rgba(255,45,111,0.55);}
+.subm:disabled{opacity:.45;cursor:not-allowed;transform:none;}
+.fstat{font-size:0.76rem;color:#ff9dc0;margin-top:8px;min-height:18px;text-align:center;}
+
+/* ─────────────────────────────────────────────────────────────
+   CONFESSION PAGES
+───────────────────────────────────────────────────────────── */
+/* Top-right action bar */
+.top-acts{
+  position:absolute;top:44px;right:50px;
+  display:flex;gap:7px;align-items:center;
+  z-index:10;
+}
+.act{
+  display:flex;align-items:center;gap:4px;
+  background:rgba(0,0,0,0.14);border:1.5px solid rgba(0,0,0,0.18);
+  color:rgba(0,0,0,0.6);border-radius:22px;padding:5px 12px;
+  font-size:0.7rem;font-weight:700;cursor:pointer;transition:all .18s;
+  font-family:'DM Sans',sans-serif;white-space:nowrap;
+}
+.act:hover{background:rgba(0,0,0,0.22);}
+.on-dark .act{background:rgba(255,255,255,0.1);border-color:rgba(255,255,255,0.18);color:rgba(255,255,255,0.75);}
+.on-dark .act:hover{background:rgba(255,255,255,0.22);}
+.act.done{opacity:.45;cursor:default;}
+
+.pgnum-line{
+  font-size:0.58rem;letter-spacing:.14em;text-transform:uppercase;
+  opacity:.4;margin-bottom:12px;display:flex;align-items:center;gap:8px;
+}
+.pgnum-line::after{content:'';flex:1;height:1px;background:currentColor;opacity:.3;}
+.ctag{
+  display:inline-flex;align-items:center;gap:4px;
+  background:rgba(0,0,0,0.1);border:1.5px solid rgba(0,0,0,0.15);
+  border-radius:18px;padding:3px 12px;font-size:0.68rem;font-weight:700;
+  margin-bottom:14px;opacity:.75;
+}
+.on-dark .ctag{background:rgba(255,255,255,0.1);border-color:rgba(255,255,255,0.18);}
+.cotd-line{font-size:0.68rem;font-weight:800;letter-spacing:.1em;text-transform:uppercase;
+  color:#d4af37;margin-bottom:10px;display:flex;align-items:center;gap:5px;}
+.cbody{
+  font-family:'Playfair Display',serif;
+  font-size:clamp(1.35rem,3.5vw,2.1rem);
+  line-height:1.58;font-weight:700;font-style:italic;
+  margin-bottom:20px;
+  /* Truncate very long confessions */
+  display:-webkit-box;-webkit-line-clamp:7;-webkit-box-orient:vertical;overflow:hidden;
+}
+.cmeta{font-size:0.68rem;opacity:.5;display:flex;gap:10px;flex-wrap:wrap;margin-bottom:16px;}
+
+/* Reactions */
+.rxn-row{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:16px;}
+.rxb{
+  display:inline-flex;align-items:center;gap:5px;
+  background:rgba(0,0,0,0.1);border:1.5px solid rgba(0,0,0,0.14);
+  border-radius:12px;padding:8px 14px;font-size:1.1rem;cursor:pointer;
+  transition:all .18s;min-width:50px;justify-content:center;
+  font-family:'DM Sans',sans-serif;
+}
+.rxb:hover{transform:scale(1.1);}
+.rxb.on{background:rgba(0,0,0,0.22);border-color:rgba(0,0,0,0.35);box-shadow:0 0 10px rgba(0,0,0,0.15);}
+.on-dark .rxb{background:rgba(255,255,255,0.1);border-color:rgba(255,255,255,0.18);}
+.on-dark .rxb.on{background:rgba(255,255,255,0.25);border-color:rgba(255,255,255,0.5);}
+.rn{font-size:0.78rem;font-weight:700;}
+
+/* Poll */
+.pollwrap{background:rgba(0,0,0,0.1);border-radius:14px;padding:16px;margin-bottom:16px;}
+.pollq{font-family:'Playfair Display',serif;font-size:1.1rem;font-style:italic;margin-bottom:14px;}
+.pollopt{cursor:pointer;margin-bottom:10px;user-select:none;}
+.polllbl{display:flex;justify-content:space-between;font-size:0.78rem;margin-bottom:5px;opacity:.85;}
+.pollbar{height:7px;background:rgba(0,0,0,0.12);border-radius:6px;overflow:hidden;}
+.pollfill{height:100%;background:rgba(0,0,0,0.4);border-radius:6px;transition:width .5s ease;}
+.on-dark .pollbar{background:rgba(255,255,255,0.12);}
+.on-dark .pollfill{background:rgba(255,255,255,0.5);}
+
+/* Replies */
+.rep-tog{
+  display:inline-flex;align-items:center;gap:5px;
+  background:rgba(0,0,0,0.1);border:1.5px solid rgba(0,0,0,0.15);
+  border-radius:20px;padding:6px 14px;font-size:0.7rem;font-weight:700;
+  cursor:pointer;font-family:'DM Sans',sans-serif;margin-bottom:10px;
+  transition:all .18s;
+}
+.rep-tog:hover{background:rgba(0,0,0,0.18);}
+.on-dark .rep-tog{background:rgba(255,255,255,0.09);border-color:rgba(255,255,255,0.16);}
+.rep-list{display:none;margin-bottom:10px;}
+.rep-list.open{display:block;}
+.rep-item{background:rgba(0,0,0,0.1);border-radius:10px;padding:8px 12px;margin-bottom:6px;font-size:0.79rem;line-height:1.5;}
+.on-dark .rep-item{background:rgba(255,255,255,0.08);}
+.rep-time{font-size:0.62rem;opacity:.45;margin-top:3px;}
+.rep-list.open{max-height:220px;overflow-y:auto;padding-right:4px;}
+.rep-head{display:inline-flex;align-items:center;gap:7px;background:rgba(0,0,0,0.12);border:1.5px solid rgba(0,0,0,0.16);border-radius:16px;padding:6px 12px;font-size:0.72rem;font-weight:800;letter-spacing:.04em;margin-bottom:8px;}
+.on-dark .rep-head{background:rgba(255,255,255,0.1);border-color:rgba(255,255,255,0.18);}
+.rep-rxn{display:flex;gap:6px;flex-wrap:wrap;margin-top:6px;}
+.rrb{display:inline-flex;align-items:center;gap:4px;background:rgba(0,0,0,0.1);border:1px solid rgba(0,0,0,0.16);border-radius:10px;padding:4px 8px;font-size:0.83rem;cursor:pointer;}
+.on-dark .rrb{background:rgba(255,255,255,0.1);border-color:rgba(255,255,255,0.18);}
+.rrb.on{background:rgba(0,0,0,0.2);}
+.on-dark .rrb.on{background:rgba(255,255,255,0.24);}
+.share-bottom{position:absolute;left:50%;bottom:18px;transform:translateX(-50%);}
+.rep-form{display:flex;gap:7px;margin-top:4px;}
+.rinp{
+  flex:1;background:rgba(0,0,0,0.15);border:1.5px solid rgba(0,0,0,0.18);
+  border-radius:10px;padding:8px 12px;font-size:0.8rem;
+  font-family:'DM Sans',sans-serif;outline:none;color:#1a0008;
+}
+.on-dark .rinp{background:rgba(255,255,255,0.09);border-color:rgba(255,255,255,0.16);color:#fff;}
+.rinp::placeholder{opacity:.4;}
+.rsend{
+  background:rgba(255,45,111,0.75);border:none;color:#fff;
+  border-radius:10px;padding:8px 14px;font-size:0.76rem;font-weight:700;
+  cursor:pointer;font-family:'DM Sans',sans-serif;white-space:nowrap;
+}
+
+/* ─────────────────────────────────────────────────────────────
+   CHANGELOG
+───────────────────────────────────────────────────────────── */
+.cl-eye{font-size:0.62rem;letter-spacing:.16em;text-transform:uppercase;
+  color:rgba(255,255,255,0.35);margin-bottom:8px;}
+.cl-ver{
+  font-family:'Playfair Display',serif;
+  font-size:clamp(3.5rem,10vw,7rem);font-weight:900;line-height:1;margin-bottom:22px;
+  background:linear-gradient(135deg,#ff2d6f,#ff9dc0,#ffb347);
+  -webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;
+}
+.cl-list{list-style:none;max-width:520px;}
+.cl-list li{padding:10px 0;border-bottom:1px solid rgba(255,255,255,0.06);
+  font-size:0.83rem;color:rgba(255,255,255,0.55);display:flex;gap:10px;}
+.cl-list li::before{content:'→';color:#ff6b9d;flex-shrink:0;}
+.cl-list li strong{color:#fff;}
+
+/* ─────────────────────────────────────────────────────────────
+   TOAST
+───────────────────────────────────────────────────────────── */
+#toast{
+  position:fixed;bottom:30px;left:50%;transform:translateX(-50%) translateY(24px);
+  background:rgba(8,0,4,0.96);border:1px solid rgba(255,100,150,0.4);
+  border-radius:28px;padding:10px 22px;font-size:0.83rem;color:#fff0f5;
+  z-index:2000;opacity:0;transition:all .32s;white-space:nowrap;pointer-events:none;
+}
+#toast.on{opacity:1;transform:translateX(-50%) translateY(0);}
+
+/* Mobile */
+@media(max-width:640px){
+  .pg{padding:32px 24px 80px;}
+  .top-acts{top:28px;right:22px;}
+  .land-title{font-size:clamp(2.5rem,12vw,4rem);}
+  #pgArrows{right:20px;gap:14px;}
+}
+</style>
+</head>
+<body>
+
+<!-- Fixed UI chrome -->
+<div id="liveBubble">
+  <div class="live-row"><div class="ldot"></div>LIVE</div>
+  <div id="liveNum">—</div>
+  <div class="live-lbl">visitors</div>
+</div>
+
+<div id="pgCounter">01<sub>/01</sub></div>
+
+<div id="pgArrows">
+  <button class="parr" id="btnPrev" onclick="goDir(-1)" disabled>
+    <svg width="14" height="10" viewBox="0 0 14 10" fill="none"><path d="M13 5H1M1 5L5 1M1 5l4 4" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
+    PREV
+  </button>
+  <button class="parr" id="btnNext" onclick="goDir(1)">
+    NEXT
+    <svg width="14" height="10" viewBox="0 0 14 10" fill="none"><path d="M1 5h12M13 5L9 1M13 5l-4 4" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
+  </button>
+</div>
+
+<div id="pgDots"></div>
+
+<!-- Book -->
+<div id="book">
+
+  <!-- PAGE 1: LANDING -->
+  <div class="pg c-landing on-dark active" id="pg0">
+    <span class="land-logo">💌</span>
+    <h1 class="land-title">GIET<br><em>Confessions</em></h1>
+    <p class="land-sub">"Say what your heart won't let you speak aloud"</p>
+    <nav class="land-nav">
+      <a href="https://www.instagram.com/" target="_blank" class="lbtn ig">📷 Instagram</a>
+      <a href="/admin.html" class="lbtn adm">🔐 Admin</a>
+      <button class="lbtn go" onclick="goDir(1)">✍️ Confess Now ↓</button>
+    </nav>
+    <div class="disclaim">
+      <span style="font-size:1rem;flex-shrink:0;padding-top:1px">⚠️</span>
+      <p><strong>Entertainment only.</strong> Anonymous confessions for GIET students. All reviewed before publishing. If any content causes harm, it will be removed immediately.</p>
+    </div>
+  </div>
+
+  <!-- PAGE 2: CONFESS FORM -->
+  <div class="pg c-confess on-dark" id="pg1">
+    <div class="cf-wrap">
+      <div class="cf-eye">Anonymous · Safe · GIET only</div>
+      <h2 class="cf-h">Send a Confession</h2>
+      <p class="cf-sub">It'll reach them. No one will ever know it was you.</p>
+      <div class="cat-row" id="catPicker">
+        <button class="cpill on" data-cat="💘 Crush">💘 Crush</button>
+        <button class="cpill" data-cat="🌹 Shayari">🌹 Shayari</button>
+        <button class="cpill" data-cat="💭 Random">💭 Random</button>
+        <button class="cpill" data-cat="📊 Poll">📊 Poll</button>
+      </div>
+      <div class="batch-row">
+        <select class="bsel" id="selYear"><option value="">Year...</option><option>1st Year</option><option>2nd Year</option><option>3rd Year</option><option>4th Year</option></select>
+        <select class="bsel" id="selBranch"><option value="">Branch...</option><option>CSE</option><option>AIML</option><option>ECE</option><option>AGRI</option><option>Others</option></select>
+      </div>
+      <div class="poll-sec" id="pollSec">
+        <input class="pinp" id="pollQ" placeholder="Poll question…"/>
+        <input class="pinp" id="pollA" placeholder="Option A (default: Yes)"/>
+        <input class="pinp" id="pollB" placeholder="Option B (default: No)"/>
+      </div>
+      <textarea class="cta" id="confMsg" placeholder="Write your confession… it'll reach them, anonymously 💕"></textarea>
+      <div class="wc-line"><span id="wcLabel">0 / 400 words</span></div>
+      <button class="subm" id="submitBtn">Send Anonymously 💌</button>
+      <div class="fstat" id="fstat"></div>
+    </div>
+  </div>
+
+  <!-- Confession pages injected here -->
+  <div id="confSlots"></div>
+
+  <!-- CHANGELOG — always last -->
+  <div class="pg c-cl on-dark" id="pgCL">
+    <div class="cl-eye">What's new</div>
+    <div class="cl-ver">v3.0</div>
+    <ul class="cl-list">
+      <li><strong>v3.0</strong> — Full-page flip experience. Each confession on its own page. Legwork-style flip animation.</li>
+      <li><strong>v2.5</strong> — Admin theme system, analytics charts, scheduled publishing, weekly prompt.</li>
+      <li><strong>v2.4</strong> — Smart content filter v4 (roll numbers, leet-speak, section IDs).</li>
+      <li><strong>v2.3</strong> — Exam season theme, "This is me!", poll confessions, reply notifications.</li>
+      <li><strong>v2.2</strong> — DB-backed live count, captcha gate, admin auth fixes.</li>
+      <li><strong>v2.1</strong> — Security: helmet, rate limiting, NoSQL sanitize.</li>
+      <li><strong>v2.0</strong> — Story Mode, emoji reactions, COTD, keep-last-200.</li>
+      <li><strong>v1.0</strong> — Launch: anonymous confessions, admin moderation, MongoDB.</li>
+    </ul>
+  </div>
+
+</div><!-- #book -->
+<div id="toast"></div>
+
+<script>
+/* ── Constants ── */
+const API='https://confession-app-1w0s.onrender.com';
+const EMOJIS=['❤️','😮','😂','🥺','🔥'];
+const BG_CYCLE=[
+  {cls:'c-0',dark:false},{cls:'c-1',dark:false},{cls:'c-2',dark:false},
+  {cls:'c-3',dark:true}, {cls:'c-4',dark:false},{cls:'c-5',dark:false},
+  {cls:'c-6',dark:true}, {cls:'c-7',dark:false},{cls:'c-8',dark:true},
+  {cls:'c-9',dark:false},
+];
+let ALL_PAGES=[], curIdx=0, animating=false;
+let confData=[], clientId=null;
+
+/* ── Client ID ── */
+function cid(){
+  if(clientId)return clientId;
+  let id=localStorage.getItem('giet_cid');
+  if(!id){id=crypto.randomUUID();localStorage.setItem('giet_cid',id);}
+  return clientId=id;
+}
+function toast(msg,dur=3000){
+  const t=document.getElementById('toast');
+  t.textContent=msg;t.classList.add('on');
+  clearTimeout(t._t);t._t=setTimeout(()=>t.classList.remove('on'),dur);
+}
+function ago(ts){
+  const d=(Date.now()-ts)/1000;
+  if(d<60)return 'just now';
+  if(d<3600)return Math.floor(d/60)+'m ago';
+  if(d<86400)return Math.floor(d/3600)+'h ago';
+  return Math.floor(d/86400)+'d ago';
+}
+
+/* ── Page navigation with flip animation ── */
+function buildPageList(){
+  ALL_PAGES=[];
+  ALL_PAGES.push(document.getElementById('pg0'));
+  ALL_PAGES.push(document.getElementById('pg1'));
+  document.querySelectorAll('#confSlots .pg').forEach(p=>ALL_PAGES.push(p));
+  ALL_PAGES.push(document.getElementById('pgCL'));
+  updateChrome();
+  buildDots();
+}
+
+function goDir(dir){
+  const next=curIdx+dir;
+  if(next<0||next>=ALL_PAGES.length||animating)return;
+  flipTo(next,dir);
+}
+function goIdx(idx){
+  if(idx===curIdx||animating)return;
+  flipTo(idx,idx>curIdx?1:-1);
+}
+
+function flipTo(next,dir){
+  animating=true;
+  const from=ALL_PAGES[curIdx];
+  const to=ALL_PAGES[next];
+
+  /* 1. Prepare incoming page off-screen */
+  to.classList.remove('active','flip-in-right','flip-in-left','flip-out-left','flip-out-right');
+  to.style.transition='none';
+  to.classList.add(dir>0?'flip-in-right':'flip-in-left');
+  // Force reflow
+  to.offsetHeight;
+
+  /* 2. Animate outgoing page */
+  from.style.transition='';
+  from.classList.remove('active');
+  from.classList.add(dir>0?'flip-out-left':'flip-out-right');
+
+  /* 3. Animate incoming page to active */
+  to.style.transition='';
+  to.classList.remove('flip-in-right','flip-in-left');
+  to.classList.add('active');
+  to.style.pointerEvents='all';
+
+  curIdx=next;
+  updateChrome();
+
+  /* 4. Cleanup after animation */
+  setTimeout(()=>{
+    from.classList.remove('flip-out-left','flip-out-right');
+    from.style.pointerEvents='none';
+    animating=false;
+  },500);
+}
+
+function updateChrome(){
+  const total=ALL_PAGES.length;
+  document.getElementById('pgCounter').innerHTML=
+    String(curIdx+1).padStart(2,'0')+'<sub>/'+String(total).padStart(2,'0')+'</sub>';
+  document.getElementById('btnPrev').disabled=curIdx<=0;
+  document.getElementById('btnNext').disabled=curIdx>=total-1;
+  // Dot update
+  document.querySelectorAll('.pdot').forEach((d,i)=>d.classList.toggle('on',i===curIdx));
+  // Arrow/counter color based on page darkness
+  const isDark=ALL_PAGES[curIdx]?.classList.contains('on-dark');
+  const col=isDark?'rgba(255,255,255,0.65)':'rgba(0,0,0,0.55)';
+  document.querySelectorAll('.parr').forEach(a=>a.style.color=col);
+  document.getElementById('pgCounter').style.color=isDark?'rgba(255,255,255,0.7)':'rgba(0,0,0,0.5)';
+}
+
+function buildDots(){
+  const el=document.getElementById('pgDots');
+  el.innerHTML='';
+  ALL_PAGES.forEach((_,i)=>{
+    const d=document.createElement('div');
+    d.className='pdot'+(i===curIdx?' on':'');
+    d.onclick=()=>goIdx(i);
+    el.appendChild(d);
+  });
+}
+
+/* ── Keyboard & swipe ── */
+window.addEventListener('keydown',e=>{
+  if(['ArrowDown','ArrowRight','PageDown'].includes(e.key)){e.preventDefault();goDir(1);}
+  if(['ArrowUp','ArrowLeft','PageUp'].includes(e.key)){e.preventDefault();goDir(-1);}
+});
+let tx=0;
+window.addEventListener('touchstart',e=>{tx=e.touches[0].clientX;},{passive:true});
+window.addEventListener('touchend',e=>{
+  const dx=tx-e.changedTouches[0].clientX;
+  if(Math.abs(dx)>48)goDir(dx>0?1:-1);
+},{passive:true});
+
+/* ── Category picker ── */
+let selCat='💘 Crush';
+document.getElementById('catPicker').addEventListener('click',e=>{
+  const btn=e.target.closest('.cpill');
+  if(!btn)return;
+  document.querySelectorAll('.cpill').forEach(p=>p.classList.remove('on'));
+  btn.classList.add('on');
+  selCat=btn.dataset.cat;
+  document.getElementById('pollSec').classList.toggle('show',selCat==='📊 Poll');
+});
+
+/* ── Word count ── */
+document.getElementById('confMsg').addEventListener('input',function(){
+  const wc=this.value.trim().split(/\s+/).filter(Boolean).length;
+  document.getElementById('wcLabel').textContent=wc+' / 400 words';
+});
+
+/* ── Submit ── */
+document.getElementById('submitBtn').addEventListener('click',async function(){
+  const msg=document.getElementById('confMsg').value.trim();
+  const isPoll=selCat==='📊 Poll';
+  const stat=document.getElementById('fstat');
+  if(!isPoll&&!msg){stat.textContent='Please write something 💭';return;}
+  if(!isPoll&&msg.split(/\s+/).filter(Boolean).length>400){stat.textContent='Max 400 words.';return;}
+  this.disabled=true;this.textContent='Sending… 💌';stat.textContent='';
+  const year=document.getElementById('selYear').value;
+  const branch=document.getElementById('selBranch').value;
+  const body={
+    message:isPoll?document.getElementById('pollQ').value.trim():msg,
+    clientId:cid(),category:selCat,
+    branch:(year&&branch)?{year,branch}:null,
+    poll:isPoll?{
+      question:document.getElementById('pollQ').value.trim(),
+      optA:document.getElementById('pollA').value.trim()||'Yes',
+      optB:document.getElementById('pollB').value.trim()||'No',
+    }:null
+  };
+  try{
+    const r=await fetch(API+'/api/confessions',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(body)});
+    const d=await r.json();
+    if(d.error){stat.textContent=d.error;this.disabled=false;this.textContent='Send Anonymously 💌';return;}
+    stat.textContent=d.status==='approved'?'✅ Published!':'⏳ Sent for review!';
+    document.getElementById('confMsg').value='';
+    if(d.confessionId){
+      const ids=JSON.parse(localStorage.getItem('giet_my_confs')||'[]');
+      ids.push(d.confessionId);localStorage.setItem('giet_my_confs',JSON.stringify(ids));
+    }
+    toast('💌 Confession sent!');
+    const btn=this;
+    setTimeout(()=>{btn.disabled=false;btn.textContent='Send Anonymously 💌';stat.textContent='';},3500);
+  }catch(e){stat.textContent='Network error';this.disabled=false;this.textContent='Send Anonymously 💌';}
+});
+
+/* ── Reactions ── */
+async function doReact(confId,emoji){
+  try{
+    const r=await fetch(API+'/api/react/'+confId,{
+      method:'POST',headers:{'Content-Type':'application/json'},
+      body:JSON.stringify({clientId:cid(),emoji})
+    });
+    const d=await r.json();
+    const row=document.getElementById('rxns-'+confId);
+    if(!row||!d.reactions)return;
+    EMOJIS.forEach(e=>{
+      const b=row.querySelector('[data-e="'+e+'"]');
+      if(b){b.querySelector('.rn').textContent=d.reactions[e]||0;b.classList.toggle('on',d.myReaction===e);}
+    });
+  }catch(e){}
+}
+
+/* ── Poll vote ── */
+async function doPoll(confId,opt){
+  try{
+    const r=await fetch(API+'/api/poll/'+confId+'/vote',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({clientId:cid(),option:opt})});
+    const d=await r.json();
+    if(d.alreadyVoted){toast('Already voted');return;}
+    toast('✅ Vote cast!');
+  }catch(e){toast('Network error');}
+}
+
+/* ── Remove ── */
+function getRem(){try{return JSON.parse(localStorage.getItem('giet_removed')||'[]');}catch(e){return[];}}
+function getRep(){try{return JSON.parse(localStorage.getItem('giet_reported')||'[]');}catch(e){return[];}}
+async function doRemove(confId,btn){
+  if(getRem().includes(confId))return;
+  btn.classList.add('done');btn.textContent='Removed';
+  const ids=getRem();ids.push(confId);localStorage.setItem('giet_removed',JSON.stringify(ids));
+  try{
+    const r=await fetch(API+'/api/remove/'+confId,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({clientId:cid()})});
+    const d=await r.json();
+    toast(d.flagged?'⚠️ Flagged for admin review':'🗑 Noted — '+Math.max(0,4-(d.removeCount||1))+' more to flag');
+  }catch(e){}
+}
+
+/* ── Report ── */
+async function doReport(confId,btn){
+  if(getRep().includes(confId)){toast('Already reported');return;}
+  const rn=prompt('Reason?\n1 = identity revealed\n2 = harassment\n3 = fake\n4 = spam\n5 = other\nEnter number:');
+  if(!rn)return;
+  const mp={'1':'identity','2':'harassment','3':'fake','4':'spam','5':'other'};
+  const reason=mp[rn.trim()]||'other';
+  try{
+    const r=await fetch(API+'/api/report/'+confId,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({clientId:cid(),reason})});
+    const d=await r.json();
+    const ids=getRep();ids.push(confId);localStorage.setItem('giet_reported',JSON.stringify(ids));
+    btn.classList.add('done');btn.textContent='Reported';
+    toast(d.autoHidden?'🛡 Hidden pending review':'⚑ Reported!');
+  }catch(e){toast('Network error');}
+}
+
+/* ── Share ── */
+function doShare(){
+  const url=location.href.split('#')[0];
+  if(navigator.share){navigator.share({title:'GIET Confessions 💌',url}).catch(()=>{});}
+  else{navigator.clipboard&&navigator.clipboard.writeText(url);toast('🔗 Link copied!');}
+}
+
+/* ── Replies ── */
+function toggleRep(confId){
+  const list=document.getElementById('rl-'+confId);
+  if(!list)return;
+  const open=list.classList.toggle('open');
+  document.querySelector('[data-rt="'+confId+'"]').textContent=open?'💬 Hide':'💬 Replies';
+  if(open&&!list.dataset.loaded){
+    list.dataset.loaded='1';list.innerHTML='<div class="rep-item" style="opacity:.4;font-style:italic">Loading…</div>';
+    fetch(API+'/api/replies/'+confId).then(r=>r.json()).then(reps=>{
+      if(!reps.length){list.innerHTML='<div class="rep-item" style="opacity:.4;font-style:italic">No replies yet</div>';return;}
+      list.innerHTML=reps.map(rp=>`<div class="rep-item">${rp.message}<div class="rep-time">${ago(rp.createdAt)}</div><div class="rep-rxn">${EMOJIS.map(e=>`<button class="rrb${rp.reactedBy?.[cid()]===e?' on':''}" onclick="doReplyReact('${rp.id}','${e}',this)">${e} <span>${rp.reactions?.[e]||''}</span></button>`).join('')}</div></div>`).join('');
+    }).catch(()=>{list.innerHTML='<div class="rep-item" style="opacity:.4">Error loading</div>';});
+  }
+}
+function loadRepliesOpen(confId){
+  const list=document.getElementById('rl-'+confId);
+  if(!list || list.dataset.loaded) return;
+  list.dataset.loaded='1';
+  list.innerHTML='<div class="rep-item" style="opacity:.4;font-style:italic">Loading…</div>';
+  fetch(API+'/api/replies/'+confId).then(r=>r.json()).then(reps=>{
+    if(!reps.length){list.innerHTML='<div class="rep-item" style="opacity:.4;font-style:italic">No replies yet</div>';return;}
+    list.innerHTML=reps.map(rp=>`<div class="rep-item">${rp.message}<div class="rep-time">${ago(rp.createdAt)}</div><div class="rep-rxn">${EMOJIS.map(e=>`<button class="rrb${rp.reactedBy?.[cid()]===e?' on':''}" onclick="doReplyReact('${rp.id}','${e}',this)">${e} <span>${rp.reactions?.[e]||''}</span></button>`).join('')}</div></div>`).join('');
+  }).catch(()=>{list.innerHTML='<div class="rep-item" style="opacity:.4">Error loading</div>';});
+}
+async function doReplyReact(replyId,emoji,btn){
+  try{
+    const r=await fetch(API+'/api/reply/react/'+replyId,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({clientId:cid(),emoji})});
+    const d=await r.json();
+    if(!d.reactions)return;
+    const box=btn.closest('.rep-rxn');
+    box.innerHTML=EMOJIS.map(e=>`<button class="rrb${d.myReaction===e?' on':''}" onclick="doReplyReact('${replyId}','${e}',this)">${e} <span>${d.reactions?.[e]||''}</span></button>`).join('');
+  }catch(e){}
+}
+async function sendRep(confId){
+  const inp=document.getElementById('ri-'+confId);
+  const msg=inp.value.trim();if(!msg)return;
+  try{
+    const r=await fetch(API+'/api/replies/'+confId,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({message:msg,clientId:cid()})});
+    const d=await r.json();
+    if(d.error){toast(d.error);return;}
+    inp.value='';
+    const list=document.getElementById('rl-'+confId);
+    if(list){list.classList.add('open');list.dataset.loaded='1';
+      const dv=document.createElement('div');dv.className='rep-item';dv.textContent=msg;list.appendChild(dv);}
+    toast('💬 Reply sent!');
+  }catch(e){toast('Network error');}
+}
+
+/* ── Build one confession page ── */
+function buildConfPage(conf,i,total){
+  const bg=BG_CYCLE[i%BG_CYCLE.length];
+  const isDark=bg.dark;
+  const textCls=isDark?'on-dark':'on-light';
+
+  const removed=getRem().includes(conf.id);
+  const reported=getRep().includes(conf.id);
+
+  const div=document.createElement('div');
+  div.className='pg '+bg.cls+' '+textCls;
+  div.id='cp-'+conf.id;
+
+  /* Reactions HTML */
+  const rxHtml=EMOJIS.map(e=>
+    `<button class="rxb${conf.myReaction===e?' on':''}" data-e="${e}" onclick="doReact('${conf.id}','${e}')">
+      <span>${e}</span><span class="rn">${conf.reactions?.[e]||0}</span>
+    </button>`
+  ).join('');
+
+  /* Category + branch tags */
+  const ctag=`<span class="ctag">${conf.category||'💭'}</span>`;
+  const btag=conf.branchTag?.year||conf.branchTag?.branch
+    ? `<span class="ctag" style="margin-left:6px">🎓 ${[conf.branchTag.year,conf.branchTag.branch].filter(Boolean).join(' · ')}</span>` : '';
+  const cotd=conf.isConfessionOfDay?`<div class="cotd-line">👑 Confession of the Day</div>`:'';
+
+  /* Body */
+  let bodyHtml='';
+  if(conf.isPoll){
+    const tot=(conf.pollVotes?.a||0)+(conf.pollVotes?.b||0);
+    const pA=tot?Math.round((conf.pollVotes.a/tot)*100):0;
+    const pB=tot?100-pA:0;
+    bodyHtml=`<div class="pollwrap">
+      <div class="pollq">${conf.message}</div>
+      <div class="pollopt" onclick="doPoll('${conf.id}','a')">
+        <div class="polllbl"><span>${conf.pollOptions?.a||'Yes'}</span><span>${conf.pollVotes?.a||0} (${pA}%)</span></div>
+        <div class="pollbar"><div class="pollfill" style="width:${pA}%"></div></div>
+      </div>
+      <div class="pollopt" onclick="doPoll('${conf.id}','b')">
+        <div class="polllbl"><span>${conf.pollOptions?.b||'No'}</span><span>${conf.pollVotes?.b||0} (${pB}%)</span></div>
+        <div class="pollbar"><div class="pollfill" style="width:${pB}%"></div></div>
+      </div>
+    </div>`;
+  } else {
+    bodyHtml=`<div class="cbody">&ldquo;${conf.message}&rdquo;</div>`;
+  }
+
+  div.innerHTML=`
+    <div class="top-acts">
+      <button class="act${removed?' done':''}" onclick="doRemove('${conf.id}',this)">${removed?'Removed':'🗑 Remove'}</button>
+      <button class="act${reported?' done':''}" onclick="doReport('${conf.id}',this)">${reported?'Reported':'⚑ Flag'}</button>
+    </div>
+    <button class="act share-bottom" onclick="doShare()">📤 Share</button>
+    <div class="pgnum-line">${String(i+1).padStart(2,'0')} of ${String(total).padStart(2,'0')}</div>
+    <div style="margin-bottom:14px">${ctag}${btag}</div>
+    ${cotd}
+    ${bodyHtml}
+    <div class="cmeta">
+      <span>🕐 ${ago(conf.createdAt)}</span>
+      ${(conf.views||0)>4?`<span>👁 ${conf.views} read</span>`:''}
+      ${(conf.thisIsMe||[]).length?`<span>🫣 ${conf.thisIsMe.length} claimed</span>`:''}
+    </div>
+    <div class="rxn-row" id="rxns-${conf.id}">${rxHtml}</div>
+    <div>
+      <div class="rep-head">💬 Replies</div>
+      <div class="rep-list open" id="rl-${conf.id}"></div>
+      <div class="rep-form">
+        <input class="rinp" id="ri-${conf.id}" placeholder="Write an anonymous reply…"/>
+        <button class="rsend" onclick="sendRep('${conf.id}')">Send</button>
+      </div>
+    </div>`;
+  return div;
+}
+
+/* ── Render confessions ── */
+function renderConf(){
+  const slot=document.getElementById('confSlots');
+  slot.innerHTML='';
+  const sorted=[...confData].sort((a,b)=>b.createdAt-a.createdAt);
+  sorted.forEach((c,i)=>slot.appendChild(buildConfPage(c,i,sorted.length)));
+  sorted.forEach(c=>setTimeout(()=>loadRepliesOpen(c.id),0));
+  buildPageList();
+}
+
+/* ── Fetch ── */
+async function fetchConf(){
+  try{
+    const r=await fetch(API+'/api/confessions');
+    const d=await r.json();
+    confData=Array.isArray(d)?d:(d.confessions||[]);
+    renderConf();
+  }catch(e){
+    const slot=document.getElementById('confSlots');
+    const dv=document.createElement('div');
+    dv.className='pg c-landing on-dark';
+    dv.style.cssText='justify-content:center;align-items:center;text-align:center;';
+    dv.innerHTML='<div style="font-size:1.5rem;margin-bottom:12px">📡</div><div style="opacity:.5;font-style:italic">Connecting to server…<br>Please refresh the page.</div>';
+    slot.appendChild(dv);
+    buildPageList();
+  }
+}
+
+/* ── Ping ── */
+async function pingVisit(){
+  try{
+    const r=await fetch(API+'/api/visit',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({clientId:cid()})});
+    const d=await r.json();
+    document.getElementById('liveNum').textContent=d.activeVisitors||0;
+  }catch(e){}
+}
+
+/* ── Boot ── */
+window.addEventListener('load',()=>{
+  buildPageList();
+  fetchConf();
+  pingVisit();
+  setInterval(pingVisit,60000);
+});
+</script>
+</body>
+</html>

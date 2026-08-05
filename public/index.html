@@ -1230,6 +1230,12 @@ function burstHeartsAt(el){
   h.style.cssText=`position:fixed;left:${rect.left}px;top:${rect.top}px;`;
   document.body.appendChild(h); setTimeout(()=>h.remove(),1100);
 }
+// Register Service Worker for PWA
+if ('serviceWorker' in navigator) {
+  window.addEventListener('load', () => {
+    navigator.serviceWorker.register('/sw.js').catch(err => console.log('SW registration failed:', err));
+  });
+}
 
 // ══════════ SCROLL ══════════
 function scrollToTop(){window.scrollTo({top:0,behavior:'smooth'})}
