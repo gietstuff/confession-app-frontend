@@ -1,102 +1,717 @@
-<!-- ══════════════════════════════════════════════════════════
-     COTW ADMIN SECTION — drop this inside your admin.html
-     Place it after your weekly prompt section or wherever fits
-     ══════════════════════════════════════════════════════════ -->
-
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1.0"/>
+<title>GIET Admin Panel 🔐</title>
+<link rel="manifest" href="/manifest-admin.json"/>
+<meta name="theme-color" content="#ff2d6f"/>
+<meta name="apple-mobile-web-app-capable" content="yes"/>
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent"/>
+<meta name="apple-mobile-web-app-title" content="GIET Admin 🔐"/>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet"/>
 <style>
-/* Add to your existing admin CSS */
-.cotw-section { margin: 24px 0; }
-.cotw-section .section-title {
-  font-size: .8rem; text-transform: uppercase; letter-spacing: .5px;
-  color: var(--text3, #aaa); margin-bottom: 14px;
-  display: flex; align-items: center; gap: 8px;
-}
-.cotw-current {
-  background: rgba(240,179,91,.08); border: 1px solid rgba(240,179,91,.25);
-  border-radius: 12px; padding: 14px 16px; margin-bottom: 14px;
-}
-.cotw-current-label {
-  font-size: .7rem; color: #f0b35b; margin-bottom: 6px; font-weight: 600;
-}
-.cotw-current-text {
-  font-size: .85rem; line-height: 1.55; color: var(--text, #eee);
-  margin-bottom: 10px; max-height: 80px; overflow: hidden;
-  display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical;
-}
-.cotw-clear-btn {
-  padding: 6px 14px; border-radius: 20px; font-size: .75rem;
-  border: 1px solid rgba(232,96,122,.3); color: #e8607a;
-  background: rgba(232,96,122,.1); cursor: pointer; transition: all .2s;
-}
+*{margin:0;padding:0;box-sizing:border-box;}
+:root{--rose:#ff2d6f;--rose2:#ff6b9d;--crimson:#c0144c;--green:#22c55e;--yellow:#f59e0b;--red:#ef4444;--glass:rgba(255,255,255,0.07);--border:rgba(255,100,150,0.25);--text:#fff0f5;--muted:rgba(255,200,220,0.7);}
+body{min-height:100vh;background:#0d0008;color:var(--text);font-family:'DM Sans',sans-serif;}
+.bg{position:fixed;inset:0;z-index:0;background:radial-gradient(ellipse 80% 60% at 20% 10%,rgba(192,20,76,0.3) 0%,transparent 60%),radial-gradient(ellipse 50% 50% at 50% 50%,rgba(40,0,20,1) 0%,#0d0008 100%);}
+.page{position:relative;z-index:1;max-width:900px;margin:0 auto;padding:24px 16px 80px;}
+
+/* Login */
+.login-wrap{min-height:100vh;display:flex;align-items:center;justify-content:center;}
+.login-box{background:var(--glass);border:1px solid var(--border);border-radius:24px;padding:40px;max-width:380px;width:100%;backdrop-filter:blur(16px);text-align:center;}
+.login-icon{font-size:3rem;margin-bottom:16px;display:block;}
+.login-box h1{font-family:'Playfair Display',serif;font-size:1.8rem;margin-bottom:8px;}
+.login-box p{color:var(--muted);font-size:0.88rem;margin-bottom:24px;}
+.pass-input{width:100%;background:rgba(0,0,0,0.4);border:1.5px solid var(--border);border-radius:14px;padding:13px 16px;color:var(--text);font-size:1rem;font-family:'DM Sans',sans-serif;outline:none;margin-bottom:12px;transition:border-color .2s;}
+.pass-input:focus{border-color:var(--rose);}
+.pass-input::placeholder{color:rgba(255,200,220,0.35);}
+.login-btn{width:100%;padding:13px;background:linear-gradient(135deg,var(--rose),var(--crimson));color:#fff;border:none;border-radius:14px;font-size:1rem;font-weight:600;cursor:pointer;font-family:'DM Sans',sans-serif;transition:all .2s;}
+.login-btn:hover{transform:translateY(-2px);box-shadow:0 8px 24px rgba(255,45,111,0.4);}
+#loginMsg{margin-top:10px;font-size:0.85rem;color:var(--rose2);}
+
+/* Header */
+.admin-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:28px;flex-wrap:wrap;gap:12px;}
+.admin-title{font-family:'Playfair Display',serif;font-size:1.8rem;}
+.admin-title span{color:var(--rose);}
+.logout-btn{background:rgba(255,45,111,0.1);border:1px solid rgba(255,45,111,0.3);color:var(--rose2);border-radius:30px;padding:7px 18px;cursor:pointer;font-size:0.82rem;font-weight:600;font-family:'DM Sans',sans-serif;transition:all .2s;}
+.logout-btn:hover{background:rgba(255,45,111,0.2);}
+
+/* Stats */
+.stats-row{display:flex;gap:12px;margin-bottom:24px;flex-wrap:wrap;}
+.stat-box{flex:1;min-width:120px;background:var(--glass);border:1px solid var(--border);border-radius:16px;padding:16px;backdrop-filter:blur(10px);text-align:center;}
+.stat-num{font-size:1.8rem;font-weight:700;color:var(--rose2);}
+.stat-lbl{font-size:0.75rem;color:var(--muted);margin-top:4px;}
+
+/* Controls */
+.control-panel{background:var(--glass);border:1px solid var(--border);border-radius:20px;padding:22px;backdrop-filter:blur(12px);margin-bottom:24px;}
+.control-panel h2{font-family:'Playfair Display',serif;font-size:1.1rem;margin-bottom:18px;color:var(--muted);}
+.controls{display:flex;gap:10px;flex-wrap:wrap;align-items:center;}
+.toggle-wrap{display:flex;align-items:center;gap:10px;background:rgba(0,0,0,0.3);border:1px solid var(--border);border-radius:14px;padding:10px 16px;flex:1;min-width:220px;}
+.toggle-label{font-size:0.88rem;font-weight:600;flex:1;}
+.toggle-sub{font-size:0.72rem;color:var(--muted);display:block;margin-top:2px;}
+.toggle{position:relative;width:46px;height:26px;flex-shrink:0;}
+.toggle input{opacity:0;width:0;height:0;}
+.toggle-slider{position:absolute;inset:0;background:rgba(255,255,255,0.1);border-radius:26px;cursor:pointer;transition:background .3s;}
+.toggle-slider::before{content:'';position:absolute;width:20px;height:20px;left:3px;top:3px;background:#fff;border-radius:50%;transition:transform .3s;}
+.toggle input:checked+.toggle-slider{background:var(--green);}
+.toggle input:checked+.toggle-slider::before{transform:translateX(20px);}
+.ctrl-btn{display:flex;align-items:center;gap:7px;padding:11px 18px;border-radius:14px;border:none;cursor:pointer;font-size:0.85rem;font-weight:600;font-family:'DM Sans',sans-serif;transition:all .2s;}
+.approve-all-btn{background:linear-gradient(135deg,var(--green),#16a34a);color:#fff;box-shadow:0 4px 16px rgba(34,197,94,0.3);}
+.approve-all-btn:hover{transform:translateY(-2px);box-shadow:0 6px 22px rgba(34,197,94,0.45);}
+.notif-btn{background:rgba(245,158,11,0.15);border:1px solid rgba(245,158,11,0.35)!important;color:#fbbf24;border-radius:14px;padding:11px 18px;cursor:pointer;font-size:0.85rem;font-weight:600;font-family:'DM Sans',sans-serif;transition:all .2s;}
+.notif-btn:hover{background:rgba(245,158,11,0.25);}
+.notif-btn.enabled{background:rgba(34,197,94,0.15);border-color:rgba(34,197,94,0.35)!important;color:var(--green);}
+
+/* Section */
+.section{background:var(--glass);border:1px solid var(--border);border-radius:20px;padding:22px;backdrop-filter:blur(12px);margin-bottom:20px;}
+.section-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:16px;flex-wrap:wrap;gap:8px;}
+.section-head h2{font-family:'Playfair Display',serif;font-size:1.2rem;}
+.badge{background:var(--rose);color:#fff;border-radius:20px;padding:2px 10px;font-size:0.72rem;font-weight:700;margin-left:8px;}
+.badge.flagged-badge{background:var(--yellow);}
+
+/* Items */
+.item{background:rgba(0,0,0,0.25);border:1px solid rgba(255,100,150,0.15);border-radius:14px;padding:16px;margin-bottom:12px;transition:border-color .2s;}
+.item:last-child{margin-bottom:0;}
+.item.flagged-item{border-color:rgba(245,158,11,0.4);background:rgba(245,158,11,0.04);}
+.item-meta{display:flex;align-items:center;gap:8px;margin-bottom:8px;flex-wrap:wrap;}
+.item-cat{background:rgba(255,45,111,0.15);border:1px solid rgba(255,45,111,0.3);color:var(--rose2);border-radius:12px;padding:2px 10px;font-size:0.7rem;font-weight:600;}
+.item-time{font-size:0.72rem;color:var(--muted);}
+.flag-count{background:rgba(245,158,11,0.2);border:1px solid rgba(245,158,11,0.4);color:#fbbf24;border-radius:12px;padding:2px 10px;font-size:0.7rem;font-weight:700;}
+.item-msg{font-size:0.9rem;line-height:1.65;color:rgba(255,240,245,0.88);margin-bottom:12px;white-space:pre-wrap;word-wrap:break-word;}
+.item-actions{display:flex;gap:8px;flex-wrap:wrap;}
+.ia-btn{padding:7px 14px;border-radius:10px;border:none;font-size:0.78rem;font-weight:600;cursor:pointer;font-family:'DM Sans',sans-serif;transition:all .18s;}
+.approve{background:rgba(34,197,94,0.2);color:var(--green);border:1px solid rgba(34,197,94,0.4);}
+.approve:hover{background:rgba(34,197,94,0.35);}
+.reject{background:rgba(239,68,68,0.15);color:#fca5a5;border:1px solid rgba(239,68,68,0.35);}
+.reject:hover{background:rgba(239,68,68,0.3);}
+.delete{background:rgba(80,80,80,0.2);color:#aaa;border:1px solid rgba(150,150,150,0.25);}
+.delete:hover{background:rgba(239,68,68,0.2);color:#fca5a5;}
+.empty-msg{text-align:center;padding:30px;color:var(--muted);font-style:italic;font-family:'Playfair Display',serif;}
+#modStatus{margin-top:12px;font-size:0.85rem;font-weight:600;min-height:18px;}
+
+/* Filter tags shown on admin items */
+.filter-tags{display:flex;gap:5px;flex-wrap:wrap;margin-top:6px;margin-bottom:8px;}
+.ftag-badge{font-size:0.68rem;font-weight:700;padding:2px 8px;border-radius:10px;border:1px solid;}
+.ftag-badge.phone{color:#60a5fa;border-color:rgba(96,165,250,0.4);background:rgba(96,165,250,0.1);}
+.ftag-badge.email{color:#a78bfa;border-color:rgba(167,139,250,0.4);background:rgba(167,139,250,0.1);}
+.ftag-badge.handle{color:#34d399;border-color:rgba(52,211,153,0.4);background:rgba(52,211,153,0.1);}
+.ftag-badge.abuse{color:#f87171;border-color:rgba(248,113,113,0.4);background:rgba(248,113,113,0.1);}
+.ftag-badge.name{color:#fbbf24;border-color:rgba(251,191,36,0.4);background:rgba(251,191,36,0.1);}
+.ftag-badge.link{color:#fb923c;border-color:rgba(251,146,60,0.4);background:rgba(251,146,60,0.1);}
+.edited-note{font-size:0.72rem;color:rgba(251,191,36,0.8);margin-bottom:6px;display:flex;align-items:center;gap:4px;}
+
+/* In-page notification banner */
+.notif-banner{position:fixed;top:16px;left:50%;transform:translateX(-50%) translateY(-120px);opacity:0;background:linear-gradient(135deg,#f59e0b,#d97706);color:#fff;padding:12px 28px;border-radius:40px;font-size:0.9rem;font-weight:700;box-shadow:0 8px 30px rgba(245,158,11,0.5);transition:all .5s cubic-bezier(.34,1.56,.64,1);z-index:9999;white-space:nowrap;font-family:'DM Sans',sans-serif;cursor:pointer;}
+.notif-banner.show{transform:translateX(-50%) translateY(0);opacity:1;}
+
+/* ── COTD item highlight ── */
+.item.cotd-item{border-color:rgba(255,179,71,0.4);background:rgba(255,179,71,0.04);}
+
+/* ── EXAM SEASON THEME (admin) ── */
+body.exam-season{background:#080010;}
+body.exam-season .bg{background:radial-gradient(ellipse 80% 60% at 20% 10%,rgba(80,0,180,0.3) 0%,transparent 60%),radial-gradient(ellipse 50% 50% at 50% 50%,rgba(20,0,40,1) 0%,#080010 100%);}
+body.exam-season .admin-title span{color:#a78bfa;}
+body.exam-season .login-btn,body.exam-season .approve-all-btn{background:linear-gradient(135deg,#7c3aff,#5b00d4);}
+body.exam-season .badge{background:#6d28d9;}
+body.exam-season .logout-btn{color:#a78bfa;border-color:rgba(140,80,255,0.3);}
+.exam-banner-admin{background:linear-gradient(135deg,rgba(120,60,255,0.12),rgba(80,0,200,0.08));border:1px solid rgba(140,80,255,0.3);border-radius:14px;padding:11px 16px;margin-bottom:20px;display:none;align-items:center;gap:10px;animation:examPulse 3s ease-in-out infinite;}
+@keyframes examPulse{0%,100%{border-color:rgba(140,80,255,0.3);}50%{border-color:rgba(140,80,255,0.65);box-shadow:0 0 18px rgba(120,60,255,0.18);}}
+.exam-banner-admin span{font-size:1.2rem;}
+.exam-banner-admin p{font-size:0.78rem;color:rgba(200,170,255,0.88);line-height:1.5;}
+
+.hidden{display:none;}
+/* ── Analytics charts ── */
+.chart-wrap{margin-top:16px;}
+.chart-bar-row{display:flex;align-items:center;gap:8px;margin-bottom:7px;font-size:0.78rem;}
+.chart-bar-label{width:80px;color:var(--muted);flex-shrink:0;text-align:right;}
+.chart-bar-track{flex:1;background:rgba(255,255,255,0.06);border-radius:6px;height:18px;overflow:hidden;}
+.chart-bar-fill{height:100%;background:linear-gradient(90deg,var(--rose),var(--crimson));border-radius:6px;transition:width .6s ease;}
+.chart-bar-val{width:32px;color:var(--muted);font-size:0.72rem;flex-shrink:0;}
+/* ── Schedule input ── */
+.schedule-row{display:flex;gap:8px;align-items:center;margin-top:8px;flex-wrap:wrap;}
+.schedule-row input[type=datetime-local]{background:rgba(0,0,0,0.3);border:1px solid var(--border);color:var(--text);border-radius:10px;padding:6px 10px;font-size:0.8rem;font-family:'DM Sans',sans-serif;flex:1;}
+/* ── Prompt setter ── */
+.prompt-setter{background:rgba(255,183,71,0.06);border:1px solid rgba(255,183,71,0.2);border-radius:14px;padding:16px;margin-top:12px;}
+.prompt-setter label{font-size:0.78rem;color:var(--muted);display:block;margin-bottom:6px;}
+.prompt-setter input,.prompt-setter select{width:100%;background:rgba(0,0,0,0.3);border:1px solid var(--border);color:var(--text);border-radius:10px;padding:8px 12px;font-size:0.85rem;font-family:'DM Sans',sans-serif;margin-bottom:8px;}
+.prompt-setter select option{background:#1a0010;}
+/* ── Re-review section ── */
+.item.review-item{border-color:rgba(245,158,11,0.4);background:rgba(245,158,11,0.04);}
+
+/* ── COTW ADMIN STYLES ── */
+.cotw-current { background: rgba(240,179,91,.08); border: 1px solid rgba(240,179,91,.25); border-radius: 12px; padding: 14px 16px; margin-bottom: 14px; }
+.cotw-current-label { font-size: .7rem; color: #f0b35b; margin-bottom: 6px; font-weight: 600; }
+.cotw-current-text { font-size: .85rem; line-height: 1.55; color: var(--text); margin-bottom: 10px; max-height: 80px; overflow: hidden; display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; }
+.cotw-clear-btn { padding: 6px 14px; border-radius: 20px; font-size: .75rem; border: 1px solid rgba(232,96,122,.3); color: #e8607a; background: rgba(232,96,122,.1); cursor: pointer; transition: all .2s; }
 .cotw-clear-btn:hover { background: rgba(232,96,122,.2); }
-.cotw-no-pin {
-  font-size: .82rem; color: var(--text3, #888); font-style: italic; margin-bottom: 12px;
-}
-.cotw-search-row {
-  display: flex; gap: 8px; margin-bottom: 10px;
-}
-.cotw-search-input {
-  flex: 1; padding: 9px 12px; border-radius: 8px;
-  background: var(--surf2, #1a1528); border: 1px solid var(--border, rgba(255,255,255,.08));
-  color: var(--text, #eee); font-size: .83rem; outline: none; font-family: inherit;
-}
+.cotw-no-pin { font-size: .82rem; color: var(--muted); font-style: italic; margin-bottom: 12px; }
+.cotw-search-row { display: flex; gap: 8px; margin-bottom: 10px; }
+.cotw-search-input { flex: 1; padding: 9px 12px; border-radius: 8px; background: rgba(0,0,0,0.3); border: 1px solid var(--border); color: var(--text); font-size: .83rem; outline: none; font-family: inherit; }
 .cotw-search-input:focus { border-color: rgba(240,179,91,.4); }
-.cotw-search-btn {
-  padding: 9px 16px; border-radius: 8px;
-  background: rgba(240,179,91,.15); border: 1px solid rgba(240,179,91,.3);
-  color: #f0b35b; font-size: .82rem; cursor: pointer; font-family: inherit;
-  transition: all .2s;
-}
+.cotw-search-btn { padding: 9px 16px; border-radius: 8px; background: rgba(240,179,91,.15); border: 1px solid rgba(240,179,91,.3); color: #f0b35b; font-size: .82rem; cursor: pointer; font-family: inherit; transition: all .2s; }
 .cotw-search-btn:hover { background: rgba(240,179,91,.25); }
 .cotw-results { display: flex; flex-direction: column; gap: 8px; max-height: 340px; overflow-y: auto; }
-.cotw-result-item {
-  background: var(--surf2, #1a1528); border: 1px solid var(--border, rgba(255,255,255,.08));
-  border-radius: 10px; padding: 12px 14px;
-  display: flex; align-items: flex-start; gap: 10px;
-}
-.cotw-result-text { flex: 1; font-size: .82rem; line-height: 1.5; color: var(--text2, #ccc);
-  display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
-.cotw-result-meta { font-size: .68rem; color: var(--text3, #888); margin-top: 4px; }
-.cotw-pin-btn {
-  padding: 6px 14px; border-radius: 8px; flex-shrink: 0;
-  background: rgba(240,179,91,.15); border: 1px solid rgba(240,179,91,.3);
-  color: #f0b35b; font-size: .75rem; cursor: pointer; font-family: inherit;
-  transition: all .2s; align-self: center;
-}
+.cotw-result-item { background: rgba(0,0,0,0.25); border: 1px solid rgba(255,100,150,0.15); border-radius: 10px; padding: 12px 14px; display: flex; align-items: flex-start; gap: 10px; }
+.cotw-result-text { flex: 1; font-size: .82rem; line-height: 1.5; color: var(--text); display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
+.cotw-result-meta { font-size: .68rem; color: var(--muted); margin-top: 4px; }
+.cotw-pin-btn { padding: 6px 14px; border-radius: 8px; flex-shrink: 0; background: rgba(240,179,91,.15); border: 1px solid rgba(240,179,91,.3); color: #f0b35b; font-size: .75rem; cursor: pointer; font-family: inherit; transition: all .2s; align-self: center; }
 .cotw-pin-btn:hover { background: rgba(240,179,91,.3); }
 .cotw-pin-btn.pinned { background: rgba(240,179,91,.25); border-color: #f0b35b; }
-.cotw-no-results { font-size: .8rem; color: var(--text3, #888); padding: 10px 0; text-align: center; }
+.cotw-no-results { font-size: .8rem; color: var(--muted); padding: 10px 0; text-align: center; }
+
 </style>
+</head>
+<body>
+<div class="bg"></div>
+<div class="notif-banner" id="notifBanner" onclick="this.classList.remove('show')">💌 New confessions waiting for review!</div>
 
-<!-- Paste this HTML where you want the COTW section in admin.html -->
-<div class="cotw-section">
-  <div class="section-title">⭐ Confession of the Week (COTW)</div>
+<!-- Login -->
+<div class="login-wrap" id="loginWrap">
+  <div class="login-box">
+    <span class="login-icon">🔐</span>
+    <h1>Admin Panel</h1>
+    <p>GIET Confessions — Moderator Access</p>
+    <input class="pass-input" type="password" id="adminPass" placeholder="Enter admin password" onkeydown="if(event.key==='Enter')doLogin()"/>
+    <button class="login-btn" onclick="doLogin()">Login</button>
+    <div id="loginMsg"></div>
+  </div>
+</div>
 
-  <!-- Current COTW display -->
-  <div id="cotwCurrent">
-    <div class="cotw-no-pin">Auto-selecting (most liked this week)</div>
+<!-- Admin panel -->
+<div class="page hidden" id="adminPanel">
+  <div class="admin-header">
+    <div class="admin-title">🔐 <span>Admin</span> Panel</div>
+    <button class="logout-btn" onclick="logout()">Logout</button>
   </div>
 
-  <!-- Search & pin -->
-  <div class="cotw-search-row">
-    <input class="cotw-search-input" id="cotwSearchInput" placeholder="Search confession text to pin..."/>
-    <button class="cotw-search-btn" onclick="cotwSearch()">Search</button>
+  <!-- Exam season banner (shown in April / November) -->
+  <div class="exam-banner-admin" id="examBannerAdmin">
+    <span>📚</span>
+    <p><strong>Exam Season Active</strong> — Expect higher confession volume. Keep moderation on. Purple theme enabled.</p>
   </div>
-  <div class="cotw-results" id="cotwResults"></div>
+
+  <div class="stats-row">
+    <div class="stat-box"><div class="stat-num" id="sVisits">—</div><div class="stat-lbl">Total Visits</div></div>
+    <div class="stat-box"><div class="stat-num" id="sUnique">—</div><div class="stat-lbl">Unique Visitors</div></div>
+    <div class="stat-box"><div class="stat-num" id="sLive" style="color:var(--rose)">—</div><div class="stat-lbl">Online Now</div></div>
+    <div class="stat-box"><div class="stat-num" id="sPending">—</div><div class="stat-lbl">Pending</div></div>
+    <div class="stat-box"><div class="stat-num" id="sTotal">—</div><div class="stat-lbl">Total Confessions</div></div>
+  </div>
+  <!-- Analytics Charts -->
+  <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:16px;">
+    <div style="background:rgba(255,255,255,0.04);border:1px solid var(--border);border-radius:14px;padding:14px;">
+      <div style="font-size:0.72rem;color:var(--muted);margin-bottom:8px;font-weight:600;text-transform:uppercase;letter-spacing:.05em;">By Category</div>
+      <div id="catChart"></div>
+    </div>
+    <div style="background:rgba(255,255,255,0.04);border:1px solid var(--border);border-radius:14px;padding:14px;">
+      <div style="font-size:0.72rem;color:var(--muted);margin-bottom:8px;font-weight:600;text-transform:uppercase;letter-spacing:.05em;">Top Reactions</div>
+      <div id="rxnChart"></div>
+    </div>
+  </div>
+
+  <div class="control-panel">
+    <h2>⚙️ Controls</h2>
+    <div class="controls">
+      <div class="toggle-wrap">
+        <div>
+          <div class="toggle-label">Auto-Approve</div>
+          <span class="toggle-sub">New confessions go live instantly</span>
+        </div>
+        <label class="toggle">
+          <input type="checkbox" id="autoApproveToggle" onchange="toggleAutoApprove()"/>
+          <span class="toggle-slider"></span>
+        </label>
+      </div>
+      <button class="ctrl-btn approve-all-btn" onclick="approveAll()">✅ Approve All Pending</button>
+      <button class="notif-btn" id="notifBtn" onclick="requestPushPermission()">🔔 Enable Push Notifications</button>
+    </div>
+  </div>
+
+  <!-- ════════════════════════════════════════════════════
+       ⭐ COTW ADMIN SECTION
+       ════════════════════════════════════════════════════ -->
+  <div class="section">
+    <div class="section-head">
+      <h2>⭐ Confession of the Week (COTW)</h2>
+    </div>
+    <div id="cotwCurrent">
+      <div class="cotw-no-pin">Auto-selecting (most liked this week)</div>
+    </div>
+    <div class="cotw-search-row">
+      <input class="cotw-search-input" id="cotwSearchInput" placeholder="Search confession text to pin..." onkeydown="if(event.key==='Enter')cotwSearch()"/>
+      <button class="cotw-search-btn" onclick="cotwSearch()">Search</button>
+    </div>
+    <div class="cotw-results" id="cotwResults"></div>
+  </div>
+
+  <!-- ════════════════════════════════════════════════════
+       1) PENDING APPROVALS — Always at top
+       ════════════════════════════════════════════════════ -->
+  <div class="section">
+    <div class="section-head">
+      <h2>📥 Pending <span class="badge" id="pendingBadge">0</span> <span class="badge flagged-badge" id="flaggedBadge" style="display:none">⚑ Flagged</span></h2>
+    </div>
+    <div id="pendingList"><div class="empty-msg">No pending confessions 🎉</div></div>
+  </div>
+
+  <!-- ════════════════════════════════════════════════════
+       2) APPROVED CONFESSIONS
+       ════════════════════════════════════════════════════ -->
+  <div class="section">
+    <div class="section-head">
+      <h2>✅ Approved <span class="badge" id="approvedBadge">0</span></h2>
+    </div>
+    <div id="approvedList"><div class="empty-msg">No approved confessions yet</div></div>
+  </div>
+
+  <!-- ════════════════════════════════════════════════════
+       3) REPORTED CONFESSIONS
+       ════════════════════════════════════════════════════ -->
+  <div class="section" id="reportedSection" style="display:none">
+    <div class="section-head">
+      <h2>🚨 Reported <span class="badge" style="background:#ef4444" id="reportedBadge">0</span></h2>
+    </div>
+    <div id="reportedList"><div class="empty-msg">No reported confessions 🎉</div></div>
+  </div>
+
+  <!-- ════════════════════════════════════════════════════
+       4) RE-REVIEW (4+ REMOVE clicks)
+       ════════════════════════════════════════════════════ -->
+  <div class="section" id="reviewSection" style="display:none">
+    <div class="section-head">
+      <h2>⚠️ Re-Review Requested <span class="badge" style="background:#f59e0b" id="reviewBadge">0</span></h2>
+    </div>
+    <div id="reviewList"><div class="empty-msg">No re-review requests</div></div>
+  </div>
+
+  <!-- ════════════════════════════════════════════════════
+       5) SUGGESTIONS FROM USERS
+       ════════════════════════════════════════════════════ -->
+  <div class="section" id="suggestionsSection">
+    <div class="section-head">
+      <h2>💡 Suggestions <span class="badge" style="background:#8b5cf6;" id="suggestionsBadge">0</span></h2>
+    </div>
+    <div id="suggestionsList"><div class="empty-msg">No suggestions yet</div></div>
+  </div>
+
+  <!-- ════════════════════════════════════════════════════
+       6) BIRTHDAY MANAGEMENT
+       ════════════════════════════════════════════════════ -->
+  <div class="section" style="border-color:rgba(255,200,50,0.35);background:linear-gradient(135deg,rgba(255,179,0,0.05),rgba(255,100,150,0.04));">
+    <div class="section-head">
+      <h2 style="color:#ffd700;">🎂 Birthday Requests <span class="badge" style="background:linear-gradient(135deg,#b8860b,#d4a017);" id="bdayReqBadge">0</span></h2>
+      <button class="ctrl-btn" onclick="loadBirthdayRequests()" style="background:rgba(255,200,50,0.1);border:1px solid rgba(255,200,50,0.3);color:#ffd700;">↻ Refresh</button>
+    </div>
+    <p style="font-size:0.8rem;color:rgba(255,210,120,0.7);margin-bottom:14px;line-height:1.5;">
+      These are birthday messages submitted by students. Review and use "✅ Set as Birthday" to officially publish it — it'll appear on the site on the matching date with confetti!
+    </p>
+    <div id="bdayRequestsList"><div class="empty-msg">No birthday requests yet</div></div>
+  </div>
+
+  <div class="section" style="border-color:rgba(255,200,50,0.35);background:linear-gradient(135deg,rgba(255,179,0,0.05),rgba(255,100,150,0.04));">
+    <div class="section-head">
+      <h2 style="color:#ffd700;">🎂 Birthday Entries (Active)</h2>
+      <button class="ctrl-btn" onclick="loadBirthdayEntries()" style="background:rgba(255,200,50,0.1);border:1px solid rgba(255,200,50,0.3);color:#ffd700;">↻ Refresh</button>
+    </div>
+    <!-- Manual add form -->
+    <div style="background:rgba(255,200,50,0.06);border:1px solid rgba(255,200,50,0.2);border-radius:14px;padding:16px;margin-bottom:16px;">
+      <p style="font-size:0.78rem;font-weight:700;color:rgba(255,210,80,0.9);margin-bottom:12px;">➕ Add / Edit Birthday Entry</p>
+      <input type="hidden" id="bdayEditId"/>
+      <div style="display:flex;gap:10px;flex-wrap:wrap;margin-bottom:10px;">
+        <input id="bdaySetName" placeholder="Name (e.g. Priya Sharma)" maxlength="80" style="flex:2;min-width:140px;background:rgba(0,0,0,0.3);border:1px solid rgba(255,200,50,0.3);border-radius:10px;padding:9px 12px;color:var(--text);font-family:'DM Sans',sans-serif;font-size:0.85rem;outline:none;"/>
+        <input id="bdaySetDate" placeholder="MM-DD (e.g. 05-29)" maxlength="5" style="flex:1;min-width:100px;background:rgba(0,0,0,0.3);border:1px solid rgba(255,200,50,0.3);border-radius:10px;padding:9px 12px;color:var(--text);font-family:'DM Sans',sans-serif;font-size:0.85rem;outline:none;"/>
+      </div>
+      <textarea id="bdaySetMsg" placeholder="Birthday message that'll appear on the site…" maxlength="500" style="width:100%;min-height:80px;background:rgba(0,0,0,0.3);border:1px solid rgba(255,200,50,0.3);border-radius:10px;padding:9px 12px;color:var(--text);font-family:'DM Sans',sans-serif;font-size:0.85rem;resize:vertical;outline:none;margin-bottom:10px;"></textarea>
+      <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap;">
+        <button class="ctrl-btn approve-all-btn" onclick="saveBirthdayEntry()" style="background:linear-gradient(135deg,#b8860b,#d4a017);box-shadow:0 4px 16px rgba(255,179,0,0.3);">🎂 Save Birthday Entry</button>
+        <button class="ctrl-btn" onclick="clearBdayForm()" style="background:rgba(255,255,255,0.06);border:1px solid rgba(255,255,255,0.12);color:var(--muted);">✕ Clear</button>
+        <span id="bdaySetStatus" style="font-size:0.8rem;color:var(--green);"></span>
+      </div>
+    </div>
+    <div id="bdayEntriesList"><div class="empty-msg">No birthday entries yet — add one above or approve a request below</div></div>
+  </div>
+
+  <!-- ════════════════════════════════════════════════════
+       7) TEACH AI PANEL
+       ════════════════════════════════════════════════════ -->
+  <!-- Teach AI Panel -->
+  <div class="section">
+    <div class="section-head"><h2>🧠 Teach AI — Add Patterns to Block</h2></div>
+    <div class="control-panel" style="border-color:rgba(139,92,246,0.3);">
+      <p style="font-size:0.82rem;color:var(--muted);margin-bottom:14px;line-height:1.6;">
+        Teach the AI to block confessions with a specific <b>meaning or pattern</b> — without waiting for someone to submit one.
+        Type any example phrase, name context, or Odia abuse, click Teach. Future similar confessions get auto-blocked by Layer 2.
+      </p>
+      <div style="display:flex;gap:8px;flex-wrap:wrap;align-items:flex-end;">
+        <div style="flex:1;min-width:200px;">
+          <label style="font-size:0.75rem;color:var(--muted);display:block;margin-bottom:6px;">Example phrase to block</label>
+          <input type="text" id="teachText"
+            placeholder="e.g. bhaudi tui bahut kharap, or: that CSE girl with specs..."
+            style="width:100%;background:rgba(0,0,0,0.4);border:1.5px solid rgba(139,92,246,0.35);border-radius:12px;padding:11px 14px;color:var(--text);font-size:0.88rem;font-family:'DM Sans',sans-serif;outline:none;"
+            maxlength="300"/>
+        </div>
+        <button class="ia-btn" style="background:rgba(139,92,246,0.2);color:#c4b5fd;border:1px solid rgba(139,92,246,0.4);white-space:nowrap;" onclick="teachAI()">🧠 Teach AI</button>
+      </div>
+      <div id="teachStatus" style="margin-top:10px;font-size:0.8rem;color:#c4b5fd;min-height:18px;"></div>
+      <details style="margin-top:14px;">
+        <summary style="font-size:0.76rem;color:var(--muted);cursor:pointer;">💡 Tips — what to teach</summary>
+        <div style="font-size:0.76rem;color:var(--muted);margin-top:8px;line-height:1.7;padding:10px;background:rgba(0,0,0,0.2);border-radius:10px;">
+          <b style="color:#c4b5fd;">Odia abuse phrases:</b> "bhaudi tui nalayak", "sala ganda kaam karu", "beshya mafia"<br>
+          <b style="color:#c4b5fd;">Name targeting patterns:</b> "that girl from room 204", "the professor who teaches DBMS"<br>
+          <b style="color:#c4b5fd;">Harassment patterns:</b> "everyone knows she is characterless", "he cheated in exam 2nd year"<br>
+          <b style="color:#c4b5fd;">How it works:</b> The AI learns the <i>meaning</i>, not just the words. So teaching one phrase catches many similar ones.
+        </div>
+      </details>
+    </div>
+  </div>
+
+  <!-- ════════════════════════════════════════════════════
+       8) FLAGGED DISCUSSION MESSAGES
+       ════════════════════════════════════════════════════ -->
+  <div class="section">
+    <div class="section-head">
+      <h2>🚩 Flagged Discussion Messages <span id="flaggedDiscCount" style="font-size:0.75rem;background:rgba(239,68,68,0.15);color:#fca5a5;border-radius:20px;padding:2px 10px;margin-left:6px;"></span></h2>
+    </div>
+    <div class="control-panel" style="border-color:rgba(239,68,68,0.25);padding:14px;">
+      <p style="font-size:0.78rem;color:var(--muted);margin-bottom:12px;">Messages flagged by 3+ users. Review and decide: restore (innocent) or Mark Abusive (teach AI + delete).</p>
+      <div id="flaggedDiscFeed">
+        <div style="font-size:0.8rem;color:var(--muted);">Loading…</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ════════════════════════════════════════════════════
+       9) SITE VERSION / UPDATE CELEBRATION
+       ════════════════════════════════════════════════════ -->
+  <div class="section">
+    <div class="section-head"><h2>🎉 Trigger Update Celebration</h2></div>
+    <div class="control-panel" style="border-color:rgba(255,200,0,0.25);">
+      <p style="font-size:0.82rem;color:var(--muted);margin-bottom:14px;line-height:1.6;">
+        After deploying a new update, set the version here. Every user who visits for the first time since the update will see a <strong style="color:#fde68a;">confetti celebration</strong> once. Works once per device per version.
+      </p>
+      <div style="display:flex;gap:8px;flex-wrap:wrap;align-items:flex-end;">
+        <div>
+          <label style="font-size:0.75rem;color:var(--muted);display:block;margin-bottom:6px;">Version tag (e.g. v3.2)</label>
+          <input type="text" id="versionTag" placeholder="v3.2" maxlength="20"
+            style="width:110px;background:rgba(0,0,0,0.4);border:1.5px solid rgba(255,200,0,0.3);border-radius:12px;padding:10px 14px;color:var(--text);font-size:0.88rem;font-family:'DM Sans',sans-serif;outline:none;"/>
+        </div>
+        <div style="flex:1;min-width:160px;">
+          <label style="font-size:0.75rem;color:var(--muted);display:block;margin-bottom:6px;">Celebration message (optional)</label>
+          <input type="text" id="versionLabel" placeholder="e.g. WhatsApp-style chat is here!" maxlength="100"
+            style="width:100%;background:rgba(0,0,0,0.4);border:1.5px solid rgba(255,200,0,0.3);border-radius:12px;padding:10px 14px;color:var(--text);font-size:0.88rem;font-family:'DM Sans',sans-serif;outline:none;"/>
+        </div>
+        <button class="ia-btn" style="background:rgba(255,200,0,0.15);color:#fde68a;border:1px solid rgba(255,200,0,0.35);white-space:nowrap;" onclick="setVersion()">🎉 Set Version</button>
+      </div>
+      <div id="versionStatus" style="margin-top:10px;font-size:0.8rem;color:#fde68a;min-height:18px;"></div>
+    </div>
+  </div>
+
+  <!-- ════════════════════════════════════════════════════
+       10) WEEKLY THEME / PROMPT
+       ════════════════════════════════════════════════════ -->
+  <div class="section">
+    <div class="section-head"><h2>💬 Weekly Theme / Prompt</h2></div>
+    <div class="prompt-setter">
+      <label>Theme type</label>
+      <select id="promptTheme">
+        <option value="">-- No theme (clear) --</option>
+        <option value="crush">💘 Crush Confessions Week — Deep Rose / Pink</option>
+        <option value="hostel">🏠 Hostel Life Week — Amber / Warm Orange</option>
+        <option value="exam">📚 Exam Season — Violet / Dark Purple</option>
+        <option value="general">💭 General Theme — Teal / Soft Blue</option>
+      </select>
+      <label>Prompt message (shown to all users as banner)</label>
+      <input type="text" id="promptText" placeholder="e.g. This week: confess something about your hostel life 🏠" maxlength="200"/>
+      <button class="ia-btn approve" onclick="savePrompt()">💾 Save Theme</button>
+      <button class="ia-btn delete" style="margin-left:8px;" onclick="clearPrompt()">✕ Clear</button>
+    </div>
+  </div>
+
+  <div id="modStatus"></div>
 </div>
 
 <script>
-// ── COTW Admin JS — add to your existing admin JS block ──
+const API = 'https://confession-app-6sr0.onrender.com';
+let authToken = null;
+let lastPendingCount = -1; // -1 = not yet polled; avoids false notif on first load
+let pushSubscription = null;
 
-const COTW_API = 'https://confession-app-6sr0.onrender.com'; // same as your API base
+function adminH(){ return {'Content-Type':'application/json','x-admin-token':authToken||''}; }
+function setStatus(msg,color='var(--green)'){const el=document.getElementById('modStatus');el.textContent=msg;el.style.color=color;setTimeout(()=>el.textContent='',4000);}
+function ago(ts){const d=Math.floor((Date.now()-ts)/1000);if(d<60)return 'just now';if(d<3600)return Math.floor(d/60)+'m ago';if(d<86400)return Math.floor(d/3600)+'h ago';return Math.floor(d/86400)+'d ago';}
+function escHtml(s) { return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;') }
 
-// Load current COTW on admin panel open
-async function loadCotwStatus() {
-  const token = getAdminToken(); // use your existing auth token getter
-  try {
-    const r = await fetch(`${COTW_API}/api/admin/cotw`, {
-      headers: { 'Authorization': `Bearer ${token}` }
+// ── In-page banner ─────────────────────────────────────
+let bannerTimer;
+function showBanner(count){
+  const el=document.getElementById('notifBanner');
+  el.textContent=`💌 ${count} new confession${count>1?'s':''} waiting for review!`;
+  el.classList.add('show');
+  clearTimeout(bannerTimer);
+  bannerTimer=setTimeout(()=>el.classList.remove('show'),7000);
+}
+
+// ── Login ──────────────────────────────────────────────
+async function doLogin(){
+  const pass=document.getElementById('adminPass').value.trim();
+  document.getElementById('loginMsg').textContent='Logging in…';
+  try{
+    const r=await fetch(`${API}/api/admin/login`,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({password:pass})});
+    const d=await r.json();
+    if(d.token){
+      authToken=d.token;
+      document.getElementById('loginWrap').classList.add('hidden');
+      document.getElementById('adminPanel').classList.remove('hidden');
+      loadAll();
+      setInterval(loadAll,12000);
+      setInterval(loadAnalytics,15000);
+      loadAutoApproveState();
+      applyAdminExamTheme();
+      // After login, set up push notifications for admin
+      setupAdminPush();
+    }else{
+      document.getElementById('loginMsg').textContent=d.error||'Login failed';
+    }
+  }catch(e){document.getElementById('loginMsg').textContent='Network error';}
+}
+
+function logout(){authToken=null;location.reload();}
+
+// ── Push Notifications (Admin) ─────────────────────────
+async function setupAdminPush(){
+  if(!('serviceWorker' in navigator)||!('PushManager' in window))return;
+  const reg=await navigator.serviceWorker.register('/sw.js').catch(()=>null);
+  if(!reg)return;
+  await navigator.serviceWorker.ready;
+  // Check existing subscription
+  const existing=await reg.pushManager.getSubscription();
+  if(existing){
+    pushSubscription=existing;
+    await sendAdminSubToServer(existing);
+    updateNotifBtn(true);
+    return;
+  }
+  // If permission already granted, subscribe silently
+  if(Notification.permission==='granted'){
+    await subscribeAdminPush(reg);
+  }
+}
+
+async function requestPushPermission(){
+  if(!('serviceWorker' in navigator)||!('PushManager' in window)){
+    alert('Push notifications are not supported on this browser.');return;
+  }
+  if(Notification.permission==='denied'){
+    alert('Notifications are blocked. Please allow them in your browser/phone settings for this site.');return;
+  }
+  const perm=await Notification.requestPermission();
+  if(perm==='granted'){
+    const reg=await navigator.serviceWorker.ready;
+    await subscribeAdminPush(reg);
+  }
+}
+
+async function subscribeAdminPush(reg){
+  try{
+    const keyRes=await fetch(`${API}/api/push/vapid-public-key`);
+    const {key}=await keyRes.json();
+    if(!key){setStatus('Push not configured on server','var(--yellow)');return;}
+    const appServerKey=urlBase64ToUint8Array(key);
+    const sub=await reg.pushManager.subscribe({userVisibleOnly:true,applicationServerKey:appServerKey});
+    pushSubscription=sub;
+    await sendAdminSubToServer(sub);
+    updateNotifBtn(true);
+    setStatus('🔔 Push notifications enabled! You\'ll be notified of new confessions.','var(--green)');
+    // Send a test notification
+    new Notification('GIET Admin 🔐',{body:'Notifications enabled! New confessions will ping you.',icon:'https://em-content.zobj.net/source/twitter/376/love-letter_1f48c.png'});
+  }catch(e){
+    setStatus('Could not enable push notifications','var(--rose)');
+    console.warn('Admin push subscribe failed:',e);
+  }
+}
+
+async function sendAdminSubToServer(sub){
+  try{
+    await fetch(`${API}/api/admin/push/subscribe`,{
+      method:'POST',
+      headers:adminH(),
+      body:JSON.stringify({subscription:sub.toJSON()})
     });
+  }catch(e){}
+}
+
+function updateNotifBtn(enabled){
+  const btn=document.getElementById('notifBtn');
+  if(enabled){btn.textContent='🔔 Notifications ON';btn.classList.add('enabled');}
+  else{btn.textContent='🔔 Enable Push Notifications';btn.classList.remove('enabled');}
+}
+
+function urlBase64ToUint8Array(base64String){
+  const padding='='.repeat((4-base64String.length%4)%4);
+  const base64=(base64String+padding).replace(/-/g,'+').replace(/_/g,'/');
+  const rawData=window.atob(base64);
+  return Uint8Array.from([...rawData].map(c=>c.charCodeAt(0)));
+}
+
+// ── Auto-approve ───────────────────────────────────────
+async function loadAutoApproveState(){
+  try{
+    // LEARN: /api/settings is an admin-only endpoint — needs token
+    const r=await fetch(`${API}/api/settings`,{headers:adminH()});
+    const d=await r.json();
+    document.getElementById('autoApproveToggle').checked=!!d.autoApprove;
+  }catch(e){}
+}
+async function toggleAutoApprove(){
+  const enabled=document.getElementById('autoApproveToggle').checked;
+  try{
+    await fetch(`${API}/api/admin/auto-approve`,{method:'POST',headers:adminH(),body:JSON.stringify({enabled})});
+    setStatus(enabled?'✅ Auto-approve ON — confessions go live instantly':'⏸ Auto-approve OFF — manual review required',enabled?'var(--green)':'var(--rose2)');
+  }catch(e){setStatus('Failed to update setting','var(--rose)');document.getElementById('autoApproveToggle').checked=!enabled;}
+}
+
+// ── Approve all ────────────────────────────────────────
+async function approveAll(){
+  if(!confirm('Approve ALL pending confessions at once?'))return;
+  try{
+    const r=await fetch(`${API}/api/admin/approve-all`,{method:'POST',headers:adminH()});
+    const d=await r.json();
+    if(d.error){setStatus(d.error,'var(--rose)');return;}
+    setStatus(`✅ ${d.approved} confession${d.approved!==1?'s':''} approved!`);
+    loadAll();
+  }catch(e){setStatus('Network error','var(--rose)');}
+}
+
+// ── Moderate ───────────────────────────────────────────
+async function moderate(id,action){
+  try{
+    const r=await fetch(`${API}/api/admin/moderate`,{method:'POST',headers:adminH(),body:JSON.stringify({confessionId:id,action})});
+    const d=await r.json();
+    if(d.error){setStatus(d.error,'var(--rose)');return;}
+    setStatus(action==='approve'?'✅ Approved!':'❌ Rejected');
+    loadAll();
+  }catch(e){setStatus('Network error','var(--rose)');}
+}
+async function deleteConf(id){
+  if(!confirm('Delete this confession?'))return;
+  try{
+    const r=await fetch(`${API}/api/admin/delete`,{method:'POST',headers:adminH(),body:JSON.stringify({confessionId:id})});
+    const d=await r.json();
+    if(d.error){setStatus(d.error,'var(--rose)');return;}
+    setStatus('🗑 Deleted');loadAll();
+  }catch(e){setStatus('Network error','var(--rose)');}
+}
+
+// LEARN: markAbusive does two things in one click:
+// 1. Deletes the confession from the database
+// 2. Saves its "fingerprint" (vector embedding) to Upstash
+//   so similar confessions are auto-blocked in the future
+// This is how the AI system learns without you writing new rules.
+// The more confessions you mark abusive, the smarter the filter gets.
+// ── Flagged Discussion Messages ───────────────────────────────────────────────
+async function loadFlaggedDisc() {
+  const feed = document.getElementById('flaggedDiscFeed');
+  const countEl = document.getElementById('flaggedDiscCount');
+  try {
+    const r = await fetch(`${API}/api/admin/discussions/flagged`, { headers: adminH() });
+    const items = await r.json();
+    if (!items.length) {
+      feed.innerHTML = '<div style="font-size:0.8rem;color:var(--muted);text-align:center;padding:16px;">✅ No flagged messages right now</div>';
+      countEl.textContent = '';
+      return;
+    }
+    countEl.textContent = items.length;
+    feed.innerHTML = items.map(item => `
+      <div style="background:rgba(239,68,68,0.06);border:1px solid rgba(239,68,68,0.2);border-radius:14px;padding:14px;margin-bottom:10px;">
+        <div style="font-size:0.72rem;color:rgba(239,68,68,0.7);margin-bottom:6px;">
+          🚩 ${item.flags} flag${item.flags!==1?'s':''} · ${item.displayName||'Anonymous'} · ${new Date(item.createdAt).toLocaleString('en-IN')}
+        </div>
+        <div style="font-size:0.9rem;color:var(--text);line-height:1.55;margin-bottom:12px;">${escHtml(item.message)}</div>
+        <div style="display:flex;gap:8px;flex-wrap:wrap;">
+          <button class="ia-btn approve" onclick="restoreDiscMsg('${item.id}')">✅ Restore (not abusive)</button>
+          <button class="ia-btn delete" onclick="deleteDiscMsg('${item.id}')">🗑 Delete</button>
+          <button class="ia-btn" style="background:rgba(139,92,246,0.15);color:#c4b5fd;border:1px solid rgba(139,92,246,0.35);" onclick="markDiscAbusive('${item.id}')">🧠 Mark Abusive</button>
+        </div>
+      </div>`).join('');
+  } catch(e) { feed.innerHTML = '<div style="color:var(--muted);">Error loading</div>'; }
+}
+
+async function restoreDiscMsg(id) {
+  try {
+    await fetch(`${API}/api/admin/discussions/restore`, { method:'POST', headers:adminH(), body:JSON.stringify({messageId:id}) });
+    setStatus('✅ Message restored to public chat');
+    loadFlaggedDisc();
+  } catch(e) { setStatus('Network error','var(--rose)'); }
+}
+
+async function deleteDiscMsg(id) {
+  if(!confirm('Delete this message?')) return;
+  try {
+    await fetch(`${API}/api/admin/discussions/delete`, { method:'POST', headers:adminH(), body:JSON.stringify({messageId:id}) });
+    setStatus('🗑 Deleted');
+    loadFlaggedDisc();
+  } catch(e) { setStatus('Network error','var(--rose)'); }
+}
+
+async function markDiscAbusive(id) {
+  if(!confirm('Mark as abusive?\n\nThis will:\n✓ Delete the message\n✓ Teach AI to block similar ones')) return;
+  try {
+    const r = await fetch(`${API}/api/admin/discussions/mark-abusive`, { method:'POST', headers:adminH(), body:JSON.stringify({messageId:id}) });
+    const d = await r.json();
+    setStatus(d.message || '🧠 Learned & deleted', 'var(--rose2)');
+    loadFlaggedDisc();
+  } catch(e) { setStatus('Network error','var(--rose)'); }
+}
+
+async function setVersion(){
+  const version = document.getElementById('versionTag')?.value?.trim();
+  const label = document.getElementById('versionLabel')?.value?.trim();
+  const status = document.getElementById('versionStatus');
+  if(!version){ status.textContent='⚠️ Enter a version tag'; return; }
+  status.textContent='⏳ Setting...';
+  try{
+    const r = await fetch(`${API}/api/admin/version`,{method:'POST',headers:adminH(),body:JSON.stringify({version,label})});
+    const d = await r.json();
+    if(d.error){status.textContent='❌ '+d.error;return;}
+    status.textContent=`🎉 Set to ${d.version} — users will see confetti on next visit!`;
+    setTimeout(()=>{status.textContent='';},5000);
+  }catch(e){status.textContent='❌ Network error';}
+}
+
+async function teachAI(){
+  const text = document.getElementById('teachText')?.value?.trim();
+  const status = document.getElementById('teachStatus');
+  if(!text || text.length < 3){ status.textContent = '⚠️ Enter at least a few words'; return; }
+  status.textContent = '⏳ Teaching...';
+  try{
+    const r = await fetch(`${API}/api/admin/teach`, {
+      method:'POST', headers: adminH(),
+      body: JSON.stringify({ text })
+    });
+    const d = await r.json();
+    if(d.error){ status.textContent = '❌ ' + d.error; return; }
+    status.textContent = d.message || '✅ Learned!';
+    document.getElementById('teachText').value = '';
+    setTimeout(() => { status.textContent = ''; }, 4000);
+  } catch(e){ status.textContent = '❌ Network error'; }
+}
+
+async function markAbusive(id){
+  if(!confirm('Mark as abusive and teach AI?\n\nThis will:\n✓ Delete the confession\n✓ Save its pattern to AI memory\n✓ Future similar posts will be auto-blocked'))return;
+  try{
+    const r=await fetch(`${API}/api/admin/mark-abusive`,{method:'POST',headers:adminH(),body:JSON.stringify({confessionId:id})});
+    const d=await r.json();
+    if(d.error){setStatus(d.error,'var(--rose)');return;}
+    setStatus(d.message||'🧠 Learned & deleted','var(--rose2)');
+    loadAll();
+  }catch(e){setStatus('Network error','var(--rose)');}
+}
+
+// ── COTW ADMIN ─────────────────────────────────────────
+async function loadCotwStatus() {
+  try {
+    const r = await fetch(`${API}/api/admin/cotw`, { headers: adminH() });
     const d = await r.json();
     const el = document.getElementById('cotwCurrent');
     if (d.pinned && d.confession) {
@@ -104,7 +719,7 @@ async function loadCotwStatus() {
         <div class="cotw-current">
           <div class="cotw-current-label">⭐ Currently Pinned as COTW</div>
           <div class="cotw-current-text">${escHtml(d.confession.message)}</div>
-          <div style="font-size:.7rem;color:var(--text3,#888);margin-bottom:8px">
+          <div style="font-size:.7rem;color:var(--muted);margin-bottom:8px">
             ${d.confession.category} · ${d.confession.likes||0} ❤️ · ID: ${d.confession.id.slice(0,8)}...
           </div>
           <button class="cotw-clear-btn" onclick="cotwClear()">✕ Clear Pin (revert to auto)</button>
@@ -115,16 +730,14 @@ async function loadCotwStatus() {
   } catch(e) { console.error('COTW load error', e); }
 }
 
-// Search confessions to pin
 async function cotwSearch() {
   const query = document.getElementById('cotwSearchInput').value.trim().toLowerCase();
   const resultsEl = document.getElementById('cotwResults');
   resultsEl.innerHTML = '<div class="cotw-no-results">Searching...</div>';
   try {
-    const token = getAdminToken();
-    // Fetch all approved confessions and filter client-side
-    const r = await fetch(`${COTW_API}/api/confessions`);
-    const all = await r.json();
+    const r = await fetch(`${API}/api/confessions`);
+    const rawData = await r.json();
+    const all = Array.isArray(rawData) ? rawData : (rawData.confessions || []);
     const filtered = query
       ? all.filter(c => (c.message||'').toLowerCase().includes(query))
       : all.sort((a,b) => (b.likes||0)-(a.likes||0)).slice(0, 20); // top 20 if no query
@@ -137,7 +750,7 @@ async function cotwSearch() {
       <div class="cotw-result-item">
         <div style="flex:1">
           <div class="cotw-result-text">${escHtml(c.message||c.pollOptions?.o1||'')}</div>
-          <div class="cotw-result-meta">${c.category} · ${c.likes||0} ❤️ · ${timeAgo(c.createdAt)}</div>
+          <div class="cotw-result-meta">${c.category} · ${c.likes||0} ❤️ · ${ago(c.createdAt)}</div>
         </div>
         <button class="cotw-pin-btn" onclick="cotwPin('${c.id}',this)">📌 Pin</button>
       </div>`).join('');
@@ -146,51 +759,522 @@ async function cotwSearch() {
   }
 }
 
-// Pin a confession as COTW
 async function cotwPin(confessionId, btn) {
-  const token = getAdminToken();
   btn.textContent = 'Pinning...'; btn.disabled = true;
   try {
-    const r = await fetch(`${COTW_API}/api/admin/cotw/set`, {
+    const r = await fetch(`${API}/api/admin/cotw/set`, {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
+      headers: adminH(),
       body: JSON.stringify({ confessionId })
     });
     const d = await r.json();
     if (!r.ok) throw new Error(d.error);
     btn.textContent = '✓ Pinned'; btn.classList.add('pinned');
-    showAdminToast('⭐ Confession pinned as COTW!');
+    setStatus('⭐ Confession pinned as COTW!', 'var(--green)');
     await loadCotwStatus();
   } catch(e) {
     btn.textContent = '📌 Pin'; btn.disabled = false;
-    showAdminToast('❌ ' + e.message);
+    setStatus('❌ ' + e.message, 'var(--rose)');
   }
 }
 
-// Clear the manual COTW pin
 async function cotwClear() {
-  const token = getAdminToken();
   try {
-    await fetch(`${COTW_API}/api/admin/cotw/clear`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` }
-    });
-    showAdminToast('✓ COTW pin cleared — reverted to auto');
+    await fetch(`${API}/api/admin/cotw/clear`, { method: 'POST', headers: adminH() });
+    setStatus('✓ COTW pin cleared — reverted to auto', 'var(--green)');
     await loadCotwStatus();
-  } catch(e) { showAdminToast('❌ Failed to clear'); }
+  } catch(e) { setStatus('❌ Failed to clear', 'var(--rose)'); }
+}
+// ───────────────────────────────────────────────────────
+
+// ── Load data ──────────────────────────────────────────
+async function loadPending(){
+  // LEARN: Always pass auth headers for admin endpoints!
+  // Without adminH(), the server returns 401 Unauthorized and arr is undefined,
+  // causing "arr.length is not a function" crash.
+  const r=await fetch(`${API}/api/pending`,{headers:adminH()});
+  const arr=await r.json();
+  const container=document.getElementById('pendingList');
+  const badge=document.getElementById('pendingBadge');
+  const flagBadge=document.getElementById('flaggedBadge');
+  badge.textContent=arr.length;
+  document.getElementById('sPending').textContent=arr.length;
+
+  // Notify on new arrivals — skip very first poll (lastPendingCount === -1)
+  if(lastPendingCount !== -1 && arr.length > lastPendingCount){
+    const newCount=arr.length-lastPendingCount;
+    showBanner(newCount);
+  }
+  lastPendingCount=arr.length;
+
+  const flagged=arr.filter(i=>(i.flags||0)>0);
+  flagBadge.style.display=flagged.length?'inline':'none';
+  flagBadge.textContent=`⚑ ${flagged.length} Flagged`;
+
+  if(!arr.length){container.innerHTML='<div class="empty-msg">No pending confessions 🎉</div>';return;}
+  container.innerHTML='';
+  arr.forEach(item=>{
+    const div=document.createElement('div');
+    div.className='item'+(((item.flags||0)>0)?' flagged-item':'');
+
+    // Build filter tags
+    const fFlags=item.filterFlags||[];
+    const flagLabels={'phone':'📞 phone hidden','email':'📧 email hidden','handle':'@ handle hidden','abuse':'🤬 words blurred','name':'👤 name replaced','link':'🔗 link removed'};
+    const filterTagsHtml=fFlags.length
+      ?`<div class="filter-tags">${fFlags.map(f=>`<span class="ftag-badge ${f}">${flagLabels[f]||f}</span>`).join('')}</div>`
+      :'';
+    const editedNote=item.wasEdited
+      ?`<div class="edited-note">✏️ Auto-cleaned by filter — original preserved in DB</div>`
+      :'';
+    // LEARN: Shadow-banned confessions appear in pending with a purple tag.
+    // The submitter thinks it went through — they got a normal response.
+    // Only admins see this badge. You can approve (if AI was wrong) or delete.
+    const shadowNote=item.shadowBanned
+      ?`<div style="margin:5px 0;padding:6px 12px;background:rgba(139,92,246,0.15);border:1px solid rgba(139,92,246,0.35);border-radius:10px;font-size:0.76rem;color:#c4b5fd;">🧠 Shadow Banned by AI — Layer: ${item.aiModLayer||'?'} · ${item.aiModReason||'No reason stored'}</div>`
+      :''
+
+    div.innerHTML=`
+      <div class="item-meta">
+        <span class="item-cat">${item.category||'💭 Random'}</span>
+        <span class="item-time">🕐 ${ago(item.createdAt)}</span>
+        ${(item.flags||0)>0?`<span class="flag-count">⚑ ${item.flags} flag${item.flags>1?'s':''}</span>`:''}
+      </div>
+      ${editedNote}
+      ${shadowNote}
+      ${filterTagsHtml}
+      <div class="item-msg">${item.isPoll?`📊 ${item.message}\n${Object.entries(item.pollOptions||{}).map(([k,label])=>`${label}: ${(item.pollVotes||{})[k]||0} votes`).join(' | ')}`:item.message}</div>
+      <div class="item-actions">
+        <button class="ia-btn approve" onclick="moderate('${item.id}','approve')">✅ Approve</button>
+        <button class="ia-btn reject" onclick="moderate('${item.id}','reject')">❌ Reject</button>
+        <button class="ia-btn delete" onclick="deleteConf('${item.id}')">🗑 Delete</button>
+        <button class="ia-btn" style="background:rgba(139,92,246,0.15);color:#c4b5fd;border:1px solid rgba(139,92,246,0.35);" onclick="markAbusive('${item.id}')">🧠 Mark Abusive</button>
+        <button class="ia-btn" style="background:rgba(96,165,250,0.12);color:#93c5fd;border:1px solid rgba(96,165,250,0.3);" onclick="toggleReplies('${item.id}',this)">💬 Replies</button>
+        ${item.flaggedForReview?'<span style="font-size:0.72rem;padding:3px 10px;border-radius:8px;background:rgba(245,158,11,0.2);color:#fbbf24;border:1px solid rgba(245,158,11,0.3);">⚠️ Re-review</span>':''}
+      </div>
+      <div id="ra-${item.id}" style="display:none;margin-top:10px;"></div>`;
+    container.appendChild(div);
+  });
 }
 
-// Helper — reuse from existing admin code or define:
-function escHtml(s) { return (s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;') }
-function timeAgo(ts) {
-  const d=Date.now()-ts, h=3600000, day=86400000;
-  if(d<h) return Math.floor(d/60000)+'m ago';
-  if(d<day) return Math.floor(d/h)+'h ago';
-  return Math.floor(d/day)+'d ago';
+async function loadApproved(){
+  // LEARN: The API returns { confessions: [...], cotdId: "..." } not a plain array.
+  // Same fix as the main index.html fetchConf() bug.
+  const r=await fetch(`${API}/api/confessions`);
+  const rawData=await r.json();
+  const arr = Array.isArray(rawData) ? rawData : (rawData.confessions || []);
+  const cotdId = Array.isArray(rawData) ? null : rawData.cotdId;
+  const container=document.getElementById('approvedList');
+  document.getElementById('approvedBadge').textContent=arr.length;
+  if(!arr.length){container.innerHTML='<div class="empty-msg">No approved confessions yet</div>';return;}
+  container.innerHTML='';
+  arr.forEach(item=>{
+    const isCotd = cotdId && item.id === cotdId;
+    const div=document.createElement('div');
+    div.className='item'+(isCotd?' cotd-item':'');
+    div.innerHTML=`
+      <div class="item-meta">
+        ${isCotd?'<span class="item-cat" style="background:rgba(255,179,71,0.15);border-color:rgba(255,179,71,0.4);color:#ffb347;">👑 COTD</span>':''}
+        <span class="item-cat">${item.category||'💭 Random'}</span>
+        ${item.branchTag&&(item.branchTag.year||item.branchTag.branch)?`<span class="item-cat" style="background:rgba(124,58,237,0.15);border-color:rgba(124,58,237,0.3);color:#a855f7;">🎓 ${[item.branchTag.year,item.branchTag.branch].filter(Boolean).join(' · ')}</span>`:''}
+        <span class="item-time">🕐 ${ago(item.createdAt)} · ❤️ ${item.likes||0}${Object.values(item.reactions||{}).some(v=>v>0)?' · '+Object.entries(item.reactions||{}).filter(([,v])=>v>0).map(([e,v])=>e+v).join(''):''}${(item.thisIsMe||[]).length?' · 🫣 '+item.thisIsMe.length:''}</span>
+        ${(item.flags||0)>0?`<span class="flag-count">⚑ ${item.flags} flag${item.flags>1?'s':''}</span>`:''}
+      </div>
+      <div class="item-msg">${item.isPoll?`📊 ${item.message}\n${Object.entries(item.pollOptions||{}).map(([k,label])=>`${label}: ${(item.pollVotes||{})[k]||0} votes`).join(' | ')}`:item.message}</div>
+      <div class="item-actions">
+        <button class="ia-btn delete" onclick="deleteConf('${item.id}')">🗑 Delete</button>
+        <button class="ia-btn" style="background:rgba(139,92,246,0.15);color:#c4b5fd;border:1px solid rgba(139,92,246,0.35);" onclick="markAbusive('${item.id}')">🧠 Mark Abusive</button>
+        <button class="ia-btn" style="background:rgba(96,165,250,0.12);color:#93c5fd;border:1px solid rgba(96,165,250,0.3);" onclick="toggleReplies('${item.id}',this)">💬 Replies</button>
+        ${item.flaggedForReview?'<span style="font-size:0.72rem;padding:3px 10px;border-radius:8px;background:rgba(245,158,11,0.2);color:#fbbf24;border:1px solid rgba(245,158,11,0.3);">⚠️ Re-review</span>':''}
+      </div>
+      <div id="ra-${item.id}" style="display:none;margin-top:10px;"></div>`;
+    container.appendChild(div);
+  });
 }
-// NOTE: getAdminToken() — use your existing token method
-// NOTE: showAdminToast() — use your existing toast method
 
-// Call on admin load (after auth check):
-// loadCotwStatus();
+async function loadAnalytics(){
+  try{
+    // LEARN: /api/analytics requires the admin token header (x-admin-token).
+    // Without it, server returns 401 and we get an error response, not stats.
+    const r=await fetch(`${API}/api/analytics`,{headers:adminH()});
+    const d=await r.json();
+    document.getElementById('sVisits').textContent=d.visits||0;
+    document.getElementById('sUnique').textContent=d.uniqueVisitors||0;
+    document.getElementById('sLive').textContent=d.activeVisitors||0;
+  }catch(e){}
+}
+
+// ── Exam Season Theme (Admin) ────────────────────────
+// LEARN: Same month-check as index.html. Runs once on login.
+// We call it inside doLogin() after the panel is shown.
+function applyAdminExamTheme(){
+  const m = new Date().getMonth(); // 0-indexed: 3=April, 10=November
+  if(m===3||m===10){
+    document.body.classList.add('exam-season');
+    const banner=document.getElementById('examBannerAdmin');
+    if(banner) banner.style.display='flex';
+  }
+}
+
+
+async function toggleReplies(confId,btn){
+  const box=document.getElementById('ra-'+confId);
+  if(!box)return;
+  if(box.style.display!=='none'){box.style.display='none';btn.textContent='💬 Replies';return;}
+  box.style.display='block';btn.textContent='💬 Hide';
+  box.innerHTML='<div style="color:var(--muted);font-size:0.8rem;padding:4px">Loading…</div>';
+  try{
+    const r=await fetch(`${API}/api/replies/${confId}`);
+    const replies=await r.json();
+    if(!replies.length){box.innerHTML='<div style="color:var(--muted);font-size:0.8rem;font-style:italic;padding:4px">No replies yet</div>';return;}
+    box.innerHTML=replies.map(rep=>`<div id="ri-${rep.id}" style="display:flex;justify-content:space-between;align-items:flex-start;gap:8px;padding:8px 10px;margin-bottom:6px;background:rgba(255,255,255,0.03);border:1px solid rgba(255,255,255,0.07);border-radius:10px;"><div style="font-size:0.82rem;color:rgba(255,240,245,0.8);flex:1;line-height:1.5;">${rep.message}<div style="font-size:0.68rem;color:var(--muted);margin-top:2px;">${ago(rep.createdAt)}</div></div><button class="ia-btn delete" style="flex-shrink:0;padding:5px 10px;font-size:0.72rem;" onclick="deleteReply('${rep.id}')">🗑</button></div>`).join('');
+  }catch(e){box.innerHTML='<div style="color:var(--rose);font-size:0.8rem;">Error loading</div>';}
+}
+async function deleteReply(replyId){
+  if(!confirm('Delete this reply?'))return;
+  try{
+    const r=await fetch(`${API}/api/admin/reply/delete`,{method:'POST',headers:adminH(),body:JSON.stringify({replyId})});
+    const d=await r.json();
+    if(d.error){setStatus(d.error,'var(--rose)');return;}
+    const el=document.getElementById('ri-'+replyId);
+    if(el)el.remove();
+    setStatus('🗑 Reply deleted');
+  }catch(e){setStatus('Network error','var(--rose)');}
+}
+async function loadReported(){
+  try{
+    const r=await fetch(`${API}/api/reported`,{headers:adminH()});
+    const arr=await r.json();
+    const section=document.getElementById('reportedSection');
+    document.getElementById('reportedBadge').textContent=arr.length;
+    section.style.display=arr.length?'block':'none';
+    const container=document.getElementById('reportedList');
+    if(!arr.length){container.innerHTML='<div class="empty-msg">No reported confessions 🎉</div>';return;}
+    const LABELS={'identity':'🪪 Identity','harassment':'😤 Harassment','fake':'🤥 Fake','spam':'🗑 Spam','other':'💬 Other'};
+    container.innerHTML='';
+    arr.forEach(item=>{
+      const div=document.createElement('div');
+      div.className='item flagged-item';
+      const counts=(item.reports||[]).reduce((a,r)=>{a[r.reason]=(a[r.reason]||0)+1;return a;},{});
+      const tags=Object.entries(counts).map(([r,n])=>`<span style="font-size:0.68rem;padding:2px 8px;border-radius:8px;background:rgba(239,68,68,0.15);border:1px solid rgba(239,68,68,0.3);color:#fca5a5;">${LABELS[r]||r} ×${n}</span>`).join(' ');
+      div.innerHTML=`<div class="item-meta"><span class="item-cat">${item.category||'💭 Random'}</span><span class="flag-count">⚑ ${(item.reports||[]).length} reports</span>${item.reportHidden?'<span style="font-size:0.68rem;padding:2px 8px;border-radius:8px;background:rgba(239,68,68,0.2);color:#fca5a5;border:1px solid rgba(239,68,68,0.35);">🚫 Hidden</span>':''}</div><div style="display:flex;flex-wrap:wrap;gap:4px;margin:6px 0;">${tags}</div><div class="item-msg">${item.message}</div><div class="item-actions"><button class="ia-btn approve" onclick="restoreConf('${item.id}')">✅ Restore</button><button class="ia-btn delete" onclick="deleteConf('${item.id}')">🗑 Delete</button><button class="ia-btn" style="background:rgba(139,92,246,0.15);color:#c4b5fd;border:1px solid rgba(139,92,246,0.35);font-size:0.76rem;padding:7px 12px;" onclick="markAbusive('${item.id}')">🧠 Mark Abusive</button></div>`;
+      container.appendChild(div);
+    });
+  }catch(e){}
+}
+async function restoreConf(id){
+  try{
+    await fetch(`${API}/api/admin/restore`,{method:'POST',headers:adminH(),body:JSON.stringify({confessionId:id})});
+    setStatus('✅ Restored — reports cleared');loadAll();
+  }catch(e){setStatus('Network error','var(--rose)');}
+}
+
+// ── Scheduled publish ─────────────────────────────────
+async function scheduleConf(confId){
+  const dt=document.getElementById('sched-'+confId)?.value;
+  if(!dt){setStatus('Pick a date/time first','var(--rose)');return;}
+  try{
+    const r=await fetch(`${API}/api/admin/schedule`,{method:'POST',headers:adminH(),body:JSON.stringify({confessionId:confId,scheduledAt:new Date(dt).toISOString()})});
+    const d=await r.json();
+    if(d.error){setStatus(d.error,'var(--rose)');return;}
+    setStatus('🕐 Scheduled for '+new Date(dt).toLocaleString());
+    loadAll();
+  }catch(e){setStatus('Network error','var(--rose)');}
+}
+
+// ── Weekly prompt ─────────────────────────────────────
+async function savePrompt(){
+  const prompt=document.getElementById('promptText')?.value?.trim();
+  const promptTheme=document.getElementById('promptTheme')?.value;
+  if(!prompt){setStatus('Enter a prompt message','var(--rose)');return;}
+  try{
+    const r=await fetch(`${API}/api/admin/prompt`,{method:'POST',headers:adminH(),body:JSON.stringify({prompt,promptTheme})});
+    const d=await r.json();
+    if(d.error){setStatus(d.error,'var(--rose)');return;}
+    setStatus('✅ Theme saved — will show to all users');
+  }catch(e){setStatus('Network error','var(--rose)');}
+}
+async function clearPrompt(){
+  try{
+    await fetch(`${API}/api/admin/prompt`,{method:'POST',headers:adminH(),body:JSON.stringify({prompt:'',promptTheme:''})});
+    document.getElementById('promptText').value='';
+    document.getElementById('promptTheme').value='';
+    setStatus('✅ Theme cleared');
+  }catch(e){setStatus('Network error','var(--rose)');}
+}
+async function loadCurrentPrompt(){
+  try{
+    const r=await fetch(`${API}/api/prompt`);
+    const d=await r.json();
+    if(d.prompt&&document.getElementById('promptText')){
+      document.getElementById('promptText').value=d.prompt;
+      document.getElementById('promptTheme').value=d.promptTheme||'';
+    }
+  }catch(e){}
+}
+
+// ── Re-review section ─────────────────────────────────
+async function loadReview(){
+  try{
+    const r=await fetch(`${API}/api/flagged-review`,{headers:adminH()});
+    if(!r.ok)return;
+    const arr=await r.json();
+    const sec=document.getElementById('reviewSection');
+    const badge=document.getElementById('reviewBadge');
+    if(badge)badge.textContent=arr.length;
+    if(sec)sec.style.display=arr.length?'block':'none';
+    const container=document.getElementById('reviewList');
+    if(!container)return;
+    if(!arr.length){container.innerHTML='<div class="empty-msg">No re-review requests</div>';return;}
+    container.innerHTML='';
+    arr.forEach(item=>{
+      const div=document.createElement('div');
+      div.className='item review-item';
+      div.innerHTML=`<div class="item-meta"><span class="item-cat">${item.category||'💭 Random'}</span>
+        <span class="flag-count">🗑 ${(item.removedBy||[]).length} removes</span></div>
+        <div class="item-msg">${item.message}</div>
+        <div class="item-actions">
+          <button class="ia-btn approve" onclick="clearReview('${item.id}')">✅ Keep</button>
+          <button class="ia-btn delete" onclick="deleteConf('${item.id}')">🗑 Delete</button>
+        </div>`;
+      container.appendChild(div);
+    });
+  }catch(e){}
+}
+async function clearReview(id){
+  try{
+    await fetch(`${API}/api/admin/clear-review`,{method:'POST',headers:adminH(),body:JSON.stringify({confessionId:id})});
+    setStatus('✅ Kept — remove flags cleared');loadAll();
+  }catch(e){setStatus('Network error','var(--rose)');}
+}
+
+// ── Analytics charts ──────────────────────────────────
+function renderBarChart(containerId, data, maxVal){
+  const el=document.getElementById(containerId);
+  if(!el)return;
+  el.innerHTML=data.map(({label,val})=>`
+    <div class="chart-bar-row">
+      <div class="chart-bar-label">${label}</div>
+      <div class="chart-bar-track"><div class="chart-bar-fill" style="width:${maxVal?Math.round(val/maxVal*100):0}%"></div></div>
+      <div class="chart-bar-val">${val}</div>
+    </div>`).join('');
+}
+
+async function loadCharts(){
+  try{
+    const r=await fetch(`${API}/api/confessions`);
+    const rawData=await r.json();
+    const arr=Array.isArray(rawData)?rawData:(rawData.confessions||[]);
+    document.getElementById('sTotal').textContent=arr.length;
+
+    // Category breakdown
+    const cats={};
+    arr.forEach(c=>{const k=c.category||'💭 Random';cats[k]=(cats[k]||0)+1;});
+    const catData=Object.entries(cats).sort((a,b)=>b[1]-a[1]).map(([k,v])=>({label:k.split(' ').slice(-1)[0],val:v}));
+    renderBarChart('catChart',catData,Math.max(...catData.map(d=>d.val),1));
+
+    // Reaction breakdown
+    const rxns={'❤️':0,'😮':0,'😂':0,'🥺':0,'🔥':0};
+    arr.forEach(c=>Object.entries(c.reactions||{}).forEach(([e,v])=>{if(rxns[e]!==undefined)rxns[e]+=v;}));
+    const rxnData=Object.entries(rxns).sort((a,b)=>b[1]-a[1]).map(([k,v])=>({label:k,val:v}));
+    renderBarChart('rxnChart',rxnData,Math.max(...rxnData.map(d=>d.val),1));
+  }catch(e){}
+}
+
+async function loadAll(){
+  try{await loadCotwStatus();}catch(e){}
+  try{await loadPending();}catch(e){}
+  try{await loadApproved();}catch(e){}
+  try{await loadAnalytics();}catch(e){}
+  try{await loadCharts();}catch(e){}
+  try{await loadReported();}catch(e){}
+  try{await loadSuggestions();}catch(e){}
+  try{await loadFlaggedDisc();}catch(e){}
+  try{await loadBirthdayRequests();}catch(e){}
+  try{await loadBirthdayEntries();}catch(e){}
+}
+
+// ── Suggestions ───────────────────────────────────────
+async function loadSuggestions(){
+  try{
+    const r=await fetch(`${API}/api/suggestions`,{headers:adminH()});
+    if(!r.ok)return;
+    const arr=await r.json();
+    const badge=document.getElementById('suggestionsBadge');
+    if(badge)badge.textContent=arr.length;
+    const container=document.getElementById('suggestionsList');
+    if(!container)return;
+    if(!arr.length){container.innerHTML='<div class="empty-msg">No suggestions yet</div>';return;}
+    container.innerHTML='';
+    arr.forEach(item=>{
+      const div=document.createElement('div');
+      div.className='item';
+      div.style.borderColor='rgba(139,92,246,0.25)';
+      div.innerHTML=`
+        <div class="item-meta">
+          <span style="background:rgba(139,92,246,0.18);border:1px solid rgba(139,92,246,0.35);color:#c4b5fd;border-radius:12px;padding:2px 10px;font-size:0.7rem;font-weight:600;">💡 suggestion</span>
+          <span class="item-time">${ago(item.createdAt)}</span>
+        </div>
+        <div class="item-msg" style="font-size:0.88rem;line-height:1.6;">${item.message.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;')}</div>
+        <div class="item-actions"><button class="ia-btn delete" onclick="deleteSuggestion('${item.id}')">🗑 Delete</button></div>`;
+      container.appendChild(div);
+    });
+  }catch(e){}
+}
+
+async function deleteSuggestion(id){
+  if(!confirm('Delete this suggestion?'))return;
+  try{
+    await fetch(`${API}/api/admin/suggestions/delete`,{method:'POST',headers:adminH(),body:JSON.stringify({suggestionId:id})});
+    setStatus('🗑 Suggestion deleted');
+    loadSuggestions();
+  }catch(e){setStatus('Network error','var(--rose)');}
+}
+
+// ══════════════════════════════════════════════════════════════════
+// BIRTHDAY MANAGEMENT (Admin)
+// ══════════════════════════════════════════════════════════════════
+// LEARN: Two functions:
+//   loadBirthdayRequests() — shows user-submitted birthday messages for review.
+//     Each request has a "Set as Birthday" button that pre-fills the save form.
+//   loadBirthdayEntries() — shows all admin-saved birthdays in the birthdays collection.
+//
+// saveBirthdayEntry() — upserts a birthday in the DB via POST /api/admin/birthday/set
+// deleteBirthdayEntry(id) — removes a birthday
+// loadBdayIntoForm(req) — pre-fills the form from a request card (for easy approval)
+
+async function loadBirthdayRequests() {
+  try {
+    const r = await fetch(`${API}/api/admin/birthday-requests`, { headers: adminH() });
+    if (!r.ok) return;
+    const arr = await r.json();
+    const badge = document.getElementById('bdayReqBadge');
+    if (badge) badge.textContent = arr.length;
+    const container = document.getElementById('bdayRequestsList');
+    if (!container) return;
+    if (!arr.length) { container.innerHTML = '<div class="empty-msg">No birthday requests yet</div>'; return; }
+    container.innerHTML = '';
+    arr.forEach(item => {
+      const div = document.createElement('div');
+      div.className = 'item';
+      div.style.borderColor = 'rgba(255,200,50,0.25)';
+      div.style.background = 'rgba(255,200,50,0.04)';
+      const esc = s => s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+      div.innerHTML = `
+        <div class="item-meta">
+          <span style="background:rgba(255,200,50,0.18);border:1px solid rgba(255,200,50,0.4);color:#ffd700;border-radius:12px;padding:2px 10px;font-size:0.7rem;font-weight:600;">🎂 Birthday Request</span>
+          <span style="background:rgba(255,200,50,0.1);border:1px solid rgba(255,200,50,0.3);color:#ffd700;border-radius:12px;padding:2px 10px;font-size:0.7rem;font-weight:600;">📅 ${esc(item.date)}</span>
+          <span class="item-time">${ago(item.createdAt)}</span>
+        </div>
+        <div style="font-size:0.8rem;color:rgba(255,210,80,0.8);font-weight:700;margin-bottom:4px;">For: ${esc(item.name)}</div>
+        <div class="item-msg" style="font-size:0.88rem;line-height:1.6;">${esc(item.message)}</div>
+        <div class="item-actions">
+          <button class="ia-btn approve" onclick="loadBdayIntoForm('${esc(item.id)}','${esc(item.name)}','${esc(item.date)}',\`${item.message.replace(/`/g,"'")}\`)">✅ Set as Birthday</button>
+          <button class="ia-btn delete" onclick="deleteBirthdayRequest('${esc(item.id)}')">🗑 Delete</button>
+        </div>`;
+      container.appendChild(div);
+    });
+  } catch(e) {}
+}
+
+async function loadBirthdayEntries() {
+  try {
+    const r = await fetch(`${API}/api/admin/birthdays`, { headers: adminH() });
+    if (!r.ok) return;
+    const arr = await r.json();
+    const container = document.getElementById('bdayEntriesList');
+    if (!container) return;
+    if (!arr.length) { container.innerHTML = '<div class="empty-msg">No birthday entries yet — add one above or approve a request below</div>'; return; }
+    container.innerHTML = '';
+    arr.forEach(item => {
+      const div = document.createElement('div');
+      div.className = 'item';
+      div.style.borderColor = item.active !== false ? 'rgba(255,200,50,0.4)' : 'rgba(255,255,255,0.1)';
+      div.style.background = item.active !== false ? 'rgba(255,200,50,0.05)' : 'rgba(0,0,0,0.1)';
+      const esc = s => s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+      const activeLabel = item.active !== false
+        ? '<span style="background:rgba(34,197,94,0.18);border:1px solid rgba(34,197,94,0.4);color:#22c55e;border-radius:12px;padding:2px 10px;font-size:0.7rem;font-weight:600;">✅ Active</span>'
+        : '<span style="background:rgba(255,255,255,0.06);border:1px solid rgba(255,255,255,0.12);color:rgba(255,200,220,0.5);border-radius:12px;padding:2px 10px;font-size:0.7rem;font-weight:600;">⏸ Inactive</span>';
+      div.innerHTML = `
+        <div class="item-meta">
+          ${activeLabel}
+          <span style="background:rgba(255,200,50,0.15);border:1px solid rgba(255,200,50,0.35);color:#ffd700;border-radius:12px;padding:2px 10px;font-size:0.7rem;font-weight:600;">📅 ${esc(item.date)}</span>
+        </div>
+        <div style="font-size:0.9rem;font-weight:700;color:#ffd700;margin-bottom:4px;">🎂 ${esc(item.name)}</div>
+        <div class="item-msg" style="font-size:0.85rem;line-height:1.6;">${esc(item.message)}</div>
+        <div class="item-actions">
+          <button class="ia-btn approve" onclick="loadBdayIntoForm('${esc(item.id)}','${esc(item.name)}','${esc(item.date)}',\`${item.message.replace(/`/g,"'")}\`)">✏️ Edit</button>
+          <button class="ia-btn" style="background:rgba(255,200,50,0.12);border:1px solid rgba(255,200,50,0.3);color:#ffd700;" onclick="toggleBirthdayActive('${esc(item.id)}',${item.active!==false})">${item.active!==false?'⏸ Deactivate':'▶ Activate'}</button>
+          <button class="ia-btn delete" onclick="deleteBirthdayEntry('${esc(item.id)}')">🗑 Delete</button>
+        </div>`;
+      container.appendChild(div);
+    });
+  } catch(e) {}
+}
+
+function loadBdayIntoForm(id, name, date, message) {
+  // Pre-fills the set form from either a request or an existing entry
+  document.getElementById('bdayEditId').value = id || '';
+  document.getElementById('bdaySetName').value = name;
+  document.getElementById('bdaySetDate').value = date;
+  document.getElementById('bdaySetMsg').value = message;
+  document.getElementById('bdaySetStatus').textContent = '';
+  // Scroll to form
+  document.getElementById('bdaySetName').scrollIntoView({ behavior: 'smooth', block: 'center' });
+  document.getElementById('bdaySetName').focus();
+}
+
+function clearBdayForm() {
+  document.getElementById('bdayEditId').value = '';
+  document.getElementById('bdaySetName').value = '';
+  document.getElementById('bdaySetDate').value = '';
+  document.getElementById('bdaySetMsg').value = '';
+  document.getElementById('bdaySetStatus').textContent = '';
+}
+
+async function saveBirthdayEntry() {
+  const id      = document.getElementById('bdayEditId').value.trim() || null;
+  const name    = document.getElementById('bdaySetName').value.trim();
+  const date    = document.getElementById('bdaySetDate').value.trim();
+  const message = document.getElementById('bdaySetMsg').value.trim();
+  const status  = document.getElementById('bdaySetStatus');
+  if (!name || !date || !message) { status.textContent = '⚠️ All fields required'; status.style.color = 'var(--red)'; return; }
+  if (!/^\d{2}-\d{2}$/.test(date)) { status.textContent = '⚠️ Date must be MM-DD (e.g. 05-29)'; status.style.color = 'var(--red)'; return; }
+  status.textContent = 'Saving…'; status.style.color = 'var(--muted)';
+  try {
+    const r = await fetch(`${API}/api/admin/birthday/set`, { method:'POST', headers: adminH(), body: JSON.stringify({ id, name, date, message }) });
+    const d = await r.json();
+    if (d.error) { status.textContent = '⚠️ ' + d.error; status.style.color = 'var(--red)'; return; }
+    status.textContent = '🎂 Birthday saved! It will display on ' + date; status.style.color = 'var(--green)';
+    clearBdayForm();
+    loadBirthdayEntries();
+  } catch(e) { status.textContent = 'Network error'; status.style.color = 'var(--red)'; }
+}
+
+async function deleteBirthdayRequest(id) {
+  if (!confirm('Delete this birthday request?')) return;
+  try {
+    await fetch(`${API}/api/admin/birthday-requests/delete`, { method:'POST', headers: adminH(), body: JSON.stringify({ id }) });
+    setStatus('🗑 Birthday request deleted');
+    loadBirthdayRequests();
+  } catch(e) { setStatus('Network error', 'var(--rose)'); }
+}
+
+async function deleteBirthdayEntry(id) {
+  if (!confirm('Delete this birthday entry? It will no longer appear on the site.')) return;
+  try {
+    await fetch(`${API}/api/admin/birthday/delete`, { method:'POST', headers: adminH(), body: JSON.stringify({ id }) });
+    setStatus('🗑 Birthday entry deleted');
+    loadBirthdayEntries();
+  } catch(e) { setStatus('Network error', 'var(--rose)'); }
+}
+
+async function toggleBirthdayActive(id, currentlyActive) {
+  try {
+    await fetch(`${API}/api/admin/birthday/toggle`, { method:'POST', headers: adminH(), body: JSON.stringify({ id, active: !currentlyActive }) });
+    setStatus(currentlyActive ? '⏸ Birthday deactivated' : '✅ Birthday activated');
+    loadBirthdayEntries();
+  } catch(e) { setStatus('Network error', 'var(--rose)'); }
+}
 </script>
+</body>
+</html>
