@@ -617,7 +617,7 @@ body.light .bottom-nav{background:rgba(245,242,240,.95)}
 
 <!-- WEEKLY PROMPT -->
 <div class="prompt-banner" id="promptBanner">
-  <div class="prompt-label">✨ This Week's Admin Message</div>
+  <div class="prompt-label">✨ This Week's Prompt</div>
   <div class="prompt-text" id="promptText"></div>
 </div>
 
@@ -931,7 +931,7 @@ async function loadPendingBadge(){
 // ══════════ LOAD FEED ══════════
 async function fetchReplyCounts(ids){
   const result = {};
-  const chunkSize = 80;
+  const chunkSize = 50; // Smaller chunks to prevent 400 Payload Too Large
   for (let i = 0; i < ids.length; i += chunkSize) {
     const chunk = ids.slice(i, i + chunkSize);
     try {
@@ -940,10 +940,14 @@ async function fetchReplyCounts(ids){
         headers: {'Content-Type':'application/json'},
         body: JSON.stringify({ids: chunk})
       });
-      if (!rc.ok) continue;
+      if (!rc.ok) {
+        console.error('Failed to fetch reply counts chunk. Server returned:', await rc.text());
+        continue;
+      }
       const rcData = await rc.json();
       Object.assign(result, rcData);
     } catch (e) {
+      console.error('Error fetching reply counts chunk:', e);
       continue;
     }
   }
@@ -955,13 +959,14 @@ async function loadFeed(){
   try{
     const r=await fetch(`${API}/api/confessions`);
     const data=await r.json();
-    confessions = Array.isArray(data) ? data : (data.confessions || []); // Safe fallback
+    confessions = Array.isArray(data) ? data : (data.confessions || []); 
 
-    // get reply counts safely
     if (confessions.length > 0) {
-      const ids = confessions.map(c => c.id);
-      const rcData = await fetchReplyCounts(ids);
-      confessions.forEach(c => { c._replyCount = rcData[c.id] || 0; });
+      try{
+        const ids = confessions.map(c => c.id);
+        const rcData = await fetchReplyCounts(ids);
+        confessions.forEach(c => { c._replyCount = rcData[c.id] || 0; });
+      }catch(e){}
     }
     
     renderFeed();
