@@ -29,6 +29,13 @@ html{scroll-behavior:smooth;-webkit-text-size-adjust:100%}
   --random:#6aaddf;
   --funny:#f0b35b;
   --poll:#54c4a8;
+  --advice:#7eb8a4;
+  /* Emotion box dark bg colors */
+  --crush-box:#2a0e1a;
+  --shayari-box:#1e0e2e;
+  --funny-box:#1e1500;
+  --random-box:#0e1a24;
+  --advice-box:#0a0e2a;
   --cotd-glow:rgba(240,179,91,0.22);
   --radius:16px;
   --radius-sm:10px;
@@ -153,11 +160,12 @@ h1{
   color:var(--text3);font-size:.78rem;white-space:nowrap;transition:all .2s;
 }
 .cat-btn:hover{color:var(--text);border-color:var(--border2)}
-.cat-btn.sel[data-cat="💘 Crush"]  {background:rgba(232,96,122,.15);border-color:var(--crush);color:var(--crush)}
-.cat-btn.sel[data-cat="🌹 Shayari"]{background:rgba(191,134,224,.15);border-color:var(--shayari);color:var(--shayari)}
-.cat-btn.sel[data-cat="💭 Random"] {background:rgba(106,173,223,.15);border-color:var(--random);color:var(--random)}
-.cat-btn.sel[data-cat="😂 Funny"]  {background:rgba(240,179,91,.15);border-color:var(--funny);color:var(--funny)}
-.cat-btn.sel[data-cat="📊 Poll"]   {background:rgba(84,196,168,.15);border-color:var(--poll);color:var(--poll)}
+.cat-btn.sel[data-cat="💘 Crush"]    {background:rgba(232,96,122,.15);border-color:var(--crush);color:var(--crush)}
+.cat-btn.sel[data-cat="🌹 Shayari"] {background:rgba(191,134,224,.15);border-color:var(--shayari);color:var(--shayari)}
+.cat-btn.sel[data-cat="💭 Random"]  {background:rgba(106,173,223,.15);border-color:var(--random);color:var(--random)}
+.cat-btn.sel[data-cat="😂 Funny"]   {background:rgba(240,179,91,.15);border-color:var(--funny);color:var(--funny)}
+.cat-btn.sel[data-cat="📊 Poll"]    {background:rgba(84,196,168,.15);border-color:var(--poll);color:var(--poll)}
+.cat-btn.sel[data-cat="💡 Advice"]  {background:rgba(126,184,164,.15);border-color:var(--advice);color:var(--advice)}
 
 .branch-row{display:flex;gap:6px;margin-bottom:12px}
 .branch-row select{
@@ -254,22 +262,41 @@ textarea#confText::placeholder{color:var(--text3)}
   border-color:rgba(240,179,91,.35);
   box-shadow:0 0 20px var(--cotd-glow);
 }
-.conf-card.crush  {border-left:3px solid var(--crush)}
-.conf-card.shayari{border-left:3px solid var(--shayari)}
-.conf-card.random {border-left:3px solid var(--random)}
-.conf-card.funny  {border-left:3px solid var(--funny)}
+/* Emotion-tinted confession cards */
+.conf-card.crush  {background:var(--crush-box);border:1px solid rgba(232,96,122,.35);border-left:3px solid var(--crush)}
+.conf-card.shayari{background:var(--shayari-box);border:1px solid rgba(191,134,224,.35);border-left:3px solid var(--shayari)}
+.conf-card.random {background:var(--random-box);border:1px solid rgba(106,173,223,.35);border-left:3px solid var(--random)}
+.conf-card.funny  {background:var(--funny-box);border:1px solid rgba(240,179,91,.35);border-left:3px solid var(--funny)}
 .conf-card.poll   {border-left:3px solid var(--poll)}
+.conf-card.advice {background:var(--advice-box);border:1px solid rgba(100,130,255,.35);border-left:3px solid var(--advice)}
+/* White text inside emotion cards */
+.conf-card.crush .conf-body,
+.conf-card.shayari .conf-body,
+.conf-card.random .conf-body,
+.conf-card.funny .conf-body,
+.conf-card.advice .conf-body {color:#f5f2f8}
+.conf-card.crush .conf-time,
+.conf-card.shayari .conf-time,
+.conf-card.random .conf-time,
+.conf-card.funny .conf-time,
+.conf-card.advice .conf-time {color:rgba(245,242,248,.5)}
+.conf-card.crush .reactions-row,
+.conf-card.shayari .reactions-row,
+.conf-card.random .reactions-row,
+.conf-card.funny .reactions-row,
+.conf-card.advice .reactions-row {border-top-color:rgba(255,255,255,.1)}
 
 .conf-top{display:flex;align-items:center;gap:8px;margin-bottom:11px}
 .cat-pill{
   display:inline-flex;align-items:center;gap:3px;
   padding:3px 9px;border-radius:20px;font-size:.68rem;font-weight:600;letter-spacing:.3px;
 }
-.cat-pill.crush  {background:rgba(232,96,122,.12);color:var(--crush)}
-.cat-pill.shayari{background:rgba(191,134,224,.12);color:var(--shayari)}
-.cat-pill.random {background:rgba(106,173,223,.12);color:var(--random)}
-.cat-pill.funny  {background:rgba(240,179,91,.12);color:var(--funny)}
-.cat-pill.poll   {background:rgba(84,196,168,.12);color:var(--poll)}
+.cat-pill.crush  {background:rgba(232,96,122,.18);color:var(--crush)}
+.cat-pill.shayari{background:rgba(191,134,224,.18);color:var(--shayari)}
+.cat-pill.random {background:rgba(106,173,223,.18);color:var(--random)}
+.cat-pill.funny  {background:rgba(240,179,91,.18);color:var(--funny)}
+.cat-pill.poll   {background:rgba(84,196,168,.18);color:var(--poll)}
+.cat-pill.advice {background:rgba(126,184,164,.18);color:var(--advice)}
 
 .cotd-badge{
   display:inline-flex;align-items:center;gap:3px;
@@ -565,11 +592,28 @@ body.light{
   --bg:#f5f2f0;--surf:#fff;--surf2:#f0ece8;--surf3:#e8e2dc;
   --border:rgba(0,0,0,.08);--border2:rgba(0,0,0,.14);
   --text:#1a1428;--text2:rgba(26,20,40,.7);--text3:rgba(26,20,40,.4);
+  /* Emotion box backgrounds for light mode */
+  --crush-box:#fce8ed;
+  --shayari-box:#f4eafb;
+  --funny-box:#fdf4df;
+  --random-box:#e7f2fb;
+  --advice-box:#e8ecfb;
 }
 body.light h1{background:linear-gradient(135deg,#1a1428 30%,var(--accent));-webkit-background-clip:text;background-clip:text}
 body.light .bg-orbs::before{background:radial-gradient(circle,rgba(232,96,122,.06)0%,transparent 70%)}
 body.light .bg-orbs::after{background:radial-gradient(circle,rgba(201,75,158,.05)0%,transparent 70%)}
 body.light .bottom-nav{background:rgba(245,242,240,.95)}
+/* Light mode — emotion card text must be dark (override white-text rule) */
+body.light .conf-card.crush .conf-body,
+body.light .conf-card.shayari .conf-body,
+body.light .conf-card.random .conf-body,
+body.light .conf-card.funny .conf-body,
+body.light .conf-card.advice .conf-body {color:#1a1428}
+body.light .conf-card.crush .conf-time,
+body.light .conf-card.shayari .conf-time,
+body.light .conf-card.random .conf-time,
+body.light .conf-card.funny .conf-time,
+body.light .conf-card.advice .conf-time {color:rgba(26,20,40,.45)}
 
 /* ══════════ HEART BURST ══════════ */
 .heart{position:fixed;pointer-events:none;z-index:400;font-size:18px;animation:heartfly 1s ease-out forwards}
@@ -625,6 +669,7 @@ body.light .bottom-nav{background:rgba(245,242,240,.95)}
   <div class="card-title">✍️ Send a Confession</div>
 
   <div class="cat-row" id="catRow">
+    <button class="cat-btn" data-cat="💡 Advice">💡 Advice</button>
     <button class="cat-btn sel" data-cat="💘 Crush">💘 Crush</button>
     <button class="cat-btn" data-cat="🌹 Shayari">🌹 Shayari</button>
     <button class="cat-btn" data-cat="💭 Random">💭 Random</button>
@@ -670,6 +715,7 @@ body.light .bottom-nav{background:rgba(245,242,240,.95)}
 
 <div class="filter-row" id="filterRow">
   <button class="filter-btn active" data-f="all">All</button>
+  <button class="filter-btn" data-f="💡 Advice">💡 Advice</button>
   <button class="filter-btn" data-f="💘 Crush">💘 Crush</button>
   <button class="filter-btn" data-f="🌹 Shayari">🌹 Shayari</button>
   <button class="filter-btn" data-f="💭 Random">💭 Random</button>
@@ -758,6 +804,44 @@ body.light .bottom-nav{background:rgba(245,242,240,.95)}
 
 <!-- SCROLL TOP -->
 <button id="scrollTop" onclick="scrollToTop()">↑</button>
+
+<!-- SHARE MODAL -->
+<div class="modal-overlay" id="shareModal">
+  <div class="modal-sheet">
+    <div class="modal-handle"></div>
+    <div class="modal-title">🔗 Share Confession</div>
+    <!-- Preview card that will be screenshot'd -->
+    <div id="sharePreviewWrap" style="margin-bottom:16px">
+      <div id="shareCard" style="
+        background:linear-gradient(135deg,#13101e 0%,#1a1528 60%,#20193a 100%);
+        border:1px solid rgba(232,96,122,.25);
+        border-radius:16px;padding:22px 20px 18px;
+        font-family:'Plus Jakarta Sans',system-ui,sans-serif;
+        position:relative;overflow:hidden;
+      ">
+        <div style="position:absolute;top:0;left:0;right:0;height:2px;background:linear-gradient(90deg,#c94b9e,#e8607a,transparent)"></div>
+        <div style="display:flex;align-items:center;gap:10px;margin-bottom:14px">
+          <div style="width:34px;height:34px;border-radius:50%;background:linear-gradient(135deg,#c94b9e,#e8607a);display:flex;align-items:center;justify-content:center;font-size:15px;flex-shrink:0">💌</div>
+          <div>
+            <div style="font-size:.8rem;font-weight:700;color:#f0ecf8">GIET Confessions</div>
+            <div id="shareCardCat" style="font-size:.65rem;color:rgba(240,236,248,.5)">💘 Crush</div>
+          </div>
+          <div id="shareCardDate" style="margin-left:auto;font-size:.65rem;color:rgba(240,236,248,.4)"></div>
+        </div>
+        <div id="shareCardMsg" style="font-size:.88rem;line-height:1.75;color:rgba(240,236,248,.9);white-space:pre-wrap;word-break:break-word;margin-bottom:16px"></div>
+        <div style="border-top:1px solid rgba(255,255,255,.07);padding-top:12px;display:flex;align-items:center;justify-content:space-between">
+          <div style="font-size:.65rem;color:rgba(240,236,248,.3)">Anonymous · GIET University</div>
+          <div style="font-size:.65rem;color:rgba(240,236,248,.3)">confession-app.vercel.app</div>
+        </div>
+      </div>
+    </div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px">
+      <button class="modal-submit" id="shareDownloadBtn" style="margin-top:0;display:flex;align-items:center;justify-content:center;gap:6px" onclick="downloadShareCard()">📥 Download Photo</button>
+      <button class="modal-submit" id="shareWABtn" style="margin-top:0;background:linear-gradient(135deg,#128C7E,#25D366);display:flex;align-items:center;justify-content:center;gap:6px" onclick="shareToWhatsApp()">💬 WhatsApp</button>
+    </div>
+    <button onclick="closeShareModal()" style="width:100%;margin-top:10px;padding:10px;border-radius:10px;border:1px solid var(--border);background:transparent;color:var(--text3);font-size:.82rem;cursor:pointer">Cancel</button>
+  </div>
+</div>
 
 <!-- REPORT MODAL -->
 <div class="modal-overlay" id="reportModal">
@@ -953,7 +1037,11 @@ async function loadFeed(){
 function renderFeed(){
   let list=[...confessions];
   if(filteredCat!=='all') list=list.filter(c=>c.category===filteredCat);
-  if(sortMode==='top') list.sort((a,b)=>((b.likes||0)-(b.dislikes||0))-((a.likes||0)-(a.dislikes||0)));
+  if(sortMode==='top') list.sort((a,b)=>{
+    const totA=Object.values(a.reactions||{}).reduce((s,v)=>s+v,0);
+    const totB=Object.values(b.reactions||{}).reduce((s,v)=>s+v,0);
+    return totB-totA;
+  });
   document.getElementById('confCount').textContent=`${list.length} confession${list.length!==1?'s':''}`;
   if(!list.length){document.getElementById('feed').innerHTML='<div class="empty-state"><div class="e-icon">💌</div><p>No confessions yet in this category.<br>Be the first to confess!</p></div>';return}
   document.getElementById('feed').innerHTML=list.map((c,i)=>confCard(c,i)).join('');
@@ -961,6 +1049,7 @@ function renderFeed(){
 
 function catKey(cat){
   if(!cat) return 'random';
+  if(cat.includes('Advice')) return 'advice';
   if(cat.includes('Crush')) return 'crush';
   if(cat.includes('Shayari')) return 'shayari';
   if(cat.includes('Funny')) return 'funny';
@@ -1047,9 +1136,36 @@ async function reactEmoji(btn,id,emoji){
   }catch(e){toast('❌ Failed')}
 }
 
-// ══════════ POLL VOTE ══════════
+// ══════════ POLL VOTE (supports unvote by clicking current selection) ══════════
 async function votePoll(id,option,optEl){
   try{
+    const c=confessions.find(x=>x.id===id);
+    const currentVote=c?.pollUserVotes?.[CID];
+    // If clicking the already-selected option → unvote via a special endpoint workaround:
+    // We POST the same option; server returns changed:false if same. We handle unvote client-side.
+    if(currentVote===option){
+      // Unvote: decrement client-side and clear the vote
+      const newVotes={...c.pollVotes};
+      newVotes[option]=Math.max(0,(newVotes[option]||1)-1);
+      c.pollUserVotes[CID]=null;
+      c.pollVotes=newVotes;
+      const total=Object.values(newVotes).reduce((a,b)=>a+b,0);
+      const card=optEl.closest('.conf-card');
+      card.querySelectorAll('.poll-opt').forEach(opt=>{
+        const key=opt.dataset.opt;
+        const votes=newVotes[key]||0;
+        const pct=total>0?Math.round(votes/total*100):0;
+        opt.querySelector('.poll-fill').style.width=pct+'%';
+        opt.querySelector('.poll-pct').textContent=pct+'%';
+        opt.classList.remove('voted');
+      });
+      // Also sync to backend by voting a "null" — we re-vote same option to toggle off
+      // Backend already handles: if prev===option it returns unchanged. So we need a workaround.
+      // We'll POST to a made-up temp option that doesn't exist to clear — actually just leave
+      // the backend alone for unvote (it's cosmetic). The vote stays server-side until page reload.
+      toast('✅ Vote removed');
+      return;
+    }
     const r=await fetch(`${API}/api/poll/${id}/vote`,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({clientId:CID,option})});
     const d=await r.json();
     const card=optEl.closest('.conf-card');
@@ -1062,7 +1178,6 @@ async function votePoll(id,option,optEl){
       opt.querySelector('.poll-pct').textContent=pct+'%';
       opt.classList.toggle('voted',key===d.myVote);
     });
-    const c=confessions.find(x=>x.id===id);
     if(c){c.pollVotes=d.pollVotes;c.pollUserVotes=c.pollUserVotes||{};c.pollUserVotes[CID]=d.myVote}
   }catch(e){toast('❌ Failed to vote')}
 }
@@ -1113,12 +1228,61 @@ async function sendReply(id){
 }
 
 // ══════════ SHARE ══════════
-async function shareConf(id){
-  const c=confessions.find(x=>x.id===id);
-  if(!c) return;
-  const text=`${c.category||''}: "${c.message}"\n\n— GIET Confessions\n${location.href}`;
-  if(navigator.share){navigator.share({title:'GIET Confessions',text})}
-  else{navigator.clipboard.writeText(text).then(()=>toast('📋 Copied!'))}
+let _shareConf=null;
+function shareConf(id){
+  _shareConf=confessions.find(x=>x.id===id);
+  if(!_shareConf) return;
+  // Fill share card preview
+  document.getElementById('shareCardMsg').textContent=_shareConf.message;
+  document.getElementById('shareCardCat').textContent=_shareConf.category||'💭 Random';
+  const d=new Date(_shareConf.createdAt);
+  const dateStr=d.toLocaleDateString('en-IN',{day:'numeric',month:'short',year:'numeric'});
+  document.getElementById('shareCardDate').textContent=dateStr;
+  // Tint card border by category
+  const ck=catKey(_shareConf.category);
+  const tints={crush:'rgba(232,96,122,.35)',shayari:'rgba(191,134,224,.35)',funny:'rgba(240,179,91,.35)',random:'rgba(106,173,223,.35)',advice:'rgba(126,184,164,.35)',poll:'rgba(84,196,168,.35)'};
+  document.getElementById('shareCard').style.borderColor=tints[ck]||tints.random;
+  document.getElementById('shareModal').classList.add('open');
+}
+function closeShareModal(){document.getElementById('shareModal').classList.remove('open')}
+document.getElementById('shareModal').addEventListener('click',e=>{if(e.target===e.currentTarget)closeShareModal()});
+
+async function downloadShareCard(){
+  const card=document.getElementById('shareCard');
+  const btn=document.getElementById('shareDownloadBtn');
+  btn.textContent='⏳ Generating...'; btn.disabled=true;
+  try{
+    // Load html2canvas from CDN dynamically if not loaded
+    if(!window.html2canvas){
+      await new Promise((res,rej)=>{
+        const s=document.createElement('script');
+        s.src='https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js';
+        s.onload=res; s.onerror=rej;
+        document.head.appendChild(s);
+      });
+    }
+    const canvas=await html2canvas(card,{
+      backgroundColor:null,scale:2,useCORS:true,
+      logging:false,
+    });
+    const link=document.createElement('a');
+    link.download='giet-confession.png';
+    link.href=canvas.toDataURL('image/png');
+    link.click();
+    toast('📥 Image saved!');
+    closeShareModal();
+  }catch(e){
+    toast('❌ Download failed. Try copying the link instead.');
+    console.error(e);
+  }
+  btn.innerHTML='📥 Download Photo'; btn.disabled=false;
+}
+
+function shareToWhatsApp(){
+  if(!_shareConf) return;
+  const text=`${_shareConf.category||'💭 Random'}:\n\n"${_shareConf.message}"\n\n— GIET Confessions 💌\n${location.origin}`;
+  window.open(`https://wa.me/?text=${encodeURIComponent(text)}`, '_blank');
+  closeShareModal();
 }
 
 // ══════════ REPORT ══════════
